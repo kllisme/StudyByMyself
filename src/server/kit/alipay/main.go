@@ -11,7 +11,7 @@ import (
 	"encoding/hex"
 	"strings"
 	"github.com/spf13/viper"
-	"maizuo.com/soda/erp-api/src/server/common"
+	"maizuo.com/soda/erp/api/src/server/common"
 )
 
 type AlipayKit struct {

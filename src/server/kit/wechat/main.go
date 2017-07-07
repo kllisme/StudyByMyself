@@ -2,8 +2,8 @@ package wechat
 
 import (
 	"github.com/levigross/grequests"
-	"maizuo.com/soda/erp-api/src/server/kit/functions"
-	"maizuo.com/soda/erp-api/src/server/common"
+	"maizuo.com/soda/erp/api/src/server/kit/functions"
+	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
 	"github.com/spf13/viper"
 	"strconv"

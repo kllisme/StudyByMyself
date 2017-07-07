@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/viper"
 	"gopkg.in/iris-contrib/middleware.v5/logger"
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp-api/src/server/common"
-	"maizuo.com/soda/erp-api/src/server/route/api"
+	"maizuo.com/soda/erp/api/src/server/common"
+	"maizuo.com/soda/erp/api/src/server/route/api"
 )
 
 func SetUpServer() {

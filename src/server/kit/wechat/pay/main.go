@@ -12,8 +12,8 @@ import (
 	"sort"
 	"strings"
 	"time"
-	"maizuo.com/soda/erp-api/src/server/common"
-	"maizuo.com/soda/erp-api/src/server/kit/functions"
+	"maizuo.com/soda/erp/api/src/server/common"
+	"maizuo.com/soda/erp/api/src/server/kit/functions"
 )
 
 type WechatPayKit struct {

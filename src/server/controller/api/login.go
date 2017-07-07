@@ -3,7 +3,7 @@ package api
 import (
 	"github.com/bitly/go-simplejson"
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp-api/src/server/common"
+	"maizuo.com/soda/erp/api/src/server/common"
 )
 
 type LoginController struct {

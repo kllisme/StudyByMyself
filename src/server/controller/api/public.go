@@ -2,8 +2,8 @@ package api
 
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp-api/src/server/common"
-	"maizuo.com/soda/erp-api/src/server/service"
+	"maizuo.com/soda/erp/api/src/server/common"
+	"maizuo.com/soda/erp/api/src/server/service"
 )
 
 type PublicController struct{}

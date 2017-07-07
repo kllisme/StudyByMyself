@@ -2,7 +2,7 @@ package admin
 
 import (
 	iris "gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp-api/src/server/controller/api"
+	"maizuo.com/soda/erp/api/src/server/controller/api"
 )
 
 func Setup(v iris.MuxAPI) {
