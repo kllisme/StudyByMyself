@@ -17,8 +17,8 @@ make dev
 
 ### 发布
 - 打标签并上传
-	```
-	git tag 20161120.1
-	git push origin master:master --tags 
-	```
+```
+git tag 20161120.1
+git push origin master:master --tags 
+```
 
