@@ -16,7 +16,7 @@ func SetUpServer() {
 
 	iris.Config.IsDevelopment = isDevelopment
 
-	app := iris.New()
+	app := iris.Default	//如果使用iris.New(),之前设置的iris.Config
 
 	app.Use(common.NewRecover())
 

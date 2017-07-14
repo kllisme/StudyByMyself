@@ -18,13 +18,13 @@ func Api(app *iris.Framework) {
 	v1 := app.Party("/v1", func(ctx *iris.Context) {
 		ctx.Next()
 	})
-
-	v1.Get("/captcha", captcha.Captcha)
+	v1.Get("/captcha.png", captcha.Captcha)
 
 	v1.UseFunc(common.CORS.Serve)
+	v1.Options("/login",common.CORS.Serve)
 
 	v1.Get("/token", public.Token)
-	v1.Get("/login", login.Login)
+	v1.Post("/login", login.Login)
 
 	v1.UseFunc(common.Authorization)
 
@@ -32,7 +32,7 @@ func Api(app *iris.Framework) {
 
 	userApi := v1.Party("/user")
 	{
-		userApi.Get("/detail", user.GetById)
+		userApi.Get("/detail", user.GetSessionUser)
 	}
 
 }
