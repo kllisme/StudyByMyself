@@ -7,6 +7,7 @@ import (
 	"github.com/afocus/captcha"
 	"github.com/spf13/viper"
 	"gopkg.in/kataras/iris.v5"
+	"github.com/Sirupsen/logrus"
 )
 
 type CaptchaController struct {
@@ -26,4 +27,5 @@ func (self *CaptchaController) Captcha(ctx *iris.Context) {
 	img, _captcha := _cap.Create(4, captcha.NUM)
 	png.Encode(ctx.Response.BodyWriter(), img)
 	ctx.Session().Set(captchaKey, _captcha)
+	logrus.Debug(_captcha)
 }

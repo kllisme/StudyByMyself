@@ -41,8 +41,12 @@ func (self *UserService) GetList(limit int, offset int) (interface{}, error) {
 	return nil, nil
 }
 
-func (self *UserService) Create(in interface{}) (interface{}, error) {
-	return nil, nil
+func (self *UserService) Create(user *model.User) (*model.User, error) {
+	err:=common.SodaMngDB_WR.Create(user).Error
+	if err != nil {
+		return nil,err
+	}
+	return user, nil
 }
 
 func (self *UserService) UpdateById(in interface{}) (interface{}, error) {
