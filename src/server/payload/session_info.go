@@ -7,6 +7,6 @@ import (
 
 type SessionInfo struct {
 	User     *model.User        `json:"user"`
-	MenuList *[]permission.Menu       `json:"menuList"`
-	APIList	*[]permission.API	`json:"apiList"`
+	MenuList *[]*permission.Menu       `json:"menuList"`
+	APIList  *[]*permission.API        `json:"apiList"`
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"encoding/json"
 	"maizuo.com/soda/erp/api/src/server/service/permission"
+	permissionModel        "maizuo.com/soda/erp/api/src/server/model/permission"
 	"maizuo.com/soda/erp/api/src/server/payload"
 	"strings"
 )
@@ -77,6 +78,8 @@ func (self *LoginController) Login(ctx *iris.Context) {
 
 	sessionInfo := payload.SessionInfo{
 		User:userEntity,
+		MenuList:&[]*permissionModel.Menu{},
+		APIList:&[]*permissionModel.API{},
 	}
 	//获取权限
 	roleIDs, err := userRoleRelService.GetRoleIDsByUserID(userEntity.Id)
@@ -112,7 +115,6 @@ func (self *LoginController) Login(ctx *iris.Context) {
 			sessionInfo.APIList = apiList
 		}
 	}
-
 	jsonObj, _ := json.Marshal(sessionInfo)
 	jsonString := string(jsonObj)
 	ctx.Session().Set(viper.GetString("server.session.user.key"), jsonString)

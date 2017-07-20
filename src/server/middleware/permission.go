@@ -19,7 +19,7 @@ func AccessControlMiddleware(ctx *iris.Context) {
 	if err := json.Unmarshal([]byte(jsonString), &info); err != nil {
 		common.Render(ctx, "000001", nil)
 	}
-	for _, api := range *(info.APIList) {
+	for _, api := range *info.APIList {
 		logrus.Debug(api.Name)
 		if strings.EqualFold(api.Name, ctx.GetHandlerName()) {
 			ctx.Next()
