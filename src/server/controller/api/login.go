@@ -23,9 +23,10 @@ func (self *LoginController) Login(ctx *iris.Context) {
 		tokenService = service.TokenService{}
 		menuService = permission.MenuService{}
 		userRoleRelService = permission.UserRoleRelService{}
-		roleMenuRelService = permission.RoleMenuRelService{}
-		roleAPIRelService = permission.RoleAPIRelService{}
-		apiService = permission.APIService{}
+		roleMenuRelService = permission.PermissionMenuRelService{}
+		permissionActionRelService = permission.PermissionActionRelService{}
+		actionService = permission.ActionService{}
+		rolePermissionRelService = permission.RolePermissionRelService{}
 	)
 
 	//每次调用返回时都清一次图片验证码
@@ -79,7 +80,8 @@ func (self *LoginController) Login(ctx *iris.Context) {
 	sessionInfo := payload.SessionInfo{
 		User:userEntity,
 		MenuList:&[]*permissionModel.Menu{},
-		APIList:&[]*permissionModel.API{},
+		ActionList:&[]*permissionModel.Action{},
+		ElementList:&[]*permissionModel.Element{},
 	}
 	//获取权限
 	roleIDs, err := userRoleRelService.GetRoleIDsByUserID(userEntity.Id)
@@ -87,8 +89,13 @@ func (self *LoginController) Login(ctx *iris.Context) {
 		common.Render(ctx, "27010112", nil)
 		return
 	}
-	if len(roleIDs) != 0 {
-		menuIDs, err := roleMenuRelService.GetMenuIDsByRoleIDs(roleIDs)
+	permissionIDs, err := rolePermissionRelService.GetPermissionIDsByRoleIDs(roleIDs)
+	if err != nil {
+		common.Render(ctx, "27010117", nil)
+		return
+	}
+	if len(permissionIDs) != 0 {
+		menuIDs, err := roleMenuRelService.GetMenuIDsByPermissionIDs(permissionIDs)
 		if err != nil {
 			common.Render(ctx, "27010113", nil)
 			return
@@ -101,18 +108,18 @@ func (self *LoginController) Login(ctx *iris.Context) {
 			}
 			sessionInfo.MenuList = menuList
 		}
-		apiIDs, err := roleAPIRelService.GetAPIIDsByRoleIDs(roleIDs)
+		actionIDs, err := permissionActionRelService.GetActionIDsByPermissionIDs(permissionIDs)
 		if err != nil {
 			common.Render(ctx, "27010115", nil)
 			return
 		}
-		if len(apiIDs) != 0 {
-			apiList, err := apiService.GetListByIds(apiIDs)
+		if len(actionIDs) != 0 {
+			actionList, err := actionService.GetListByIds(actionIDs)
 			if err != nil {
 				common.Render(ctx, "27010116", nil)
 				return
 			}
-			sessionInfo.APIList = apiList
+			sessionInfo.ActionList = actionList
 		}
 	}
 	jsonObj, _ := json.Marshal(sessionInfo)

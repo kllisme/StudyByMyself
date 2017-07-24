@@ -19,7 +19,7 @@ func (self *UserController) AuthorizationUser(ctx *iris.Context) {
 }
 
 func (self *UserController)Create(ctx *iris.Context) {
-	userService:=service.UserService{}
+	userService := service.UserService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "27020201", nil)
@@ -37,7 +37,7 @@ func (self *UserController)Create(ctx *iris.Context) {
 		return
 	}
 	//mobile := strings.TrimSpace(params.MustString("mobile"))
-	parentID,err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
+	parentID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	if err != nil {
 		common.Render(ctx, "27010103", nil)
 		return
@@ -59,12 +59,20 @@ func (self *UserController)Create(ctx *iris.Context) {
 		Telephone:telephone,
 		Address:address,
 	}
-	entity,err:= userService.Create(&user)
+	entity, err := userService.Create(&user)
 	if err != nil {
 		common.Render(ctx, "27010103", nil)
 		return
 	}
 	common.Render(ctx, "27010100", entity)
+}
+
+func (self *UserController)Update(ctx *iris.Context) {
+
+}
+
+func (self *UserController)ChangeRoles(ctx *iris.Context) {
+
 }
 
 func (self *UserController) GetSessionUser(ctx *iris.Context) {

@@ -7,7 +7,7 @@ type Menu struct {
 	Name     string `json:"name"`
 	Icon     string	`json:"icon"`
 	Url      string `json:"url"`
-	ParentID int    `json:"pid"`
+	ParentID int    `json:"parentId"`
 	Level    int    `json:"level"`
 	Status   int    `json:"status"`
 }

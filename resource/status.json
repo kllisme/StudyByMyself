@@ -8,6 +8,7 @@
       "000003": { "status": "NOT_FOUND", "msg": "你所请求的API不存在,请检查后再试!", "description": "你所请求的API不存在,请检查后再试!", "isError": true },
       "000004": { "status": "TOO_MANY_REQUESTS", "msg": "你所请求的API超过频率限制,请稍后再试!", "description": "你所请求的API超过频率限制,请稍后再试!" },
       "000005": { "status": "FORBIDDEN", "msg": "权限不足，拒绝访问!", "description": "所请求的API超出权限范围!" },
+      "000006": { "status": "INTERNAL_SERVER_ERROR", "msg": "原始数据无法自洽，请联系管理人员!", "description": "数据库所得数据无法满足外键约束，需要更新数据!", "isError": true },
 
 
       "2701":"login",
@@ -25,10 +26,11 @@
       "27010110": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "创建token失败", "isError": true },
       "27010111": { "status": "OK", "msg": "", "description": "登出成功", "isError": false},
       "27010112": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取用户角色信息失败", "isError": true},
-      "27010113": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取角色对应菜单信息失败", "isError": true},
+      "27010113": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取权限对应菜单信息失败", "isError": true},
       "27010114": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取菜单详情失败", "isError": true},
-      "27010115": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取角色对应接口信息失败", "isError": true},
+      "27010115": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取权限对应接口信息失败", "isError": true},
       "27010116": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取接口详情失败", "isError": true},
+      "27010117": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取角色对应权限信息失败", "isError": true},
 
       "2702":"user",
       "270201":"GetSessionInfo",
