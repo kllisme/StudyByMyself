@@ -71,7 +71,7 @@ func (self *UserController)Update(ctx *iris.Context) {
 
 }
 
-func (self *UserController)ChangeRoles(ctx *iris.Context) {
+func (self *UserController)AssignRoles(ctx *iris.Context) {
 
 }
 

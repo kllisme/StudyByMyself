@@ -1,52 +1,123 @@
 
-# Group 权限
+# Group Permission
 
->用户权限API群
+## Permission [/permission]
 
-## 用户权限 [/permission]
+### GET [GET /permission/{id}]
 
-## 角色 [/permission/role]
++ Parameters
+    + id: 404(number,required)
 
-### 获取用户角色
++ Response 200
 
-### 芯片卡功能权限 [GET /permission/is-chipcard-operator]
+### POST
++ Response 200
 
->直接验证当前用户是否拥有芯片卡余额转移功能的权限
+### DELETE [DELETE /permission/{id}]
++ Parameters
+    + id: 404(number,required)
 
-+ Response 01011300 (applycation/json)
++ Response 200
 
-  + body
+### PUT [PUT /permission/{id}]
++ Parameters
+    + id: 404(number,required)
 
-            {
-                "status":"01011300",
-                "msg":"拉取用户权限列表成功",
-                "data":true
-            }
++ Response 200
 
-  + schema
+### AssignMenus [PUT /permission/{id}/menus]
++ Parameters
+    + id: 404(number,required)
 
-            {
-                "title":"data"
-                "type":"boolean"
-            }
++ Response 200
 
-### 芯片卡功能权限 [PUT /permission/is-chipcard-operator]
+### AssignElements [PUT /permission/{id}/elements]
++ Parameters
+    + id: 404(number,required)
 
->直接验证当前用户是否拥有芯片卡余额转移功能的权限
++ Response 200
 
-+ Response 01011300 (applycation/json)
+### AssignActions [PUT /permission/{id}/actions]
++ Parameters
+    + id: 404(number,required)
 
-  + body
++ Response 200
 
-            {
-                "status":"01011300",
-                "msg":"拉取用户权限列表成功",
-                "data":true
-            }
+## Role [/role]
 
-  + schema
+### GET [GET /role/{id}]
 
-            {
-                "title":"data"
-                "type":"boolean"
-            }
++ Parameters
+    + id: 404(number,required)
+
++ Response 200
+
+### POST
++ Response 200
+
+### DELETE [DELETE /role/{id}]
++ Parameters
+    + id: 404(number,required)
+
++ Response 200
+
+### PUT [PUT /role/{id}]
++ Parameters
+    + id: 404(number,required)
+
++ Response 200
+
+### AssignPermissions [PUT /role/{id}/permissions]
++ Parameters
+    + id: 404(number,required)
+
++ Response 200
+
+
+## Menu [/menu]
+
+### GET [GET /menu/{id}]
+
++ Parameters
+    + id: 404(number,required)
+
++ Response 200
+
+### POST
++ Response 200
+
+### DELETE [DELETE /menu/{id}]
++ Parameters
+    + id: 404(number,required)
+
++ Response 200
+
+### PUT [PUT /menu/{id}]
++ Parameters
+    + id: 404(number,required)
+
++ Response 200
+
+## Element [/element]
+
+### GET [GET /element/{id}]
+
++ Parameters
+    + id: 404(number,required)
+
++ Response 200
+
+### POST
++ Response 200
+
+### DELETE [DELETE /element/{id}]
++ Parameters
+    + id: 404(number,required)
+
++ Response 200
+
+### PUT [PUT /element/{id}]
++ Parameters
+    + id: 404(number,required)
+
++ Response 200

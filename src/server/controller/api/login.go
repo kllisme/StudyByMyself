@@ -1,15 +1,14 @@
 package api
 
 import (
-	"github.com/bitly/go-simplejson"
+	"encoding/json"
+	"github.com/spf13/viper"
 	"gopkg.in/kataras/iris.v5"
 	"maizuo.com/soda/erp/api/src/server/common"
-	"maizuo.com/soda/erp/api/src/server/service"
-	"github.com/spf13/viper"
-	"encoding/json"
-	"maizuo.com/soda/erp/api/src/server/service/permission"
-	permissionModel        "maizuo.com/soda/erp/api/src/server/model/permission"
+	permissionModel "maizuo.com/soda/erp/api/src/server/model/permission"
 	"maizuo.com/soda/erp/api/src/server/payload"
+	"maizuo.com/soda/erp/api/src/server/service"
+	"maizuo.com/soda/erp/api/src/server/service/permission"
 	"strings"
 )
 
@@ -32,15 +31,9 @@ func (self *LoginController) Login(ctx *iris.Context) {
 	//每次调用返回时都清一次图片验证码
 	defer ctx.Session().Delete(captchaKey)
 
-	params := simplejson.New()
-	err := ctx.ReadJSON(&params)
-	if err != nil {
-		common.Render(ctx, "27010102", nil)
-		return
-	}
-	account := strings.TrimSpace(params.Get("account").MustString())
-	password := strings.TrimSpace(params.Get("password").MustString())
-	captcha := strings.TrimSpace(params.Get("captcha").MustString())
+	account := strings.TrimSpace(ctx.URLParam("account"))
+	password := strings.TrimSpace(ctx.URLParam("password"))
+	captcha := strings.TrimSpace(ctx.URLParam("captcha"))
 
 	/*判断不能为空*/
 	if account == "" {
@@ -78,13 +71,13 @@ func (self *LoginController) Login(ctx *iris.Context) {
 	}
 
 	sessionInfo := payload.SessionInfo{
-		User:userEntity,
-		MenuList:&[]*permissionModel.Menu{},
-		ActionList:&[]*permissionModel.Action{},
-		ElementList:&[]*permissionModel.Element{},
+		User:        userEntity,
+		MenuList:    &[]*permissionModel.Menu{},
+		ActionList:  &[]*permissionModel.Action{},
+		ElementList: &[]*permissionModel.Element{},
 	}
 	//获取权限
-	roleIDs, err := userRoleRelService.GetRoleIDsByUserID(userEntity.Id)
+	roleIDs, err := userRoleRelService.GetRoleIDsByUserID(userEntity.ID)
 	if err != nil {
 		common.Render(ctx, "27010112", nil)
 		return
@@ -146,6 +139,6 @@ func (self *LoginController) PassportLogin(ctx *iris.Context) {
 
 func (self *LoginController) Logout(ctx *iris.Context) {
 	ctx.SessionDestroy()
-	common.Render(ctx, "27010111", nil)
+	common.Render(ctx, "27010200", nil)
 	return
 }
