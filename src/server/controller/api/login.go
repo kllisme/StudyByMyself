@@ -107,7 +107,7 @@ func (self *LoginController) Login(ctx *iris.Context) {
 			return
 		}
 		if len(actionIDs) != 0 {
-			actionList, err := actionService.GetListByIds(actionIDs)
+			actionList, err := actionService.GetListByIDs(actionIDs)
 			if err != nil {
 				common.Render(ctx, "27010116", nil)
 				return
@@ -118,7 +118,7 @@ func (self *LoginController) Login(ctx *iris.Context) {
 	jsonObj, _ := json.Marshal(sessionInfo)
 	jsonString := string(jsonObj)
 	ctx.Session().Set(viper.GetString("server.session.user.key"), jsonString)
-
+	ctx.Session().Set(viper.GetString("server.session.user.id"), userEntity.ID)
 	token, err := tokenService.Token(ctx)
 	if err != nil {
 		common.Render(ctx, "27010110", err)

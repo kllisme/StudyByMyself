@@ -20,6 +20,12 @@ HOST: http://api.erp.sodalife.xyz/v1
 + data - Can be anything for your wish.
 + status: FORBBIDEN(string) - Response status.
 
+## Pagination (object)
+
++ total: 15536(number)
++ from: 20(number)
++ to: 40(number)
+
 ## Model (object)
 
 + id: 404(number)

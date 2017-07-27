@@ -18,6 +18,31 @@ func (self *UserController) AuthorizationUser(ctx *iris.Context) {
 
 }
 
+func (self *UserController)Paging(ctx *iris.Context) {
+	userService := service.UserService{}
+	id, _ := ctx.URLParamInt("id")
+	account := strings.TrimSpace(ctx.URLParam("account"))
+	name := strings.TrimSpace(ctx.URLParam("name"))
+	roleID, _ := ctx.URLParamInt("role_id")
+	page, err := ctx.URLParamInt("page")
+	if err != nil {
+		common.Render(ctx, "27020301", nil)
+		return
+	}
+	perPage, err := ctx.URLParamInt("per_page")
+	if err != nil {
+		common.Render(ctx, "27020301", nil)
+		return
+	}
+	result, err := userService.Paging(name, account, id, roleID, page, perPage)
+	if err != nil {
+		common.Render(ctx, "000002", nil)
+		return
+	}
+	common.Render(ctx, "27020300", result)
+	return
+}
+
 func (self *UserController)Create(ctx *iris.Context) {
 	userService := service.UserService{}
 	params := simplejson.New()
@@ -25,13 +50,13 @@ func (self *UserController)Create(ctx *iris.Context) {
 		common.Render(ctx, "27020201", nil)
 		return
 	}
-	account := strings.TrimSpace(params.MustString("account"))
+	account := strings.TrimSpace(params.Get("account").MustString())
 	if account == "" {
 		common.Render(ctx, "27010103", nil)
 		return
 	}
 	//name := strings.TrimSpace(params.MustString("name"))
-	contact := strings.TrimSpace(params.MustString("contact"))
+	contact := strings.TrimSpace(params.Get("contact").MustString())
 	if contact == "" {
 		common.Render(ctx, "27010103", nil)
 		return
@@ -39,15 +64,16 @@ func (self *UserController)Create(ctx *iris.Context) {
 	//mobile := strings.TrimSpace(params.MustString("mobile"))
 	parentID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	if err != nil {
-		common.Render(ctx, "27010103", nil)
+		common.Render(ctx, "000001", nil)
 		return
 	}
-	telephone := strings.TrimSpace(params.MustString("telephone"))
+	telephone := strings.TrimSpace(params.Get("telephone").MustString())
 	if telephone == "" {
 		common.Render(ctx, "27010103", nil)
 		return
 	}
-	address := strings.TrimSpace(params.MustString("address"))
+
+	address := strings.TrimSpace(params.Get("address").MustString())
 	if address == "" {
 		common.Render(ctx, "27010103", nil)
 		return
@@ -68,6 +94,64 @@ func (self *UserController)Create(ctx *iris.Context) {
 }
 
 func (self *UserController)Update(ctx *iris.Context) {
+	//TODO Complete status codes
+	userService := service.UserService{}
+	id, err := ctx.ParamInt("id")
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+
+	user, err := userService.GetById(id)
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+
+	params := simplejson.New()
+	if err := ctx.ReadJSON(&params); err != nil {
+		common.Render(ctx, "27020401", nil)
+		return
+	}
+	account := strings.TrimSpace(params.Get("account").MustString())
+	if account == "" {
+		common.Render(ctx, "", nil)
+		return
+	}
+	name := strings.TrimSpace(params.Get("name").MustString())
+	contact := strings.TrimSpace(params.Get("contact").MustString())
+	if contact == "" {
+		common.Render(ctx, "", nil)
+		return
+	}
+	mobile := strings.TrimSpace(params.Get("mobile").MustString())
+	parentID := params.Get("parentId").MustInt()
+	telephone := strings.TrimSpace(params.Get("telephone").MustString())
+	if telephone == "" {
+		common.Render(ctx, "", nil)
+		return
+	}
+	address := strings.TrimSpace(params.Get("address").MustString())
+	if address == "" {
+		common.Render(ctx, "", nil)
+		return
+	}
+	user.Account = account
+	user.Name = name
+	user.Contact = contact
+	user.ParentID = parentID
+	user.Telephone = telephone
+	user.Address = address
+	user.Mobile = mobile
+	entity, err := userService.UpdateById(user)
+	if err != nil {
+		common.Render(ctx, "27010103", nil)
+		return
+	}
+	common.Render(ctx, "27010100", entity)
+}
+
+func (self *UserController)Delete(ctx *iris.Context) {
 
 }
 

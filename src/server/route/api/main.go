@@ -18,7 +18,7 @@ func Api(app *iris.Framework) {
 		loginCtrl = &api.LoginController{}
 		roleCtrl = &permission.RoleController{}
 		//menuCtrl = &permission.MenuController{}
-		//actionCtrl = &permission.ActionController{}
+		actionCtrl = &permission.ActionController{}
 		//permissionCtrl = &permission.PermissionController{}
 	)
 	v1 := app.Party("/v1", func(ctx *iris.Context) {
@@ -45,10 +45,13 @@ func Api(app *iris.Framework) {
 		accessControlledAPI := v1.UseFunc(middleware.AccessControlMiddleware)
 		{
 			accessControlledAPI.Get("/logout", loginCtrl.Logout)
+
 			accessControlledAPI.Post("/user", userCtrl.Create)
 			accessControlledAPI.Get("/user/:id", userCtrl.GetById)
+			accessControlledAPI.Get("/users", userCtrl.Paging)
+
 			accessControlledAPI.Put("/user/:id", userCtrl.Update)
-			//accessControlledAPI.Delete("/user/:id", userCtrl.Delete)
+			accessControlledAPI.Delete("/user/:id", userCtrl.Delete)
 			accessControlledAPI.Put("/user/:id/password", userCtrl.ResetPassword)
 			accessControlledAPI.Put("/user/:id/role", userCtrl.AssignRoles)
 
@@ -68,11 +71,11 @@ func Api(app *iris.Framework) {
 				//permissionAPI.Get("/menu/:id", menuCtrl.GetByID)
 				//permissionAPI.Get("/menus", menuCtrl.GetAll)
 				//
-				//permissionAPI.Post("/action", actionCtrl.Create)
-				//permissionAPI.Delete("/action/:id", actionCtrl.Delete)
-				//permissionAPI.Put("/action/:id", actionCtrl.Update)
-				//permissionAPI.Get("/action/:id", actionCtrl.GetByID)
-				//permissionAPI.Get("/actions", actionCtrl.GetAll)
+				permissionAPI.Post("/action", actionCtrl.Create)
+				permissionAPI.Delete("/action/:id", actionCtrl.Delete)
+				permissionAPI.Put("/action/:id", actionCtrl.Update)
+				permissionAPI.Get("/action/:id", actionCtrl.GetByID)
+				permissionAPI.Get("/actions", actionCtrl.Query)
 				//
 				//elementAPI.Post("/element", elementCtrl.Create)
 				//elementAPI.Delete("/element/:id", elementCtrl.Delete)

@@ -121,3 +121,85 @@
     + id: 404(number,required)
 
 + Response 200
+
+## Action [/action]
+
+### GET [GET /action/{id}]
+
++ Parameters
+    + id: 404(number,required)
+
++ Response 27030100
+
+       + Attributes (object)
+        + message: ` `(string)
+        + data (Action)
+        + status: OK(string)
+
+### Query [GET /actions{?method,handler_name}]
+
++ Parameters
+    + method: get(string,optional)
+    + handler_name: usercontroller(string,optional) - partial matching query,case insensitive!
+
++ Response 27030200
+
+    + Attributes (object)
+        + message: ` `(string)
+        + data (array[Action])
+        + status: OK(string)
+
+### POST
++ Request (application/json)
+
+    + Attributes (Action)
+
++ Response 27030300
+ 
+    + Attributes (object)
+        + message: ` `(string)
+        + data (Action)
+        + status: OK(string)
+
++ Response 27030301
+
+            {
+                "status": "INTERNAL_SERVER_ERROR",
+                "data": null,
+                "message": ""
+            } 
+
+### DELETE [DELETE /action/{id}]
++ Parameters
+    + id: 404(number,required)
+
++ Response 27030400
+
+            {
+                "status": "OK",
+                "data": null,
+                "message": ""
+            } 
+
+### PUT [PUT /action/{id}]
++ Parameters
+    + id: 404(number,required)
+
++ Request (application/json)
+
+    + Attributes (Action)    
+
++ Response 27030500
+ 
+    + Attributes (object)
+        + message: ` `(string)
+        + data (Action)
+        + status: OK(string)
+
++ Response 27030501
+
+            {
+                "status": "INTERNAL_SERVER_ERROR",
+                "data": null,
+                "message": ""
+            } 

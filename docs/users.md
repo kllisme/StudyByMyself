@@ -207,3 +207,22 @@
             }
 
 ## Users [/users]
+
+## Paging [GET /users{?id,name,role_id,account,page,per_page}]
+
++ Parameters
+    + id: 404(number,optional)
+    + name: 杨(string,optional)
+    + role_id: 2(number,optional)
+    + account: accountor(string,optional)
+    + page: 1(number,required)
+    + per_page: 10(number,required)
+
++ Response 27020300
+
+    + Attributes (object)
+        + status: OK(string)
+        + data (object)
+            + pagination (Pagination)
+            + objects (array[User])
+        + message: ` `(string)

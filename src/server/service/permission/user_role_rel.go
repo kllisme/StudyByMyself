@@ -10,6 +10,7 @@ type UserRoleRelService struct {
 }
 
 func (self *UserRoleRelService) GetRoleIDsByUserID(userID int) ([]int, error) {
+	//TODO Considering User Group defined roles
 	roleIDs := make([]int, 0)
 	err := common.SodaMngDB_R.Model(&permission.UserRoleRel{}).Where("user_id = ?", userID).Pluck("role_id", &roleIDs).Error
 	if err != nil {
@@ -18,7 +19,7 @@ func (self *UserRoleRelService) GetRoleIDsByUserID(userID int) ([]int, error) {
 	return roleIDs, nil
 }
 
-func (self *UserRoleRelService) AsignRoles(userID int, roleIDs []int) (interface{}, error) {
+func (self *UserRoleRelService) AsignRoles(userID int, roleIDs []int) (interface{}, error)  {
 	tx := common.SodaMngDB_R.Begin()
 	err := tx.Delete(permission.UserRoleRel{}, "user_id = ?", userID).Error
 	if err != nil {
