@@ -22,7 +22,7 @@ func (self *ActionController)GetByID(ctx *iris.Context) {
 	if err != nil {
 		common.Render(ctx, "000002", nil)
 	}
-	common.Render(ctx, "", action)
+	common.Render(ctx, "27040100", action)
 }
 
 func (self *ActionController)Query(ctx *iris.Context) {
@@ -35,7 +35,7 @@ func (self *ActionController)Query(ctx *iris.Context) {
 	if method != "" {
 		conditions.Method = method
 	}
-	if handlerName != ""{
+	if handlerName != "" {
 		conditions.HandlerName = handlerName
 	}
 	actionList, err := actionService.Query(&conditions)
@@ -43,19 +43,19 @@ func (self *ActionController)Query(ctx *iris.Context) {
 		common.Render(ctx, "000002", nil)
 		return
 	}
-	common.Render(ctx, "27030200", actionList)
+	common.Render(ctx, "27040200", actionList)
 }
 
 func (self *ActionController)Create(ctx *iris.Context) {
 	actionService := permission.ActionService{}
 	action := model.Action{}
 	if err := ctx.ReadJSON(&action); err != nil {
-		common.Render(ctx, "27030301", nil)
+		common.Render(ctx, "27040301", nil)
 	}
 	if err := actionService.Create(&action); err != nil {
 		common.Render(ctx, "000002", nil)
 	}
-	common.Render(ctx, "27030300", action)
+	common.Render(ctx, "27040300", action)
 }
 
 func (self *ActionController)Delete(ctx *iris.Context) {
@@ -67,7 +67,7 @@ func (self *ActionController)Delete(ctx *iris.Context) {
 	if err := actionService.Delete(id); err != nil {
 		common.Render(ctx, "000002", nil)
 	}
-	common.Render(ctx, "27030400", nil)
+	common.Render(ctx, "27040400", nil)
 }
 
 func (self *ActionController)Update(ctx *iris.Context) {
@@ -80,12 +80,13 @@ func (self *ActionController)Update(ctx *iris.Context) {
 	}
 
 	if err := ctx.ReadJSON(&action); err != nil {
-		common.Render(ctx, "27030501", nil)
+		common.Render(ctx, "27040501", nil)
 	}
 
 	action.ID = id
-	if err := actionService.Update(&action); err != nil {
+	result, err := actionService.Update(&action);
+	if err != nil {
 		common.Render(ctx, "000002", nil)
 	}
-	common.Render(ctx, "27030500", action)
+	common.Render(ctx, "27040500", result)
 }

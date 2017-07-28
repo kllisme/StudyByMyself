@@ -60,11 +60,11 @@ func (self *UserService)Paging(name string, account string, id int, roleID int, 
 
 func (self *UserService) GetById(id int) (*model.User, error) {
 	db := common.SodaMngDB_R
-	result := model.User{}
-	if err := db.Where(id).First(&result).Error; err != nil {
+	user := model.User{}
+	if err := db.Where(id).First(&user).Error; err != nil {
 		return nil, err
 	}
-	return &result, nil
+	return &user, nil
 }
 
 func (self *UserService) GetByAccount(account string) (*model.User, error) {
@@ -90,7 +90,7 @@ func (self *UserService) Create(user *model.User) (*model.User, error) {
 }
 
 func (self *UserService) UpdateById(user *model.User) (*model.User, error) {
-	if err := common.SodaMngDB_R.Model(&model.User{}).Updates(&user).Where(user.ID).Error; err != nil {
+	if err := common.SodaMngDB_R.Model(&model.User{}).Updates(&user).Where(user.ID).Scan(user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil

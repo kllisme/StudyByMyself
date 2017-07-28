@@ -94,7 +94,7 @@ func (self *LoginController) Login(ctx *iris.Context) {
 			return
 		}
 		if len(menuIDs) != 0 {
-			menuList, err := menuService.GetListByIds(menuIDs)
+			menuList, err := menuService.GetListByIDs(menuIDs)
 			if err != nil {
 				common.Render(ctx, "27010114", nil)
 				return

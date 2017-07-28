@@ -61,6 +61,21 @@
     "27030500": {"status": "OK", "msg": "", "description": "更新操作信息成功", "isError": false },
     "27030501": {"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
 
+    "2704":"menu",
+    "270401":"GetByID",
+    "27040100": {"status": "OK", "msg": "", "description": "获取菜单信息成功", "isError": false },
+    "270402":"Query",
+    "27040200": {"status": "OK", "msg": "", "description": "获取菜单信息成功", "isError": false },
+    "270403":"Create",
+    "27040300": {"status": "OK", "msg": "", "description": "新建菜单信息成功", "isError": false },
+    "27040301": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+    "270404":"Delete",
+    "27040400": {"status": "OK", "msg": "", "description": "菜单信息删除成功", "isError": false },
+    "270405":"Update",
+    "27040500": {"status": "OK", "msg": "", "description": "更新菜单信息成功", "isError": false },
+    "27040501": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+
+
     "27010000": { "status": "OK", "msg": "", "description": "获取token成功", "isError": false },
     "27010001": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取token失败", "isError": true },
     "270100000": { "status": "OK", "msg": "", "description": "", "isError": false },

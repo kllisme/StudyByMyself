@@ -24,16 +24,11 @@ func (self *UserController)Paging(ctx *iris.Context) {
 	account := strings.TrimSpace(ctx.URLParam("account"))
 	name := strings.TrimSpace(ctx.URLParam("name"))
 	roleID, _ := ctx.URLParamInt("role_id")
-	page, err := ctx.URLParamInt("page")
-	if err != nil {
-		common.Render(ctx, "27020301", nil)
-		return
-	}
-	perPage, err := ctx.URLParamInt("per_page")
-	if err != nil {
-		common.Render(ctx, "27020301", nil)
-		return
-	}
+	page, _ := ctx.URLParamInt("page")
+
+	perPage, _ := ctx.URLParamInt("per_page")
+
+	common.Logger.Debug(name, account, id, roleID, page, perPage)
 	result, err := userService.Paging(name, account, id, roleID, page, perPage)
 	if err != nil {
 		common.Render(ctx, "000002", nil)
@@ -152,7 +147,7 @@ func (self *UserController)Update(ctx *iris.Context) {
 }
 
 func (self *UserController)Delete(ctx *iris.Context) {
-
+	//userService := service.UserService{}
 }
 
 func (self *UserController)AssignRoles(ctx *iris.Context) {

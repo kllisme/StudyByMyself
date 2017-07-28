@@ -22,7 +22,7 @@ func (self *ActionService)GetByID(id int) (*permission.Action, error) {
 func (self *ActionService)Query(action *permission.Action) (*[]*permission.Action, error) {
 	actionList := make([]*permission.Action, 0)
 	db := common.SodaMngDB_R
-	scopes := make([]func(*gorm.DB) *gorm.DB,0)
+	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
 	if action.HandlerName != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
 			return db.Where("handler_name like (?)", "%" + action.HandlerName + "%")
@@ -59,7 +59,9 @@ func (self *ActionService)Delete(id int) error {
 	return err
 }
 
-func (self *ActionService)Update(action *permission.Action) error {
-	err := common.SodaMngDB_WR.Updates(action).Error
-	return err
+func (self *ActionService)Update(action *permission.Action) (*permission.Action, error) {
+	if err := common.SodaMngDB_WR.Model(&permission.Action{}).Updates(&action).Where(action.ID).Scan(action).Error; err != nil {
+		return nil, err
+	}
+	return action, nil
 }

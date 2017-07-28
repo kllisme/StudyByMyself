@@ -17,7 +17,7 @@ func Api(app *iris.Framework) {
 		captchaCtrl = &api.CaptchaController{}
 		loginCtrl = &api.LoginController{}
 		roleCtrl = &permission.RoleController{}
-		//menuCtrl = &permission.MenuController{}
+		menuCtrl = &permission.MenuController{}
 		actionCtrl = &permission.ActionController{}
 		//permissionCtrl = &permission.PermissionController{}
 	)
@@ -65,12 +65,13 @@ func Api(app *iris.Framework) {
 			permissionAPI := accessControlledAPI.Party("/")
 			{
 
-				//permissionAPI.Post("/menu", menuCtrl.Create)
-				//permissionAPI.Delete("/menu/:id", menuCtrl.Delete)
-				//permissionAPI.Put("/menu/:id", menuCtrl.Update)
-				//permissionAPI.Get("/menu/:id", menuCtrl.GetByID)
-				//permissionAPI.Get("/menus", menuCtrl.GetAll)
-				//
+				permissionAPI.Post("/menu", menuCtrl.Create)
+				permissionAPI.Delete("/menu/:id", menuCtrl.Delete)
+				permissionAPI.Put("/menu/:id", menuCtrl.Update)
+				permissionAPI.Get("/menu/:id", menuCtrl.GetByID)
+				permissionAPI.Get("/menus", menuCtrl.Paging)
+
+
 				permissionAPI.Post("/action", actionCtrl.Create)
 				permissionAPI.Delete("/action/:id", actionCtrl.Delete)
 				permissionAPI.Put("/action/:id", actionCtrl.Update)
@@ -83,7 +84,6 @@ func Api(app *iris.Framework) {
 				//elementAPI.Get("/element/:id", elementCtrl.GetByID)
 				//elementAPI.Get("/elements", elementCtrl.GetAll)
 
-				permissionAPI.Post("/menu", roleCtrl.AssignPermissions)
 			}
 		}
 
