@@ -39,12 +39,24 @@
     "270202": "Create",
     "27020200": { "status": "OK", "msg": "", "description": "创建用户成功", "isError": false },
     "27020201": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+    "27020202": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "用户名不能为空", "isError": false },
+    "27020203": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "联系人不能为空", "isError": false },
+    "27020204": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "电话号码不能为空", "isError": false },
+    "27020205": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "地址不能为空", "isError": false },
     "270203": "Paging",
     "27020300": { "status": "OK", "msg": "", "description": "分页查询用户成功", "isError": false },
     "27020301": { "status": "BAD_REQUEST", "msg": "查询参数格式错误", "description": "查询参数格式错误", "isError": true },
     "270204": "Update",
     "27020400": { "status": "OK", "msg": "", "description": "更新用户成功", "isError": false },
     "27020401": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+    "27020402": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "用户名不能为空", "isError": false },
+    "27020403": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "联系人不能为空", "isError": false },
+    "27020404": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "电话号码不能为空", "isError": false },
+    "27020405": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "地址不能为空", "isError": false },
+    "270205": "Delete",
+    "27020500": {"status": "OK", "msg": "", "description": "用户删除成功", "isError": false },
+    "270206": "GetByID",
+    "27020600": {"status": "OK", "msg": "", "description": "用户信息获取成功", "isError": false },
 
 
     "2703": "action",
@@ -64,7 +76,7 @@
     "2704":"menu",
     "270401":"GetByID",
     "27040100": {"status": "OK", "msg": "", "description": "获取菜单信息成功", "isError": false },
-    "270402":"Query",
+    "270402":"Paging",
     "27040200": {"status": "OK", "msg": "", "description": "获取菜单信息成功", "isError": false },
     "270403":"Create",
     "27040300": {"status": "OK", "msg": "", "description": "新建菜单信息成功", "isError": false },
@@ -74,15 +86,14 @@
     "270405":"Update",
     "27040500": {"status": "OK", "msg": "", "description": "更新菜单信息成功", "isError": false },
     "27040501": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+    "27020502": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "菜单名不能为空", "isError": false },
+    "27020503": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "图标不能为空", "isError": false },
 
 
     "27010000": { "status": "OK", "msg": "", "description": "获取token成功", "isError": false },
     "27010001": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取token失败", "isError": true },
     "270100000": { "status": "OK", "msg": "", "description": "", "isError": false },
-    "270100001": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取验证码key失败", "isError": true },
-
-    "27010200": { "status": "OK", "msg": "拉取用户信息成功", "description": "服务器运行正常" },
-    "27010202": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true }
+    "270100001": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取验证码key失败", "isError": true }
 
     }
 }

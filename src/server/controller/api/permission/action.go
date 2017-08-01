@@ -6,6 +6,7 @@ import (
 	model "maizuo.com/soda/erp/api/src/server/model/permission"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
+	"github.com/bitly/go-simplejson"
 )
 
 type ActionController struct {
@@ -72,19 +73,27 @@ func (self *ActionController)Delete(ctx *iris.Context) {
 
 func (self *ActionController)Update(ctx *iris.Context) {
 	actionService := permission.ActionService{}
-	action := model.Action{}
+	params := simplejson.New()
 
-	id, err := ctx.URLParamInt("id")
+	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", nil)
 	}
-
-	if err := ctx.ReadJSON(&action); err != nil {
-		common.Render(ctx, "27040501", nil)
+	action, err := actionService.GetByID(id)
+	if err != nil {
+		common.Render(ctx, "000003", nil)
 	}
+	err = ctx.ReadJSON(&params)
+	if err != nil {
+		common.Render(ctx, "27040501", nil)
+		return
+	}
+	action.API = strings.TrimSpace(params.Get("api").MustString())
+	action.Description = strings.TrimSpace(params.Get("description").MustString())
+	action.HandlerName = strings.TrimSpace(params.Get("handlerName").MustString())
+	action.Method = strings.TrimSpace(params.Get("method").MustString())
 
-	action.ID = id
-	result, err := actionService.Update(&action);
+	result, err := actionService.Update(action);
 	if err != nil {
 		common.Render(ctx, "000002", nil)
 	}

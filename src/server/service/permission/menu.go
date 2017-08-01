@@ -56,7 +56,7 @@ func (self *MenuService)Create(menu *permission.Menu) (*permission.Menu, error) 
 }
 
 func (self *MenuService)Update(menu *permission.Menu) (*permission.Menu, error) {
-	if err := common.SodaMngDB_WR.Model(&permission.Menu{}).Updates(&menu).Where(menu.ID).Scan(menu).Error; err != nil {
+	if err := common.SodaMngDB_WR.Model(&permission.Menu{}).Save(&menu).Where(menu.ID).Error; err != nil {
 		return nil, err
 	}
 	return menu, nil

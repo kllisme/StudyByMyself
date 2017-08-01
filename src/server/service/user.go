@@ -90,7 +90,7 @@ func (self *UserService) Create(user *model.User) (*model.User, error) {
 }
 
 func (self *UserService) UpdateById(user *model.User) (*model.User, error) {
-	if err := common.SodaMngDB_R.Model(&model.User{}).Updates(&user).Where(user.ID).Scan(user).Error; err != nil {
+	if err := common.SodaMngDB_R.Model(&model.User{}).Save(&user).Where(user.ID).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
@@ -100,8 +100,9 @@ func (self *UserService) UpdateByMobile(in interface{}) (interface{}, error) {
 	return nil, nil
 }
 
-func (self *UserService) DeleteById(id int) (interface{}, error) {
-	return nil, nil
+func (self *UserService) DeleteById(id int) error {
+	err := common.SodaMngDB_WR.Delete(&model.User{}, id).Error
+	return err
 }
 
 func (self *UserService) DeleteByMobile(mobile string) (interface{}, error) {

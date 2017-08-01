@@ -60,7 +60,7 @@ func (self *ActionService)Delete(id int) error {
 }
 
 func (self *ActionService)Update(action *permission.Action) (*permission.Action, error) {
-	if err := common.SodaMngDB_WR.Model(&permission.Action{}).Updates(&action).Where(action.ID).Scan(action).Error; err != nil {
+	if err := common.SodaMngDB_WR.Save(&action).Error; err != nil {
 		return nil, err
 	}
 	return action, nil
