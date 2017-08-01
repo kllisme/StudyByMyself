@@ -55,8 +55,9 @@ func Api(app *iris.Framework) {
 			accessControlledAPI.Post("/role", roleCtrl.Create)
 			accessControlledAPI.Get("/roles", roleCtrl.GetAll)
 			accessControlledAPI.Delete("/role/:id", roleCtrl.Delete)
-			//accessControlledAPI.Put("/role/:id",roleCtrl.Update)
-			accessControlledAPI.Put("/role/:id/permission", roleCtrl.AssignPermissions)
+			accessControlledAPI.Get("/role/:id", roleCtrl.GetByID)
+			accessControlledAPI.Put("/role/:id",roleCtrl.Update)
+			//accessControlledAPI.Put("/role/:id/permission", roleCtrl.AssignPermissions)
 
 			admin.Setup(accessControlledAPI)
 			permissionAPI := accessControlledAPI.Party("/")

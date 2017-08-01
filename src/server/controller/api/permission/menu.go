@@ -84,7 +84,10 @@ func (self *MenuController)Update(ctx *iris.Context) {
 	}
 
 	menu, err := menuService.GetByID(id)
-
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
 	name := strings.TrimSpace(params.Get("name").MustString())
 	if name == ""{
 		common.Render(ctx, "27020502", nil)
