@@ -118,14 +118,146 @@ func (self *PermissionController)Delete(ctx *iris.Context) {
 	common.Render(ctx, "27060400", nil)
 }
 
-func (self *PermissionController)AssignElements(ctx *iris.Context) {
-
+func (self *PermissionController)AssignMenus(ctx *iris.Context) {
+	permissionService := permission.PermissionService{}
+	permissionMenuRelService := permission.PermissionMenuRelService{}
+	id, err := ctx.ParamInt("id")
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	_, err = permissionService.GetByID(id)
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	menuIDs := make([]int, 0)
+	if err := ctx.ReadJSON(&menuIDs); err != nil {
+		common.Render(ctx, "27060601", nil)
+		return
+	}
+	result, err := permissionMenuRelService.AssignMenus(id, menuIDs)
+	if err != nil {
+		common.Render(ctx, "000002", nil)
+		return
+	}
+	common.Render(ctx, "27060600", result)
 }
 
-func (self *PermissionController)AssignMenus(ctx *iris.Context) {
+func (self *PermissionController)GetMenus(ctx *iris.Context) {
+	permissionService := permission.PermissionService{}
+	permissionMenuRelService := permission.PermissionMenuRelService{}
+	id, err := ctx.ParamInt("id")
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	_, err = permissionService.GetByID(id)
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
 
+	result, err := permissionMenuRelService.GetMenuIDsByPermissionIDs(id)
+	if err != nil {
+		common.Render(ctx, "000002", nil)
+		return
+	}
+	common.Render(ctx, "27060700", result)
 }
 
 func (self *PermissionController)AssignActions(ctx *iris.Context) {
+	permissionService := permission.PermissionService{}
+	permissionActionRelService := permission.PermissionActionRelService{}
+	id, err := ctx.ParamInt("id")
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	_, err = permissionService.GetByID(id)
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	actionIDs := make([]int, 0)
+	if err := ctx.ReadJSON(&actionIDs); err != nil {
+		common.Render(ctx, "27060801", nil)
+		return
+	}
+	result, err := permissionActionRelService.AssignActions(id, actionIDs)
+	if err != nil {
+		common.Render(ctx, "000002", nil)
+		return
+	}
+	common.Render(ctx, "27060800", result)
+}
 
+func (self *PermissionController)GetActions(ctx *iris.Context) {
+	permissionService := permission.PermissionService{}
+	permissionActionRelService := permission.PermissionActionRelService{}
+	id, err := ctx.ParamInt("id")
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	_, err = permissionService.GetByID(id)
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+
+	result, err := permissionActionRelService.GetActionIDsByPermissionIDs(id)
+	if err != nil {
+		common.Render(ctx, "000002", nil)
+		return
+	}
+	common.Render(ctx, "27060900", result)
+}
+
+func (self *PermissionController)AssignElements(ctx *iris.Context) {
+	permissionService := permission.PermissionService{}
+	permissionElementRelService := permission.PermissionElementRelService{}
+	id, err := ctx.ParamInt("id")
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	_, err = permissionService.GetByID(id)
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	elementIDs := make([]int, 0)
+	if err := ctx.ReadJSON(&elementIDs); err != nil {
+		common.Render(ctx, "27061001", nil)
+		return
+	}
+	result, err := permissionElementRelService.AssignElements(id, elementIDs)
+	if err != nil {
+		common.Render(ctx, "000002", nil)
+		return
+	}
+	common.Render(ctx, "27061000", result)
+}
+
+func (self *PermissionController)GetElements(ctx *iris.Context) {
+	permissionService := permission.PermissionService{}
+	permissionElementRelService := permission.PermissionElementRelService{}
+	id, err := ctx.ParamInt("id")
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	_, err = permissionService.GetByID(id)
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+
+	result, err := permissionElementRelService.GetElementIDsByPermissionIDs(id)
+	if err != nil {
+		common.Render(ctx, "000002", nil)
+		return
+	}
+	common.Render(ctx, "27061100", result)
 }

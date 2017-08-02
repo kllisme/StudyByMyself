@@ -18,6 +18,7 @@ func Api(app *iris.Framework) {
 		loginCtrl = &api.LoginController{}
 		roleCtrl = &permission.RoleController{}
 		menuCtrl = &permission.MenuController{}
+		elementCtrl = &permission.ElementController{}
 		actionCtrl = &permission.ActionController{}
 		permissionCtrl = &permission.PermissionController{}
 	)
@@ -32,7 +33,7 @@ func Api(app *iris.Framework) {
 		v1.Options("/*anything", common.CORS.Serve)
 
 		//v1.Get("/token", public.Token)
-		v1.Get("/login", loginCtrl.Login)
+		v1.Post("/login", loginCtrl.Login)
 
 		v1.UseFunc(common.Authorization)
 		v1.Get("/profile/session", userCtrl.GetSessionInfo)
@@ -51,7 +52,8 @@ func Api(app *iris.Framework) {
 			accessControlledAPI.Put("/user/:id", userCtrl.Update)
 			accessControlledAPI.Delete("/user/:id", userCtrl.Delete)
 			accessControlledAPI.Put("/user/:id/password", userCtrl.ResetPassword)
-			//accessControlledAPI.Put("/user/:id/role", userCtrl.AssignRoles)
+			accessControlledAPI.Put("/user/:id/roles", userCtrl.AssignRoles)
+			accessControlledAPI.Get("/user/:id/roles", userCtrl.GetRoles)
 
 			accessControlledAPI.Put("/profile/password", userCtrl.ChangePassword)
 
@@ -61,7 +63,8 @@ func Api(app *iris.Framework) {
 			accessControlledAPI.Delete("/role/:id", roleCtrl.Delete)
 			accessControlledAPI.Get("/role/:id", roleCtrl.GetByID)
 			accessControlledAPI.Put("/role/:id",roleCtrl.Update)
-			//accessControlledAPI.Put("/role/:id/permission", roleCtrl.AssignPermissions)
+			accessControlledAPI.Put("/role/:id/permissions", roleCtrl.AssignPermissions)
+			accessControlledAPI.Get("/role/:id/permissions", roleCtrl.GetPermissions)
 
 			admin.Setup(accessControlledAPI)
 			permissionAPI := accessControlledAPI.Party("/")
@@ -78,18 +81,24 @@ func Api(app *iris.Framework) {
 				permissionAPI.Put("/permission/:id", permissionCtrl.Update)
 				permissionAPI.Get("/permission/:id", permissionCtrl.GetByID)
 				permissionAPI.Get("/permissions", permissionCtrl.Paging)
+				permissionAPI.Get("/permission/:id/menu", permissionCtrl.GetMenus)
+				permissionAPI.Put("/permission/:id/menu", permissionCtrl.AssignMenus)
+				permissionAPI.Get("/permission/:id/element", permissionCtrl.GetElements)
+				permissionAPI.Put("/permission/:id/element", permissionCtrl.AssignElements)
+				permissionAPI.Get("/permission/:id/action", permissionCtrl.GetActions)
+				permissionAPI.Put("/permission/:id/action", permissionCtrl.AssignActions)
 
 				permissionAPI.Post("/action", actionCtrl.Create)
 				permissionAPI.Delete("/action/:id", actionCtrl.Delete)
 				permissionAPI.Put("/action/:id", actionCtrl.Update)
 				permissionAPI.Get("/action/:id", actionCtrl.GetByID)
 				permissionAPI.Get("/actions", actionCtrl.Query)
-				//
-				//elementAPI.Post("/element", elementCtrl.Create)
-				//elementAPI.Delete("/element/:id", elementCtrl.Delete)
-				//elementAPI.Put("/element/:id", elementCtrl.Update)
-				//elementAPI.Get("/element/:id", elementCtrl.GetByID)
-				//elementAPI.Get("/elements", elementCtrl.GetAll)
+
+				permissionAPI.Post("/element", elementCtrl.Create)
+				permissionAPI.Delete("/element/:id", elementCtrl.Delete)
+				permissionAPI.Put("/element/:id", elementCtrl.Update)
+				permissionAPI.Get("/element/:id", elementCtrl.GetByID)
+				permissionAPI.Get("/elements", elementCtrl.Paging)
 
 			}
 		}

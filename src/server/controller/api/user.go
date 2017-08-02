@@ -10,6 +10,7 @@ import (
 	"github.com/bitly/go-simplejson"
 	"maizuo.com/soda/erp/api/src/server/model"
 	"strings"
+	"maizuo.com/soda/erp/api/src/server/service/permission"
 )
 
 type UserController struct{}
@@ -181,7 +182,51 @@ func (self *UserController)Delete(ctx *iris.Context) {
 }
 
 func (self *UserController)AssignRoles(ctx *iris.Context) {
+	userService := service.UserService{}
+	userRoleRelService := permission.UserRoleRelService{}
+	id, err := ctx.ParamInt("id")
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	_, err = userService.GetById(id)
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	roleIDs := make([]int, 0)
+	if err := ctx.ReadJSON(&roleIDs); err != nil {
+		common.Render(ctx, "27020901", nil)
+		return
+	}
+	result, err := userRoleRelService.AssignRoles(id, roleIDs)
+	if err != nil {
+		common.Render(ctx, "000002", nil)
+		return
+	}
+	common.Render(ctx, "27020900", result)
+}
 
+func (self *UserController)GetRoles(ctx *iris.Context) {
+	userService := service.UserService{}
+	userRoleRelService := permission.UserRoleRelService{}
+	id, err := ctx.ParamInt("id")
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	_, err = userService.GetById(id)
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+
+	result, err := userRoleRelService.GetRoleIDsByUserID(id)
+	if err != nil {
+		common.Render(ctx, "000002", nil)
+		return
+	}
+	common.Render(ctx, "27021000", result)
 }
 
 func (self *UserController) GetById(ctx *iris.Context) {

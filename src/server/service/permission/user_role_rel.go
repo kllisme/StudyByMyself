@@ -19,7 +19,7 @@ func (self *UserRoleRelService) GetRoleIDsByUserID(userID int) ([]int, error) {
 	return roleIDs, nil
 }
 
-func (self *UserRoleRelService) AsignRoles(userID int, roleIDs []int) (interface{}, error)  {
+func (self *UserRoleRelService) AssignRoles(userID int, roleIDs []int) (*[]int, error) {
 	tx := common.SodaMngDB_R.Begin()
 	err := tx.Delete(permission.UserRoleRel{}, "user_id = ?", userID).Error
 	if err != nil {
@@ -27,7 +27,7 @@ func (self *UserRoleRelService) AsignRoles(userID int, roleIDs []int) (interface
 		return nil, err
 	}
 	for _, v := range roleIDs {
-		err := tx.Create(permission.UserRoleRel{
+		err := tx.Create(&permission.UserRoleRel{
 			UserID:userID,
 			RoleID:v,
 		}).Error
@@ -37,5 +37,5 @@ func (self *UserRoleRelService) AsignRoles(userID int, roleIDs []int) (interface
 		}
 	}
 	tx.Commit()
-	return nil, nil
+	return &roleIDs, nil
 }
