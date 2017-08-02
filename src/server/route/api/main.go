@@ -19,7 +19,7 @@ func Api(app *iris.Framework) {
 		roleCtrl = &permission.RoleController{}
 		menuCtrl = &permission.MenuController{}
 		actionCtrl = &permission.ActionController{}
-		//permissionCtrl = &permission.PermissionController{}
+		permissionCtrl = &permission.PermissionController{}
 	)
 	v1 := app.Party("/v1", func(ctx *iris.Context) {
 		ctx.Next()
@@ -53,7 +53,7 @@ func Api(app *iris.Framework) {
 			accessControlledAPI.Put("/user/:id/password", userCtrl.ResetPassword)
 			//accessControlledAPI.Put("/user/:id/role", userCtrl.AssignRoles)
 
-			accessControlledAPI.Put("/profile/user/password", userCtrl.ChangePassword)
+			accessControlledAPI.Put("/profile/password", userCtrl.ChangePassword)
 
 
 			accessControlledAPI.Post("/role", roleCtrl.Create)
@@ -73,6 +73,11 @@ func Api(app *iris.Framework) {
 				permissionAPI.Get("/menu/:id", menuCtrl.GetByID)
 				permissionAPI.Get("/menus", menuCtrl.Paging)
 
+				permissionAPI.Post("/permission", permissionCtrl.Create)
+				permissionAPI.Delete("/permission/:id", permissionCtrl.Delete)
+				permissionAPI.Put("/permission/:id", permissionCtrl.Update)
+				permissionAPI.Get("/permission/:id", permissionCtrl.GetByID)
+				permissionAPI.Get("/permissions", permissionCtrl.Paging)
 
 				permissionAPI.Post("/action", actionCtrl.Create)
 				permissionAPI.Delete("/action/:id", actionCtrl.Delete)

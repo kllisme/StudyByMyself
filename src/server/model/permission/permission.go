@@ -7,7 +7,7 @@ type Permission struct {
 	Name       string        `json:"name"`
 	Type       int        `json:"type"`
 	Status     int        `json:"status"`
-	CategoryID int        `json:"categoryId"`
+	//CategoryID int        `json:"categoryId"`
 }
 
 func (Permission)TableName() string {
