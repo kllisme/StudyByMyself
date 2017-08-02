@@ -67,6 +67,6 @@ func Error(code string, data interface{}) *Result {
 func Render(ctx *iris.Context, code string, data interface{}) {
 	result := &Result{}
 	_result := result.New(code, data)
-	Log(ctx, _result)
+	//Log(ctx, _result)
 	ctx.JSON(iris.StatusOK, _result)
 }

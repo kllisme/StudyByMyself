@@ -17,9 +17,11 @@ func main() {
 
 	common.SetupLogger()
 
+	common.SetupRedis()
+
 	common.SetupSession()
 
-	common.SetupRedis()
+	common.SetupDB()
 
 	server.SetUpServer()
 }

@@ -3,6 +3,7 @@ const package = require('../package.json')
 module.exports = Object.assign({}, {package}, {
   "isDevelopment": true,
   "name":package.name,
+  "defaultPassword":"e10adc3949ba59abbe56e057f20f883e",
   "server": {
     "host": "0.0.0.0",
     "port": 8081,
@@ -48,7 +49,7 @@ module.exports = Object.assign({}, {package}, {
     "cors": {
       "allowedOrigins": ["http://erp.sodalife.xyz", "http://erp.sodalife.dev","https://erp.sodalife.xyz", "https://erp.sodalife.dev"],
       "allowedHeaders": ["Authorization","Cookie","Origin","Content-Type", "*"],
-      "allowedMethods": ["GET", "POST","OPTIONS"],
+      "allowedMethods": ["GET", "POST", "OPTIONS", "DELETE", "PUT"],
       "maxAge": 3600
     }
   },
