@@ -43,8 +43,17 @@ func (self *UserController)Create(ctx *iris.Context) {
 		return
 	}
 	account := strings.TrimSpace(params.Get("account").MustString())
+	if _, err := userService.GetByAccount(account); err == nil {
+		common.Render(ctx, "27020206", nil)
+		return
+	}
 	if account == "" {
 		common.Render(ctx, "27020202", nil)
+		return
+	}
+	password := strings.TrimSpace(params.Get("password").MustString())
+	if password == "" {
+		common.Render(ctx, "27020207", nil)
 		return
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
@@ -78,6 +87,7 @@ func (self *UserController)Create(ctx *iris.Context) {
 		ParentID:parentID,
 		Telephone:telephone,
 		Address:address,
+		Password:password,
 	}
 	entity, err := userService.Create(&user)
 	if err != nil {
@@ -200,6 +210,57 @@ func (self *UserController)GetSessionInfo(ctx *iris.Context) {
 	common.Render(ctx, "27020100", sessionInfo)
 }
 
-//func (self *UserController)ResetPassword(ctx *iris.Context) {
-//
-//}
+func (self *UserController)ResetPassword(ctx *iris.Context) {
+	userService := service.UserService{}
+	id, err := ctx.ParamInt("id")
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	defaultPassword := viper.GetString("defaultPassword")
+	user, err := userService.ChangePassword(id, defaultPassword)
+	if err != nil {
+		common.Render(ctx, "000002", nil)
+		return
+	}
+	common.Render(ctx, "27020800", user)
+}
+
+func (self *UserController)ChangePassword(ctx *iris.Context) {
+	userService := service.UserService{}
+	currentUserID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
+	if err != nil {
+		common.Render(ctx, "000001", nil)
+		return
+	}
+	params := simplejson.New()
+	if err := ctx.ReadJSON(&params); err != nil {
+		common.Render(ctx, "", nil)
+		return
+	}
+
+	oldPassword := params.Get("oldPassword").MustString()
+	if oldPassword == "" {
+		common.Render(ctx, "27020702", nil)
+		return
+	}
+	user := model.User{}
+	user.ID = currentUserID
+	user.Password = oldPassword
+	if _, err := userService.CheckInfo(&user); err != nil {
+		common.Render(ctx, "27020701", nil)
+		return
+	}
+
+	newPassword := params.Get("newPassword").MustString()
+	if newPassword == "" {
+		common.Render(ctx, "27020703", nil)
+		return
+	}
+	entity, err := userService.ChangePassword(currentUserID, newPassword)
+	if err != nil {
+		common.Render(ctx, "000002", nil)
+		return
+	}
+	common.Render(ctx, "27020700", entity)
+}

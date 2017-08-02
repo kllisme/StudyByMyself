@@ -43,6 +43,8 @@
     "27020203": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "联系人不能为空", "isError": false },
     "27020204": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "电话号码不能为空", "isError": false },
     "27020205": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "地址不能为空", "isError": false },
+    "27020206": { "status": "BAD_REQUEST", "msg": "用户名已存在", "description": "用户名已存在", "isError": false },
+    "27020207": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "密码不能为空", "isError": false },
     "270203": "Paging",
     "27020300": { "status": "OK", "msg": "", "description": "分页查询用户成功", "isError": false },
     "27020301": { "status": "BAD_REQUEST", "msg": "查询参数格式错误", "description": "查询参数格式错误", "isError": true },
@@ -57,7 +59,13 @@
     "27020500": {"status": "OK", "msg": "", "description": "用户删除成功", "isError": false },
     "270206": "GetByID",
     "27020600": {"status": "OK", "msg": "", "description": "用户信息获取成功", "isError": false },
-
+    "270207": "ChangePassword",
+    "27020700": {"status": "OK", "msg": "", "description": "修改密码成功", "isError": false },
+    "27020701": {"status": "BAD_REQUEST", "msg": "原密码错误", "description": "原密码错误", "isError": false },
+    "27020702": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "原密码不能为空", "isError": false },
+    "27020703": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "新密码不能为空", "isError": false },
+    "270208": "ResetPassword",
+    "27020800": {"status": "OK", "msg": "", "description": "密码重置成功", "isError": false },
 
     "2703": "action",
     "270301": "GetByID",
@@ -102,13 +110,6 @@
     "270505":"Update",
     "27050500": {"status": "OK", "msg": "", "description": "更新角色信息成功", "isError": false },
     "27050501": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
-    "27050502": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "角色名不能为空", "isError": false },
-
-
-    "27010000": { "status": "OK", "msg": "", "description": "获取token成功", "isError": false },
-    "27010001": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取token失败", "isError": true },
-    "270100000": { "status": "OK", "msg": "", "description": "", "isError": false },
-    "270100001": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取验证码key失败", "isError": true }
-
+    "27050502": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "角色名不能为空", "isError": false }
     }
 }

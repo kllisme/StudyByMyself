@@ -105,6 +105,15 @@ func (self *UserService) DeleteById(id int) error {
 	return err
 }
 
+func (self *UserService) ChangePassword(id int, password string) (*model.User, error) {
+	user := model.User{}
+	err := common.SodaMngDB_WR.Model(&model.User{}).Where(id).Updates(&model.User{Password:password}).Scan(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, err
+}
+
 func (self *UserService) DeleteByMobile(mobile string) (interface{}, error) {
 	return nil, nil
 }

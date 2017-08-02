@@ -36,6 +36,7 @@ func Api(app *iris.Framework) {
 
 		v1.UseFunc(common.Authorization)
 		v1.Get("/profile/session", userCtrl.GetSessionInfo)
+
 		//v1.Get("/profile/user", userCtrl.GetSessionInfo)
 
 		//控制访问权限的接口
@@ -49,8 +50,11 @@ func Api(app *iris.Framework) {
 
 			accessControlledAPI.Put("/user/:id", userCtrl.Update)
 			accessControlledAPI.Delete("/user/:id", userCtrl.Delete)
-			//accessControlledAPI.Put("/user/:id/password", userCtrl.ResetPassword)
+			accessControlledAPI.Put("/user/:id/password", userCtrl.ResetPassword)
 			//accessControlledAPI.Put("/user/:id/role", userCtrl.AssignRoles)
+
+			accessControlledAPI.Put("/profile/user/password", userCtrl.ChangePassword)
+
 
 			accessControlledAPI.Post("/role", roleCtrl.Create)
 			accessControlledAPI.Get("/roles", roleCtrl.GetAll)
