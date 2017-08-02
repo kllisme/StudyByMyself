@@ -1,13 +1,13 @@
 const package = require('../package.json')
-
-module.exports = Object.assign({}, {package}, {
+const status = require('../resource/status')
+module.exports = Object.assign({}, {
   "isDevelopment": true,
-  "name":package.name,
-  "defaultPassword":"e10adc3949ba59abbe56e057f20f883e",
+  "name": package.name,
+  "defaultPassword": "e10adc3949ba59abbe56e057f20f883e",
   "server": {
     "host": "0.0.0.0",
     "port": 8081,
-    "href":"https://m.sodalife.xyz/v1",
+    "href": "https://m.sodalife.xyz/v1",
     "session": {
       "user": {
         "id": "USER_ID",
@@ -38,23 +38,23 @@ module.exports = Object.assign({}, {package}, {
         "path": "./resource/font/comic.ttf"
       }
     },
-    "jwt":{
-      "secret":"secret",
-      "cookieName":"Authorization",
-      "cookieDomain":"api.erp.sodalife.xyz",
-      "cookieExpire":24,
-      "tokenExpire":24,
-      "issuer":"api.erp.sodalife.xyz"
+    "jwt": {
+      "secret": "secret",
+      "cookieName": "Authorization",
+      "cookieDomain": "api.erp.sodalife.dev",
+      "cookieExpire": 24,
+      "tokenExpire": 24,
+      "issuer": "api.erp.sodalife.xyz"
     },
     "cors": {
-      "allowedOrigins": ["http://erp.sodalife.xyz", "http://erp.sodalife.dev","https://erp.sodalife.xyz", "https://erp.sodalife.dev"],
-      "allowedHeaders": ["Authorization","Cookie","Origin","Content-Type", "*"],
+      "allowedOrigins": ["http://erp.sodalife.xyz", "http://erp.sodalife.dev", "https://erp.sodalife.xyz", "https://erp.sodalife.dev"],
+      "allowedHeaders": ["Authorization", "Cookie", "Origin", "Content-Type", "*"],
       "allowedMethods": ["GET", "POST", "OPTIONS", "DELETE", "PUT"],
       "maxAge": 3600
     }
   },
   "captcha": {
-    "prefix": "erp-api:captcha:",
+    "prefix": "soda:erp:api:captcha:",
     "server": "http://captcha.sodalife.xyz",
     "maxLoginRequest": 3,
     "maxSmsRequest": 3,
@@ -112,7 +112,7 @@ module.exports = Object.assign({}, {package}, {
         "addr": "192.168.1.204:6379",
         "password": "123456",
         "database": 10,
-        "prefix": "soda-api:",
+        "prefix": "soda:erp:api:",
         "maxIdle": 20,
         "maxActive": 50,
         "idleTimeout": 60
@@ -121,7 +121,7 @@ module.exports = Object.assign({}, {package}, {
         "addr": "192.168.1.204:6379",
         "password": "123456",
         "database": 10,
-        "prefix": "soda-api:session:",
+        "prefix": "soda:erp:api:session:",
         "max-idle": 20,
         "maxActive": 50,
         "idleTimeout": 60,
@@ -132,9 +132,13 @@ module.exports = Object.assign({}, {package}, {
         "addr": "192.168.1.204:6379",
         "password": "123456",
         "database": 10,
-        "prefix": "soda-api:rate:",
+        "prefix": "soda:erp:api:rate:",
         "max-retry": 3
       }
     }
   }
+}, {
+  package
+}, {
+  status
 });

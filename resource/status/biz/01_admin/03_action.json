@@ -1,0 +1,15 @@
+{
+  "2703": "action",
+  "270301": "GetByID",
+  "27030100": {"status": "OK", "msg": "", "description": "操作信息获取成功", "isError": false },
+  "270302": "Query",
+  "27030200": {"status": "OK", "msg": "", "description": "操作信息查询成功", "isError": false },
+  "270303": "Create",
+  "27030300": {"status": "OK", "msg": "", "description": "新建操作信息成功", "isError": false },
+  "27030301": {"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+  "270304": "Delete",
+  "27030400": {"status": "OK", "msg": "", "description": "操作信息删除成功", "isError": false },
+  "270305": "Update",
+  "27030500": {"status": "OK", "msg": "", "description": "更新操作信息成功", "isError": false },
+  "27030501": {"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true }
+}
