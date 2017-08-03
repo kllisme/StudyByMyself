@@ -53,11 +53,11 @@ func (self *PermissionController)Create(ctx *iris.Context) {
 		common.Render(ctx, "27060302", nil)
 		return
 	}
-	_type := params.Get("type").MustInt()
+	categoryID := params.Get("categoryId").MustInt()
 	status := params.Get("status").MustInt()
 	_permission := model.Permission{
 		Name:name,
-		Type:_type,
+		CategoryID:categoryID,
 		Status:status,
 	}
 	entity, err := permissionService.Create(&_permission)
@@ -70,8 +70,9 @@ func (self *PermissionController)Create(ctx *iris.Context) {
 
 func (self *PermissionController)Update(ctx *iris.Context) {
 	permissionService := permission.PermissionService{}
-	params := simplejson.New()
-	if err := ctx.ReadJSON(&params); err != nil {
+	permission:= model.Permission{}
+
+	if err := ctx.ReadJSON(&permission); err != nil {
 		common.Render(ctx, "27060501", nil)
 		return
 	}
@@ -82,22 +83,19 @@ func (self *PermissionController)Update(ctx *iris.Context) {
 		return
 	}
 
-	_permission, err := permissionService.GetByID(id)
+	_, err = permissionService.GetByID(id)
 	if err != nil {
 		common.Render(ctx, "000003", nil)
 		return
 	}
-	name := strings.TrimSpace(params.Get("name").MustString())
-	if name == "" {
+
+	permission.Name = strings.TrimSpace(permission.Name)
+	if permission.Name == "" {
 		common.Render(ctx, "27060502", nil)
 		return
 	}
-	_type := params.Get("type").MustInt(0)
-	status := params.Get("status").MustInt(0)
-	_permission.Name = name
-	_permission.Status = status
-	_permission.Type = _type
-	entity, err := permissionService.Update(_permission)
+	permission.ID = id
+	entity, err := permissionService.Update(&permission)
 	if err != nil {
 		common.Render(ctx, "000002", nil)
 		return

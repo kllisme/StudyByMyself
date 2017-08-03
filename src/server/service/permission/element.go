@@ -56,7 +56,11 @@ func (self *ElementService)Create(element *permission.Element) (*permission.Elem
 }
 
 func (self *ElementService)Update(element *permission.Element) (*permission.Element, error) {
-	if err := common.SodaMngDB_WR.Model(&permission.Element{}).Save(&element).Where(element.ID).Error; err != nil {
+	_element := map[string]interface{}{
+		"name":element.Name,
+		"reference":element.Reference,
+	}
+	if err := common.SodaMngDB_WR.Model(&permission.Element{}).Where(element.ID).Updates(_element).Scan(element).Error; err != nil {
 		return nil, err
 	}
 	return element, nil

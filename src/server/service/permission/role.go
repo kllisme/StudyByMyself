@@ -50,7 +50,11 @@ func (self *RoleService)Delete(id int) error {
 }
 
 func (self *RoleService)Update(role *permission.Role) (*permission.Role, error) {
-	if err := common.SodaMngDB_WR.Save(&role).Error; err != nil {
+	_role := map[string]interface{}{
+		"name":role.Name,
+		"description":role.Description,
+	}
+	if err := common.SodaMngDB_WR.Model(&permission.Role{}).Where(role.ID).Updates(_role).Scan(role).Error; err != nil {
 		return nil, err
 	}
 	return role, nil

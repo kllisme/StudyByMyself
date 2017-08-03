@@ -106,60 +106,26 @@ func (self *UserController)Update(ctx *iris.Context) {
 		return
 	}
 
-	user, err := userService.GetById(id)
+	_, err = userService.GetById(id)
 	if err != nil {
 		common.Render(ctx, "000003", nil)
 		return
 	}
 
-	params := simplejson.New()
-	if err := ctx.ReadJSON(&params); err != nil {
+	user := model.User{}
+	if err := ctx.ReadJSON(&user); err != nil {
 		common.Render(ctx, "27020401", nil)
 		return
 	}
 
-	account := strings.TrimSpace(params.Get("account").MustString())
-	if account == "" {
-		common.Render(ctx, "27020402", nil)
-		return
-	}
-	name, e := params.CheckGet("name")
-	if e {
-		user.Name = strings.TrimSpace(name.MustString())
-	}
-
-	contact := strings.TrimSpace(params.Get("contact").MustString())
-	if contact == "" {
-		common.Render(ctx, "27020403", nil)
-		return
-	}
-
-	mobile, e := params.CheckGet("mobile")
-	if e {
-		user.Mobile = strings.TrimSpace(mobile.MustString())
-	}
-
-	parentID, e := params.CheckGet("parentId")
-	if e {
-		user.ParentID = parentID.MustInt()
-	}
-
-	telephone := strings.TrimSpace(params.Get("telephone").MustString())
-	if telephone == "" {
-		common.Render(ctx, "27020404", nil)
-		return
-	}
-
-	address := strings.TrimSpace(params.Get("address").MustString())
-	if address == "" {
-		common.Render(ctx, "27020405", nil)
-		return
-	}
-	user.Account = account
-	user.Contact = contact
-	user.Telephone = telephone
-	user.Address = address
-	entity, err := userService.UpdateById(user)
+	user.Name = strings.TrimSpace(user.Name)
+	user.Contact = strings.TrimSpace(user.Contact)
+	user.Mobile = strings.TrimSpace(user.Mobile)
+	user.Telephone = strings.TrimSpace(user.Telephone)
+	user.Address = strings.TrimSpace(user.Address)
+	user.Name = strings.TrimSpace(user.Name)
+	user.ID = id
+	entity, err := userService.Update(&user)
 	if err != nil {
 		common.Render(ctx, "000002", nil)
 		return

@@ -73,9 +73,13 @@ func (self *PermissionService)Delete(id int) error {
 	return err
 }
 
-func (self *PermissionService)Update(permission *permission.Permission) (*permission.Permission, error) {
-	if err := common.SodaMngDB_WR.Save(&permission).Error; err != nil {
+func (self *PermissionService)Update(entity *permission.Permission) (*permission.Permission, error) {
+	_permission := map[string]interface{}{
+		"name":entity.Name,
+		"category_id":entity.CategoryID,
+	}
+	if err := common.SodaMngDB_WR.Model(&permission.Permission{}).Where(entity.ID).Updates(_permission).Scan(entity).Error; err != nil {
 		return nil, err
 	}
-	return permission, nil
+	return entity, nil
 }
