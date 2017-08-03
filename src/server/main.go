@@ -16,7 +16,7 @@ func SetUpServer() {
 
 	iris.Config.IsDevelopment = isDevelopment
 
-	app := iris.Default	//如果使用iris.New(),之前设置的iris.Config无法生效
+	app := iris.Default //如果使用iris.New(),之前设置的iris.Config无法生效
 
 	app.Use(common.NewRecover())
 
@@ -42,7 +42,9 @@ func SetUpServer() {
 	})
 
 	app.OnError(iris.StatusTooManyRequests, func(ctx *iris.Context) {
-		common.Render(ctx, "000004", nil)
+		result := &common.Result{}
+		_result := result.New("000004", nil)
+		ctx.JSON(iris.StatusOK, _result)
 	})
 
 	app.OnError(iris.StatusInternalServerError, func(ctx *iris.Context) {

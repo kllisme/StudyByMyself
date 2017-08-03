@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/go-errors/errors"
+	"github.com/spf13/viper"
 	"gopkg.in/kataras/iris.v5"
 )
 
@@ -13,16 +14,16 @@ type Result struct {
 	Msg         string      `json:"message"` //中文:系统开小差了，请稍后再试！
 	Description string      `json:"-"`       //异常具体描述,如：解析JSON异常
 	Exception   interface{} `json:"-"`       //{}
-	Code        string      `json:"-"`       //系统唯一错误码：101111111
+	Code        string      `json:"code"`    //系统唯一错误码：101111111
 	IsError     bool        `json:"-"`
 }
 
 func (self *Result) New(code string, data interface{}) *Result {
-	prefix := "biz."
-	msg := StatusConfig.GetString(prefix + code + "." + "msg")
-	description := StatusConfig.GetString(prefix + code + "." + "description")
-	isError := StatusConfig.GetBool(prefix + code + "." + "isError")
-	status := StatusConfig.GetString(prefix + code + "." + "status")
+	prefix := "status.biz."
+	msg := viper.GetString(prefix + code + "." + "msg")
+	description := viper.GetString(prefix + code + "." + "description")
+	isError := viper.GetBool(prefix + code + "." + "isError")
+	status := viper.GetString(prefix + code + "." + "status")
 	result := &Result{
 		Status:      status,
 		Msg:         msg,
@@ -49,9 +50,9 @@ func Error(code string, data interface{}) *Result {
 	if code == "" {
 		code = "000001"
 	}
-	prefix := "service."
-	msg := StatusConfig.GetString(prefix + code + "." + "msg")
-	description := StatusConfig.GetString(prefix + code + "." + "description")
+	prefix := "status.service."
+	msg := viper.GetString(prefix + code + "." + "msg")
+	description := viper.GetString(prefix + code + "." + "description")
 	result := &Result{
 		Status:      code,
 		Msg:         msg,
@@ -67,6 +68,6 @@ func Error(code string, data interface{}) *Result {
 func Render(ctx *iris.Context, code string, data interface{}) {
 	result := &Result{}
 	_result := result.New(code, data)
-	//Log(ctx, _result)
 	ctx.JSON(iris.StatusOK, _result)
+	Log(ctx, _result)
 }

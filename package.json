@@ -13,6 +13,7 @@
   "devDependencies": {
     "bluebird": "^3.4.7",
     "config": "^1.21.0",
+    "glob": "^7.1.2",
     "gulp": "^3.9.1",
     "gulp-bump": "^2.7.0",
     "gulp-git": "^2.0.0",

@@ -3,9 +3,10 @@ package common
 import (
 	"flag"
 	"fmt"
+	"log"
+
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
-	"log"
 )
 
 func SetupConfig() {
@@ -27,22 +28,4 @@ func SetupConfig() {
 	viper.OnConfigChange(func(e fsnotify.Event) {
 		fmt.Println("Config file changed:", e.Name)
 	})
-
-	status := viper.New()
-	status.AddConfigPath("./")
-	status.SetConfigName("resource/status")
-	err = status.ReadInConfig()
-	if err != nil {
-		log.Fatalf("Read status config fail:", err.Error())
-	}
-	status.WatchConfig()
-	status.OnConfigChange(func(e fsnotify.Event) {
-		fmt.Println("Config file changed:", e.Name)
-	})
-	StatusConfig = status
-
 }
-
-var (
-	StatusConfig *viper.Viper
-)
