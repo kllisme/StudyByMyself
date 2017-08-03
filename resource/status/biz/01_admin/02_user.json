@@ -32,5 +32,10 @@
   "27020702": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "原密码不能为空", "isError": false },
   "27020703": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "新密码不能为空", "isError": false },
   "270208": "ResetPassword",
-  "27020800": {"status": "OK", "msg": "", "description": "密码重置成功", "isError": false }
+  "27020800": {"status": "OK", "msg": "", "description": "密码重置成功", "isError": false },
+  "270209": "AssignRoles",
+  "27020900": {"status": "OK", "msg": "", "description": "角色分配成功", "isError": false },
+  "27020901": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+  "270210": "GetRoles",
+  "27021000": {"status": "OK", "msg": "", "description": "获取用户的角色成功", "isError": false }
 }
