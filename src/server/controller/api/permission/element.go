@@ -24,7 +24,7 @@ func (self *ElementController)GetByID(ctx *iris.Context) {
 	if err != nil {
 		common.Render(ctx, "000002", nil)
 	}
-	common.Render(ctx, "27040100", element)
+	common.Render(ctx, "27070100", element)
 }
 
 func (self *ElementController)Paging(ctx *iris.Context) {
@@ -36,7 +36,7 @@ func (self *ElementController)Paging(ctx *iris.Context) {
 		common.Render(ctx, "000002", nil)
 		return
 	}
-	common.Render(ctx, "27040200", result)
+	common.Render(ctx, "27070200", result)
 	return
 }
 
@@ -44,19 +44,19 @@ func (self *ElementController)Create(ctx *iris.Context) {
 	elementService := permission.ElementService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27040301", nil)
+		common.Render(ctx, "27070301", nil)
 		return
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
 	if name == "" {
-		common.Render(ctx, "", nil)
+		common.Render(ctx, "27070302", nil)
 		return
 	}
 	reference := strings.TrimSpace(params.Get("reference").MustString())
-	if reference == "" {
-		common.Render(ctx, "", nil)
-		return
-	}
+	//if reference == "" {
+	//	common.Render(ctx, "27070303", nil)
+	//	return
+	//}
 	element := model.Element{
 		Name:name,
 		Reference:reference,
@@ -66,14 +66,14 @@ func (self *ElementController)Create(ctx *iris.Context) {
 		common.Render(ctx, "000002", nil)
 		return
 	}
-	common.Render(ctx, "27040300", entity)
+	common.Render(ctx, "27070300", entity)
 }
 
 func (self *ElementController)Update(ctx *iris.Context) {
 	elementService := permission.ElementService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27040501", nil)
+		common.Render(ctx, "27070501", nil)
 		return
 	}
 
@@ -90,14 +90,14 @@ func (self *ElementController)Update(ctx *iris.Context) {
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
 	if name == ""{
-		common.Render(ctx, "27020502", nil)
+		common.Render(ctx, "27070502", nil)
 		return
 	}
 	reference := strings.TrimSpace(params.Get("reference").MustString())
-	if reference == "" {
-		common.Render(ctx, "", nil)
-		return
-	}
+	//if reference == "" {
+	//	common.Render(ctx, "27070503", nil)
+	//	return
+	//}
 	element.Name = name
 	element.Reference = reference
 	entity, err := elementService.Update(element)
@@ -105,7 +105,7 @@ func (self *ElementController)Update(ctx *iris.Context) {
 		common.Render(ctx, "000002", nil)
 		return
 	}
-	common.Render(ctx, "27040500", entity)
+	common.Render(ctx, "27070500", entity)
 }
 
 func (self *ElementController)Delete(ctx *iris.Context) {
@@ -118,5 +118,5 @@ func (self *ElementController)Delete(ctx *iris.Context) {
 	if err := elementService.Delete(id); err != nil {
 		common.Render(ctx, "000002", nil)
 	}
-	common.Render(ctx, "27040400", nil)
+	common.Render(ctx, "27070400", nil)
 }

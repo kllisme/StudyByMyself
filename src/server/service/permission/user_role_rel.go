@@ -39,3 +39,9 @@ func (self *UserRoleRelService) AssignRoles(userID int, roleIDs []int) (*[]int, 
 	tx.Commit()
 	return &roleIDs, nil
 }
+
+//根据用户或角色ID删除关系表
+func (self *UserRoleRelService) DeleteRel(userID int, roleID int) error {
+	err := common.SodaMngDB_WR.Delete(permission.UserRoleRel{}, "user_id = ? or role_id = ?", userID, roleID).Error
+	return err
+}

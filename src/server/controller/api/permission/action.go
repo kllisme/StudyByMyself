@@ -61,7 +61,7 @@ func (self *ActionController)Create(ctx *iris.Context) {
 
 func (self *ActionController)Delete(ctx *iris.Context) {
 	actionService := permission.ActionService{}
-	id, err := ctx.URLParamInt("id")
+	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", nil)
 	}
