@@ -31,8 +31,8 @@ func (self *PermissionController)Paging(ctx *iris.Context) {
 	permissionService := permission.PermissionService{}
 	page, _ := ctx.URLParamInt("page")
 	perPage, _ := ctx.URLParamInt("per_page")
-	_type, _ := ctx.URLParamInt("type")
-	result, err := permissionService.Paging(_type, page, perPage)
+	categoryID, _ := ctx.URLParamInt("category_id")
+	result, err := permissionService.Paging(categoryID, page, perPage)
 	if err != nil {
 		common.Render(ctx, "000002", nil)
 		return

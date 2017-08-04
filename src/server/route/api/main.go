@@ -6,7 +6,6 @@ import (
 	"maizuo.com/soda/erp/api/src/server/controller/api"
 	"maizuo.com/soda/erp/api/src/server/middleware"
 	"maizuo.com/soda/erp/api/src/server/controller/api/permission"
-	"maizuo.com/soda/erp/api/src/server/route/api/admin"
 )
 
 func Api(app *iris.Framework) {
@@ -57,16 +56,15 @@ func Api(app *iris.Framework) {
 
 			accessControlledAPI.Put("/profile/password", userCtrl.ChangePassword)
 
-
 			accessControlledAPI.Post("/roles", roleCtrl.Create)
 			accessControlledAPI.Get("/roles", roleCtrl.GetAll)
 			accessControlledAPI.Delete("/roles/:id", roleCtrl.Delete)
 			accessControlledAPI.Get("/roles/:id", roleCtrl.GetByID)
-			accessControlledAPI.Put("/roles/:id",roleCtrl.Update)
+			accessControlledAPI.Put("/roles/:id", roleCtrl.Update)
 			accessControlledAPI.Put("/roles/:id/permissions", roleCtrl.AssignPermissions)
 			accessControlledAPI.Get("/roles/:id/permissions", roleCtrl.GetPermissions)
 
-			admin.Setup(accessControlledAPI)
+			//admin.Setup(accessControlledAPI)
 			permissionAPI := accessControlledAPI.Party("/")
 			{
 
@@ -79,8 +77,10 @@ func Api(app *iris.Framework) {
 				permissionAPI.Post("/permissions", permissionCtrl.Create)
 				permissionAPI.Delete("/permissions/:id", permissionCtrl.Delete)
 				permissionAPI.Put("/permissions/:id", permissionCtrl.Update)
+
 				permissionAPI.Get("/permissions/:id", permissionCtrl.GetByID)
 				permissionAPI.Get("/permissions", permissionCtrl.Paging)
+
 				permissionAPI.Get("/permissions/:id/menus", permissionCtrl.GetMenus)
 				permissionAPI.Put("/permissions/:id/menus", permissionCtrl.AssignMenus)
 				permissionAPI.Get("/permissions/:id/elements", permissionCtrl.GetElements)
