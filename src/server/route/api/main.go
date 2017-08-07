@@ -20,6 +20,9 @@ func Api(app *iris.Framework) {
 		menuCtrl = &permission.MenuController{}
 		actionCtrl = &permission.ActionController{}
 		permissionCtrl = &permission.PermissionController{}
+
+		billCtrl = &api.BillController{}
+		dailyBillCtrl = &api.DailyBillController{}
 	)
 	v1 := app.Party("/v1", func(ctx *iris.Context) {
 		ctx.Next()
@@ -36,6 +39,10 @@ func Api(app *iris.Framework) {
 
 		v1.UseFunc(common.Authorization)
 		v1.Get("/profile/session", userCtrl.GetSessionInfo)
+
+		v1.Get("/bill",billCtrl.ListByAccountType)
+
+		v1.Get("/daily-bill",dailyBillCtrl.ListByBillId)
 
 		//v1.Get("/profile/user", userCtrl.GetSessionInfo)
 
