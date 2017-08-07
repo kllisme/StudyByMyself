@@ -12,5 +12,11 @@
   "270505":"Update",
   "27050500": {"status": "OK", "msg": "", "description": "更新角色信息成功", "isError": false },
   "27050501": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
-  "27050502": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "角色名不能为空", "isError": false }
+  "27050502": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "角色名不能为空", "isError": false },
+  "270506": "AssignPermissions",
+  "27050600": {"status": "OK", "msg": "", "description": "权限分配成功", "isError": false },
+  "27050601": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+  "270507": "GetPermissions",
+  "27050700": {"status": "OK", "msg": "", "description": "获取角色的权限成功", "isError": false }
+
 }

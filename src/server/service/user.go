@@ -5,6 +5,7 @@ import (
 	"maizuo.com/soda/erp/api/src/server/common"
 	"github.com/jinzhu/gorm"
 	"maizuo.com/soda/erp/api/src/server/entity"
+	"maizuo.com/soda/erp/api/src/server/model/permission"
 )
 
 type UserService struct {
@@ -89,8 +90,16 @@ func (self *UserService) Create(user *model.User) (*model.User, error) {
 	return user, nil
 }
 
-func (self *UserService) UpdateById(user *model.User) (*model.User, error) {
-	if err := common.SodaMngDB_R.Model(&model.User{}).Save(&user).Where(user.ID).Error; err != nil {
+func (self *UserService) Update(user *model.User) (*model.User, error) {
+	_user := map[string]interface{}{
+		"name":      user.Name,
+		"contact":   user.Contact,
+		"mobile":    user.Mobile,
+		"telephone": user.Telephone,
+		"address":   user.Address,
+		"email":     user.Email,
+	}
+	if err := common.SodaMngDB_R.Model(&model.User{}).Where("id = ?", user.ID).Updates(_user).Scan(user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
@@ -101,8 +110,16 @@ func (self *UserService) UpdateByMobile(in interface{}) (interface{}, error) {
 }
 
 func (self *UserService) DeleteById(id int) error {
-	err := common.SodaMngDB_WR.Delete(&model.User{}, id).Error
-	return err
+	tx := common.SodaMngDB_WR.Begin()
+	if err := tx.Delete(&model.User{}, id).Error; err != nil {
+		tx.Rollback()
+		return err
+	} else if err := tx.Where("user_id = ?", id).Delete(&permission.UserRoleRel{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
 }
 
 func (self *UserService) ChangePassword(id int, password string) (*model.User, error) {

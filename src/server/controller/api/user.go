@@ -10,6 +10,7 @@ import (
 	"github.com/bitly/go-simplejson"
 	"maizuo.com/soda/erp/api/src/server/model"
 	"strings"
+	"maizuo.com/soda/erp/api/src/server/service/permission"
 )
 
 type UserController struct{}
@@ -105,60 +106,26 @@ func (self *UserController)Update(ctx *iris.Context) {
 		return
 	}
 
-	user, err := userService.GetById(id)
+	_, err = userService.GetById(id)
 	if err != nil {
 		common.Render(ctx, "000003", nil)
 		return
 	}
 
-	params := simplejson.New()
-	if err := ctx.ReadJSON(&params); err != nil {
+	user := model.User{}
+	if err := ctx.ReadJSON(&user); err != nil {
 		common.Render(ctx, "27020401", nil)
 		return
 	}
 
-	account := strings.TrimSpace(params.Get("account").MustString())
-	if account == "" {
-		common.Render(ctx, "27020402", nil)
-		return
-	}
-	name, e := params.CheckGet("name")
-	if e {
-		user.Name = strings.TrimSpace(name.MustString())
-	}
-
-	contact := strings.TrimSpace(params.Get("contact").MustString())
-	if contact == "" {
-		common.Render(ctx, "27020403", nil)
-		return
-	}
-
-	mobile, e := params.CheckGet("mobile")
-	if e {
-		user.Mobile = strings.TrimSpace(mobile.MustString())
-	}
-
-	parentID, e := params.CheckGet("parentId")
-	if e {
-		user.ParentID = parentID.MustInt()
-	}
-
-	telephone := strings.TrimSpace(params.Get("telephone").MustString())
-	if telephone == "" {
-		common.Render(ctx, "27020404", nil)
-		return
-	}
-
-	address := strings.TrimSpace(params.Get("address").MustString())
-	if address == "" {
-		common.Render(ctx, "27020405", nil)
-		return
-	}
-	user.Account = account
-	user.Contact = contact
-	user.Telephone = telephone
-	user.Address = address
-	entity, err := userService.UpdateById(user)
+	user.Name = strings.TrimSpace(user.Name)
+	user.Contact = strings.TrimSpace(user.Contact)
+	user.Mobile = strings.TrimSpace(user.Mobile)
+	user.Telephone = strings.TrimSpace(user.Telephone)
+	user.Address = strings.TrimSpace(user.Address)
+	user.Name = strings.TrimSpace(user.Name)
+	user.ID = id
+	entity, err := userService.Update(&user)
 	if err != nil {
 		common.Render(ctx, "000002", nil)
 		return
@@ -181,7 +148,51 @@ func (self *UserController)Delete(ctx *iris.Context) {
 }
 
 func (self *UserController)AssignRoles(ctx *iris.Context) {
+	userService := service.UserService{}
+	userRoleRelService := permission.UserRoleRelService{}
+	id, err := ctx.ParamInt("id")
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	_, err = userService.GetById(id)
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	roleIDs := make([]int, 0)
+	if err := ctx.ReadJSON(&roleIDs); err != nil {
+		common.Render(ctx, "27020901", nil)
+		return
+	}
+	result, err := userRoleRelService.AssignRoles(id, roleIDs)
+	if err != nil {
+		common.Render(ctx, "000002", nil)
+		return
+	}
+	common.Render(ctx, "27020900", result)
+}
 
+func (self *UserController)GetRoles(ctx *iris.Context) {
+	userService := service.UserService{}
+	userRoleRelService := permission.UserRoleRelService{}
+	id, err := ctx.ParamInt("id")
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	_, err = userService.GetById(id)
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+
+	result, err := userRoleRelService.GetRoleIDsByUserID(id)
+	if err != nil {
+		common.Render(ctx, "000002", nil)
+		return
+	}
+	common.Render(ctx, "27021000", result)
 }
 
 func (self *UserController) GetById(ctx *iris.Context) {
@@ -209,7 +220,7 @@ func (self *UserController)GetSessionInfo(ctx *iris.Context) {
 	//userEntity, _ := userService.GetById(user.ID)
 	common.Render(ctx, "27020100", sessionInfo)
 }
-
+//ResetPassword 将指定用户的密码重置为服务器默认初始密码
 func (self *UserController)ResetPassword(ctx *iris.Context) {
 	userService := service.UserService{}
 	id, err := ctx.ParamInt("id")
@@ -225,7 +236,7 @@ func (self *UserController)ResetPassword(ctx *iris.Context) {
 	}
 	common.Render(ctx, "27020800", user)
 }
-
+//ChangePassword 更改当前登录用户的密码
 func (self *UserController)ChangePassword(ctx *iris.Context) {
 	userService := service.UserService{}
 	currentUserID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))

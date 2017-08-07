@@ -69,5 +69,5 @@ func Render(ctx *iris.Context, code string, data interface{}) {
 	result := &Result{}
 	_result := result.New(code, data)
 	ctx.JSON(iris.StatusOK, _result)
-	Log(ctx, _result)
+	//Log(ctx, _result)
 }
