@@ -5,6 +5,7 @@ import (
 	"maizuo.com/soda/erp/api/src/server/common"
 	"github.com/jinzhu/gorm"
 	"maizuo.com/soda/erp/api/src/server/entity"
+	"maizuo.com/soda/erp/api/src/server/model/permission"
 )
 
 type UserService struct {
@@ -109,8 +110,16 @@ func (self *UserService) UpdateByMobile(in interface{}) (interface{}, error) {
 }
 
 func (self *UserService) DeleteById(id int) error {
-	err := common.SodaMngDB_WR.Delete(&model.User{}, id).Error
-	return err
+	tx := common.SodaMngDB_WR.Begin()
+	if err := tx.Delete(&model.User{}, id).Error; err != nil {
+		tx.Rollback()
+		return err
+	} else if err := tx.Where("user_id = ?", id).Delete(&permission.UserRoleRel{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
 }
 
 func (self *UserService) ChangePassword(id int, password string) (*model.User, error) {

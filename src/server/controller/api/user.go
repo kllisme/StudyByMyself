@@ -220,7 +220,7 @@ func (self *UserController)GetSessionInfo(ctx *iris.Context) {
 	//userEntity, _ := userService.GetById(user.ID)
 	common.Render(ctx, "27020100", sessionInfo)
 }
-
+//ResetPassword 将指定用户的密码重置为服务器默认初始密码
 func (self *UserController)ResetPassword(ctx *iris.Context) {
 	userService := service.UserService{}
 	id, err := ctx.ParamInt("id")
@@ -236,7 +236,7 @@ func (self *UserController)ResetPassword(ctx *iris.Context) {
 	}
 	common.Render(ctx, "27020800", user)
 }
-
+//ChangePassword 更改当前登录用户的密码
 func (self *UserController)ChangePassword(ctx *iris.Context) {
 	userService := service.UserService{}
 	currentUserID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))

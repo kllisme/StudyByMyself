@@ -55,8 +55,16 @@ func (self *ActionService)Create(action *permission.Action) error {
 }
 
 func (self *ActionService)Delete(id int) error {
-	err := common.SodaMngDB_WR.Delete(&permission.Action{}, id).Error
-	return err
+	tx := common.SodaMngDB_WR.Begin()
+	if err := tx.Delete(&permission.Action{}, id).Error; err != nil {
+		tx.Rollback()
+		return err
+	} else if err := tx.Where("action_id = ?", id).Delete(&permission.PermissionActionRel{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
 }
 
 func (self *ActionService)Update(action *permission.Action) (*permission.Action, error) {

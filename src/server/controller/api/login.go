@@ -27,6 +27,8 @@ func (self *LoginController) Login(ctx *iris.Context) {
 		permissionActionRelService = permission.PermissionActionRelService{}
 		actionService = permission.ActionService{}
 		rolePermissionRelService = permission.RolePermissionRelService{}
+		permissionElementRelService = permission.PermissionElementRelService{}
+		elementService = permission.ElementService{}
 	)
 
 	//每次调用返回时都清一次图片验证码
@@ -120,6 +122,19 @@ func (self *LoginController) Login(ctx *iris.Context) {
 				return
 			}
 			sessionInfo.ActionList = actionList
+		}
+		elementIDs, err := permissionElementRelService.GetElementIDsByPermissionIDs(permissionIDs)
+		if err != nil {
+			common.Render(ctx, "27010119", nil)
+			return
+		}
+		if len(elementIDs) != 0 {
+			elementList, err := elementService.GetListByIDs(elementIDs)
+			if err != nil {
+				common.Render(ctx, "27010118", nil)
+				return
+			}
+			sessionInfo.ElementList = elementList
 		}
 	}
 	jsonObj, _ := json.Marshal(sessionInfo)
