@@ -298,7 +298,7 @@ func (self *WechatPayKit) Refund(refundRequest *RefundRequest) (*map[string]stri
 }
 
 
-func (self *WechatPayKit) BatchPay(batchPayRequest *BatchPayRequest) (*map[string]string, error) {
+func (self *WechatPayKit) BatchPay(batchPayRequest *BatchPayRequest) (map[string]string, error) {
 	batchPayUrl := viper.GetString("resource.pay.wechat.batchpay-url")
 	mchId := viper.GetString("resource.pay.wechat.mch-id")
 	appId := viper.GetString("resource.pay.wechat.app-id")
@@ -343,7 +343,7 @@ func (self *WechatPayKit) BatchPay(batchPayRequest *BatchPayRequest) (*map[strin
 	respMap, err := util.DecodeXMLToMap(bytes.NewReader(response.Bytes()))
 	if err != nil {
 		common.Logger.Warningln("解析xml形式编码错误, 原因:", err.Error())
-		return &respMap, err
+		return respMap, err
 	}
-	return &respMap, nil
+	return respMap, nil
 }

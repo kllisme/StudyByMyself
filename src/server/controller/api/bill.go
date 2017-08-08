@@ -1,6 +1,10 @@
 package api
 
 import (
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/bitly/go-simplejson"
 	"github.com/go-errors/errors"
 	"github.com/spf13/viper"
@@ -9,12 +13,10 @@ import (
 	"maizuo.com/soda/erp/api/src/server/entity"
 	"maizuo.com/soda/erp/api/src/server/kit/alipay"
 	"maizuo.com/soda/erp/api/src/server/kit/functions"
+	"maizuo.com/soda/erp/api/src/server/kit/wechat/pay"
 	"maizuo.com/soda/erp/api/src/server/model"
 	"maizuo.com/soda/erp/api/src/server/service"
 	"maizuo.com/soda/erp/api/src/server/service/permission"
-	"strconv"
-	"strings"
-	"time"
 )
 
 type BillController struct {
@@ -24,6 +26,7 @@ type BillController struct {
 func (self *BillController) ListByAccountType(ctx *iris.Context) {
 	// 或许可以放到中间件
 	userRoleService := &permission.UserRoleRelService{}
+	userService := &service.UserService{}
 	userId, _ := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	userRoleList, err := userRoleService.GetRoleIDsByUserID(userId)
 	if err != nil {
@@ -68,91 +71,104 @@ func (self *BillController) ListByAccountType(ctx *iris.Context) {
 		common.Render(ctx, "27070102", err)
 		return
 	}
+	objects := make([]interface{},0)
+	for _,bill := range  billList {
+		user,err := userService.GetById(bill.ID)
+		if err != nil {
+			common.Logger.Debugln("获取账单用户信息失败err----------", err)
+			common.Render(ctx, "27070106", err)
+		}
+		objects = append(objects,bill.Mapping(user))
+	}
 
 	common.Render(ctx, "27070100", &entity.PaginationData{
 		Pagination: entity.Pagination{Total: total, From: offset, To: offset + limit},
-		Objects:    billList,
+		Objects:    objects,
 	})
 	return
 }
 
-func (self *DailyBillController) BatchPay(ctx *iris.Context) {
+func (self *BillController) BatchPay(ctx *iris.Context) {
 	billService := service.BillService{}
 	billBatchNoService := &service.BillBatchNoService{}
 	params := simplejson.New()
 	if ctx.ReadJSON(params) != nil {
 		common.Logger.Debugln("解析json异常")
-		common.Render(ctx, "CODE", "DATA")
+		common.Render(ctx, "27080201", "解析json异常")
 		return
 	}
 	// 结算支付类型 1:支付宝 2:微信
 	payType, err := params.Get("type").Int()
 	if err == nil {
 		common.Logger.Debugln("获取结算支付类型异常")
-		common.Render(ctx, "CODE", "DATA")
+		common.Render(ctx, "27080202", "获取结算支付类型异常")
 		return
 	}
 	bills, err := params.Get("bills").Array()
 	if err == nil {
 		common.Logger.Debugln("获取bills异常")
-		common.Render(ctx, "CODE", "获取bills异常")
+		common.Render(ctx, "27080203", "获取bills异常")
 		return
 	}
 	if len(bills) == 0 {
-		common.Render(ctx, "CODE", "未选择任何账单")
+		common.Render(ctx, "27080204", "未选择任何账单")
 		return
 	}
-	billIds := make([]string, 0)
+	billIds := make([]interface{}, 0)
 	for _, _param := range bills {
 		_map := _param.(map[string]interface{})
-		billId := _map["billId"].(string)
-		billIds = append(billIds, billId)
+		billIds = append(billIds, _map["billId"])
 	}
 	// 确定选取的是发起结算和结账失败的账单
-	statusList := []int{1,4}
-	billList, err := billService.ListByBillIdsAndStatus(billIds,statusList)
+	statusList := []interface{}{1, 4}
+	billList, err := billService.ListByBillIdsAndStatus(billIds, statusList)
 	if err != nil {
-		common.Render(ctx, "CODE", "获取账单列表失败")
+		common.Render(ctx, "27080205", "获取账单列表失败")
 		return
 	}
 	if len(billList) != len(billIds) {
-		common.Render(ctx,"CODE","所选账单中包含不是发起提现和结算失败的订单")
+		common.Render(ctx, "27080206", "所选账单中包含不是发起提现和结算失败的订单")
 	}
 	//查询账单列表中是否已有批次号的订单(再次确认,这里的订单号只是"已申请"和"结账失败"的)
 	batchNoList, _ := billBatchNoService.Baisc(billIds)
 	if len(*batchNoList) > 0 {
 		//common.Render(ctx,"CODE","所选账单中包含已结账账单，请重新选择")
-		common.Render(ctx, "CODE", "所选账单中包含已结账账单，请重新选择")
+		common.Render(ctx, "27080207", "所选账单中包含已结账账单，请重新选择")
 		return
 	}
-	code,data := "",make(map[string]string)
+	code, data := "", make(map[string]string)
 	if payType == 1 {
-		data,billIds, code, err = BatchAlipay(billList)
+		// 支付宝,生成批次号并拼接支付宝支付的参数
+		data, code, err = BatchAlipay(billList)
 	} else if payType == 2 {
-		//billIds, code, err = BatchWechatPay(billList)
+		// 微信,无需做处理,只需要在下面统一改变bill和daily_bill的状态
+		err = nil
 	} else {
-		common.Render(ctx, "CODE", "错误结算类型")
+		common.Render(ctx, "27080208", "错误结算类型")
 		return
 	}
 
+	// 将支付宝处理后的问题排解
+	if err != nil {
+		common.Render(ctx, code, err)
+	}
+	// 不用区分微信还是支付宝的单,统一改变bill和daily_bill的状态
 	err = billService.BatchUpdateStatusById(3, billIds)
 	if err != nil {
-		common.Logger.Debugln("更新日账单为'结算中'失败:", err.Error())
-		common.Render(ctx, "CODE", err)
+		common.Logger.Debugln("更新账单为'结算中'失败:", err.Error())
+		common.Render(ctx, "27080209", err)
 		return
 	}
 	// "日账单结账成功"
-	common.Render(ctx, code, data)
+	common.Render(ctx, "27080200", data)
 }
 
 /*
 	map[string]string aliPayReqParam
-	[]string 批次号切片
 	string   code
 */
-func BatchAlipay(billList []*model.Bill) (map[string]string,[]string, string, error) {
+func BatchAlipay(billList []*model.Bill) (map[string]string, string, error) {
 
-	batchNoList := make([]string,0)
 	billBatchNoService := &service.BillBatchNoService{}
 	aliPayBillIds := make([]int, 0)
 	billBatchNoList := make([]*model.BillBatchNo, 0)
@@ -176,33 +192,32 @@ func BatchAlipay(billList []*model.Bill) (map[string]string,[]string, string, er
 		aliPayReqParam = GenerateBatchAliPay(batchNum, batchFee, aliPayDetailDataStr)
 		if aliPayReqParam["batch_no"] == "" {
 			common.Logger.Debugln("生成批次号失败")
-			return nil,nil, "CODE", errors.New("支付宝结算更新状态失败")
+			return nil, "27080210", errors.New("支付宝结算更新状态失败")
 		}
 		//create bill_batch_no
 		for _, _bill := range billList {
 			_billBatchNo := &model.BillBatchNo{
-				BillId: _bill.BillId,
-				BatchNo: aliPayReqParam["batch_no"],
-				BillType:1,// 1为bill
+				BillId:   _bill.BillId,
+				BatchNo:  aliPayReqParam["batch_no"],
+				BillType: 1, // 1为bill
 			}
 			billBatchNoList = append(billBatchNoList, _billBatchNo)
 		}
 		if len(billBatchNoList) <= 0 {
 			common.Logger.Debugln("生成批次号信息失败")
-			return nil,nil, "CODE", errors.New("支付宝结算更新状态失败")
+			return nil, "27080211", errors.New("支付宝结算更新状态失败")
 		}
 		_, err := billBatchNoService.BatchCreate(&billBatchNoList)
 		if err != nil {
 			common.Logger.Debugln("持久化批次号失败:", err.Error())
-			return nil,nil, "CODE", errors.New("支付宝结算更新状态失败")
+			return nil, "27080212", errors.New("支付宝结算更新状态失败")
 		}
 
 	} else if (batchNum <= 0 || batchNum > 1000) && aliPayDetailDataStr != "" {
 		common.Logger.Debugln("所选支付宝账单超出批次结算最大值1000", ":", batchNum)
-		return nil,nil, "CODE", errors.New("所选支付宝账单超出批次结算最大值1000")
+		return nil, "27080213", errors.New("所选支付宝账单超出批次结算最大值1000")
 	}
-	batchNoList = append(batchNoList,aliPayReqParam["batch_no"])
-	return aliPayReqParam,batchNoList, "CODE", nil
+	return aliPayReqParam, "", nil
 }
 
 /*
@@ -407,8 +422,41 @@ func GenerateBatchAliPay(batchNum int, batchFee int, aliPayDetailDataStr string)
 //	ctx.Response.SetBodyString("success")
 //}
 
-func BatchWechatPay(bills interface{}) ([]string, string, error) {
-
-
-	return nil, "CODE", nil
+func (self *BillController) WechatPay(bills interface{}) {
+	billService := &service.BillService{}
+	bill, err := billService.GetFirstWechatBill()
+	if err != nil {
+		common.Logger.Debugln("获取微信账单失败")
+	}
+	status := 3
+	billIds := []interface{}{bill.BillId}
+	wechatPayKit := pay.WechatPayKit{}
+	batchPayRequest := &pay.BatchPayRequest{}
+	batchPayRequest.PartnerTradeNo = bill.BillId
+	batchPayRequest.Desc = bill.CreatedAt.Local().Format("01月02日") + "结算款"
+	batchPayRequest.Amount = strconv.Itoa(bill.Amount)
+	batchPayRequest.ReUserName = bill.AccountName
+	batchPayRequest.Openid = bill.Account
+	respMap,err := wechatPayKit.BatchPay(batchPayRequest)
+	if err != nil {
+		common.Logger.Debugln("微信企业支付失败")
+		status = 4
+	}
+	if respMap["return_code"] == "FAIL" {
+		common.Logger.Debugln("请求微信企业支付成功但通信失败,原因:",respMap["return_msg"])
+		status = 4
+	}else{
+		if respMap["result_code"] == "FAIL"  {
+			if respMap["err_code"] == "SYSTEMERROR" {
+				// 系统错误，请重试	请使用原单号以及原请求参数重试，否则可能造成重复支付等资金风险
+			}else {
+				common.Logger.Debugln("请求微信企业支付通信成功但业务失败,错误码",
+					respMap["err_code"],",原因:",respMap["err_code_des"])
+				status = 4
+			}
+		}else{
+			status = 3
+		}
+	}
+	billService.BatchUpdateStatusById(status,billIds)
 }

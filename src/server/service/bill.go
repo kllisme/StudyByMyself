@@ -1,16 +1,16 @@
 package service
 
 import (
-	"maizuo.com/soda/erp/api/src/server/model"
-	"maizuo.com/soda/erp/api/src/server/common"
 	"time"
+
+	"maizuo.com/soda/erp/api/src/server/common"
+	"maizuo.com/soda/erp/api/src/server/model"
 )
 
 type BillService struct {
-
 }
 
-func (self *BillService) TotalByAccountType(accountType,status int,createdAt,settledAt,keys string)(int,error){
+func (self *BillService) TotalByAccountType(accountType, status int, createdAt, settledAt, keys string) (int, error) {
 	type Result struct {
 		Total int
 	}
@@ -37,15 +37,15 @@ func (self *BillService) TotalByAccountType(accountType,status int,createdAt,set
 		params = append(params, "%"+keys+"%")
 	}
 	sql += " and bill.account_type = ? and user_id != 1 " // user_id != 1 过滤测试的账单
-	params = append(params,accountType)
+	params = append(params, accountType)
 	r := common.SodaMngDB_R.Raw(sql, params...).Scan(result)
 	if r.Error != nil {
-		return -1,r.Error
+		return -1, r.Error
 	}
-	return result.Total,nil
+	return result.Total, nil
 }
 
-func (self *BillService) ListByAccountType(accountType,status,offset,limit int,createdAt,settledAt,keys string )([]*model.Bill,error){
+func (self *BillService) ListByAccountType(accountType, status, offset, limit int, createdAt, settledAt, keys string) ([]*model.Bill, error) {
 	billList := []*model.Bill{}
 	sql := "select * from bill where ( bill.deleted_at IS NULL "
 	params := []interface{}{}
@@ -68,27 +68,27 @@ func (self *BillService) ListByAccountType(accountType,status,offset,limit int,c
 		params = append(params, "%"+keys+"%")
 	}
 	sql += " and bill.account_type = ? and user_id != 1 " // user_id != 1 过滤测试的账单
-	params = append(params,accountType)
+	params = append(params, accountType)
 	// TODO 排序规则：等待结算的单排在最前面，然后到结算中→结算成功→结算失败，
 	// 	同状态的账单按申请时间先后排序，最新提交的提现申请排在最前面；
 	r := common.SodaMngDB_R.Raw(sql, params...).Order(" created_at desc ").Offset(offset).Limit(limit).Scan(&billList)
 	if r.Error != nil {
-		return nil,r.Error
+		return nil, r.Error
 	}
-	return billList,nil
+	return billList, nil
 }
 
-func (self *BillService) ListByBillIdsAndStatus(billIds []string,status []int)([]*model.Bill,error){
+func (self *BillService) ListByBillIdsAndStatus(billIds []interface{}, status []interface{}) ([]*model.Bill, error) {
 	billList := []*model.Bill{}
-	r := common.SodaMngDB_R.Where(" bill_id in (?) ",billIds...).Where(" status in (?) ",status...).Find(billList)
+	r := common.SodaMngDB_R.Where(" bill_id in (?) ", billIds...).Where(" status in (?) ", status...).Find(billList)
 	if r.Error != nil {
-		return nil,r.Error
+		return nil, r.Error
 	}
-	return billList,nil
+	return billList, nil
 }
 
-func (self *BillService) BatchUpdateStatusById(status int, ids ...interface{}) (error) {
-	tx := common.SodaMngDB_R.Begin()
+func (self *BillService) BatchUpdateStatusById(status int, ids ...interface{}) error {
+	tx := common.SodaMngDB_WR.Begin()
 	param := make(map[string]interface{}, 0)
 	param["status"] = status
 	// 先更新bill
@@ -113,10 +113,20 @@ func (self *BillService) BatchUpdateStatusById(status int, ids ...interface{}) (
 	if status == 3 {
 		dailyBillParam["submit_at"] = time.Now()
 	}
-	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) ",ids).Update(param)
+	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) ", ids).Update(param)
 	if r.Error != nil {
 		tx.Rollback()
 		return r.Error
 	}
-	return  nil
+	return nil
+}
+
+func (self *BillService) GetFirstWechatBill() (*model.Bill, error) {
+	bill := &model.Bill{}
+	// 找到状态为3结账中和结算账号为微信的账单出来结算
+	r := common.SodaMngDB_R.Where(map[string]interface{}{"status": 3, "account_type": 2}).First(bill)
+	if r.Error != nil {
+		return nil, r.Error
+	}
+	return bill, r.Error
 }

@@ -37,9 +37,17 @@ func Api(app *iris.Framework) {
 		v1.UseFunc(common.Authorization)
 		v1.Get("/profile/session", userCtrl.GetSessionInfo)
 
-		v1.Get("/bill",billCtrl.ListByAccountType)
+		api := v1.Party("/api",func(ctx *iris.Context){
+			ctx.Next()
+		})
 
-		v1.Get("/daily-bill",dailyBillCtrl.ListByBillId)
+		api.Get("/bills",billCtrl.ListByAccountType)
+		api.Get("/bills/:id",dailyBillCtrl.ListByBillId)
+
+		//api.Get()
+
+		api.Post("/settlement/actions/pay",billCtrl.BatchPay)
+		api.Post("/settlement/actions/cancel",billCtrl.BatchPay)
 
 		//v1.Get("/profile/user", userCtrl.GetSessionInfo)
 

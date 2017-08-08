@@ -4,6 +4,7 @@ import (
 	"maizuo.com/soda/erp/api/src/server/model"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"time"
+	"maizuo.com/soda/erp/api/src/server/model/soda"
 )
 
 type DailyBillService struct {
@@ -75,4 +76,11 @@ func (self *DailyBillService) BasicMap(billAt string, status int, userIds ...str
 	return dailyBillMap, nil
 }
 
-
+func (self *DailyBillService)BasicById(id int)(*model.DailyBill,error){
+	dailyBill := &model.DailyBill{}
+	r := common.SodaMngDB_R.Where(" id = ? ",id).Find(dailyBill)
+	if r.Error != nil {
+		return nil, r.Error
+	}
+	return dailyBill,nil
+}
