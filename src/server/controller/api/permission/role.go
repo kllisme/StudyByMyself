@@ -31,6 +31,13 @@ func (self *RoleController)Create(ctx *iris.Context) {
 		return
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
+	if name == "" {
+		common.Render(ctx, "27050302", nil)
+		return
+	} else if len(name) > 20 {
+		common.Render(ctx, "27050303", nil)
+		return
+	}
 	description := strings.TrimSpace(params.Get("description").MustString())
 	status := params.Get("status").MustInt()
 	role := model.Role{
@@ -93,6 +100,9 @@ func (self *RoleController)Update(ctx *iris.Context) {
 	name := strings.TrimSpace(params.Get("name").MustString())
 	if name == "" {
 		common.Render(ctx, "27050502", nil)
+		return
+	} else if len(name) > 20 {
+		common.Render(ctx, "27050503", nil)
 		return
 	}
 	description, e := params.CheckGet("description")

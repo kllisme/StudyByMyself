@@ -44,12 +44,12 @@ func (self *UserController)Create(ctx *iris.Context) {
 		return
 	}
 	account := strings.TrimSpace(params.Get("account").MustString())
-	if _, err := userService.GetByAccount(account); err == nil {
-		common.Render(ctx, "27020206", nil)
-		return
-	}
+
 	if account == "" {
 		common.Render(ctx, "27020202", nil)
+		return
+	} else if len(account) < 5 || len(account) > 50 {
+		common.Render(ctx, "27020208", nil)
 		return
 	}
 	password := strings.TrimSpace(params.Get("password").MustString())
@@ -58,28 +58,40 @@ func (self *UserController)Create(ctx *iris.Context) {
 		return
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
+	if name == "" {
+		common.Render(ctx, "27020202", nil)
+		return
+	} else if len(name) > 50 {
+		common.Render(ctx, "27020209", nil)
+		return
+	}
 	contact := strings.TrimSpace(params.Get("contact").MustString())
 	if contact == "" {
 		common.Render(ctx, "27020203", nil)
 		return
 	}
 	mobile := strings.TrimSpace(params.Get("mobile").MustString())
-	parentID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
-	if err != nil {
-		common.Render(ctx, "000001", nil)
-		return
-	}
-	telephone := strings.TrimSpace(params.Get("telephone").MustString())
-	if telephone == "" {
+	if mobile == "" {
 		common.Render(ctx, "27020204", nil)
 		return
+	} else if len(mobile) != 11 {
+		common.Render(ctx, "27020210", nil)
+		return
 	}
+
+	telephone := strings.TrimSpace(params.Get("telephone").MustString())
 
 	address := strings.TrimSpace(params.Get("address").MustString())
 	if address == "" {
 		common.Render(ctx, "27020205", nil)
 		return
 	}
+	parentID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
+	if err != nil {
+		common.Render(ctx, "000001", nil)
+		return
+	}
+
 	user := model.User{
 		Account:account,
 		Name:name,
@@ -89,6 +101,11 @@ func (self *UserController)Create(ctx *iris.Context) {
 		Telephone:telephone,
 		Address:address,
 		Password:password,
+	}
+
+	if _, err := userService.GetByAccount(account); err == nil {
+		common.Render(ctx, "27020206", nil)
+		return
 	}
 	entity, err := userService.Create(&user)
 	if err != nil {
@@ -119,8 +136,22 @@ func (self *UserController)Update(ctx *iris.Context) {
 	}
 
 	user.Name = strings.TrimSpace(user.Name)
+	if user.Name == "" {
+		common.Render(ctx, "27020402", nil)
+		return
+	} else if len(user.Name) != 11 {
+		common.Render(ctx, "27020403", nil)
+		return
+	}
 	user.Contact = strings.TrimSpace(user.Contact)
 	user.Mobile = strings.TrimSpace(user.Mobile)
+	if user.Mobile == "" {
+		common.Render(ctx, "27020404", nil)
+		return
+	} else if len(user.Mobile) != 11 {
+		common.Render(ctx, "27020405", nil)
+		return
+	}
 	user.Telephone = strings.TrimSpace(user.Telephone)
 	user.Address = strings.TrimSpace(user.Address)
 	user.ID = id
