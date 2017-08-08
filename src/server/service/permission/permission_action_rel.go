@@ -17,3 +17,24 @@ func (self *PermissionActionRelService) GetActionIDsByPermissionIDs(permissionID
 	}
 	return actionIDs, nil
 }
+
+func (self *PermissionActionRelService) AssignActions(permissionID int, actionIDs []int) (*[]int, error) {
+	tx := common.SodaMngDB_R.Begin()
+	err := tx.Delete(permission.PermissionActionRel{}, "permission_id = ?", permissionID).Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	for _, v := range actionIDs {
+		err := tx.Create(&permission.PermissionActionRel{
+			PermissionID:permissionID,
+			ActionID:v,
+		}).Error
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
+	tx.Commit()
+	return &actionIDs, nil
+}

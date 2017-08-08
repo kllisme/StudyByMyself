@@ -69,13 +69,34 @@ func (self *PermissionService)Create(permission *permission.Permission) (*permis
 }
 
 func (self *PermissionService)Delete(id int) error {
-	err := common.SodaMngDB_WR.Delete(&permission.Permission{}, id).Error
-	return err
+	tx := common.SodaMngDB_WR.Begin()
+	if err := tx.Delete(&permission.Permission{}, id).Error; err != nil {
+		tx.Rollback()
+		return err
+	} else if err := tx.Where("permission_id = ?", id).Delete(&permission.RolePermissionRel{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	} else if err := tx.Where("permission_id = ?", id).Delete(&permission.PermissionActionRel{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	} else if err := tx.Where("permission_id = ?", id).Delete(&permission.PermissionElementRel{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	} else if err := tx.Where("permission_id = ?", id).Delete(&permission.PermissionMenuRel{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
 }
 
-func (self *PermissionService)Update(permission *permission.Permission) (*permission.Permission, error) {
-	if err := common.SodaMngDB_WR.Save(&permission).Error; err != nil {
+func (self *PermissionService)Update(entity *permission.Permission) (*permission.Permission, error) {
+	_permission := map[string]interface{}{
+		"name":entity.Name,
+		"category_id":entity.CategoryID,
+	}
+	if err := common.SodaMngDB_WR.Model(&permission.Permission{}).Where(entity.ID).Updates(_permission).Scan(entity).Error; err != nil {
 		return nil, err
 	}
-	return permission, nil
+	return entity, nil
 }

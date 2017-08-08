@@ -111,6 +111,49 @@ func (self *RoleController)Update(ctx *iris.Context) {
 }
 
 func (self *RoleController)AssignPermissions(ctx *iris.Context) {
-
+	roleService := permission.RoleService{}
+	rolePermissionRelService := permission.RolePermissionRelService{}
+	id, err := ctx.ParamInt("id")
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	_, err = roleService.GetByID(id)
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	permissionIDs := make([]int, 0)
+	if err := ctx.ReadJSON(&permissionIDs); err != nil {
+		common.Render(ctx, "27050601", nil)
+		return
+	}
+	result, err := rolePermissionRelService.AssignPermissions(id, permissionIDs)
+	if err != nil {
+		common.Render(ctx, "000002", nil)
+		return
+	}
+	common.Render(ctx, "27050600", result)
 }
 
+func (self *RoleController)GetPermissions(ctx *iris.Context) {
+	roleService := permission.RoleService{}
+	rolePermissionRelService := permission.RolePermissionRelService{}
+	id, err := ctx.ParamInt("id")
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+	_, err = roleService.GetByID(id)
+	if err != nil {
+		common.Render(ctx, "000003", nil)
+		return
+	}
+
+	result, err := rolePermissionRelService.GetPermissionIDsByRoleIDs(id)
+	if err != nil {
+		common.Render(ctx, "000002", nil)
+		return
+	}
+	common.Render(ctx, "27050700", result)
+}

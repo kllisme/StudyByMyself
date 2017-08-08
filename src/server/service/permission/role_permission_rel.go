@@ -17,3 +17,24 @@ func (self *RolePermissionRelService) GetPermissionIDsByRoleIDs(roleIDs ...inter
 	}
 	return permissionIDs, nil
 }
+
+func (self *RolePermissionRelService) AssignPermissions(roleID int, permissionIDs []int) (*[]int, error) {
+	tx := common.SodaMngDB_R.Begin()
+	err := tx.Delete(permission.RolePermissionRel{}, "role_id = ?", roleID).Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	for _, v := range permissionIDs {
+		err := tx.Create(&permission.RolePermissionRel{
+			RoleID:roleID,
+			PermissionID:v,
+		}).Error
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
+	tx.Commit()
+	return &permissionIDs, nil
+}

@@ -10,6 +10,7 @@ import (
 	"maizuo.com/soda/erp/api/src/server/service"
 	"maizuo.com/soda/erp/api/src/server/service/permission"
 	"strings"
+	"github.com/bitly/go-simplejson"
 )
 
 type LoginController struct {
@@ -26,14 +27,22 @@ func (self *LoginController) Login(ctx *iris.Context) {
 		permissionActionRelService = permission.PermissionActionRelService{}
 		actionService = permission.ActionService{}
 		rolePermissionRelService = permission.RolePermissionRelService{}
+		permissionElementRelService = permission.PermissionElementRelService{}
+		elementService = permission.ElementService{}
 	)
 
 	//每次调用返回时都清一次图片验证码
 	defer ctx.Session().Delete(captchaKey)
 
-	account := strings.TrimSpace(ctx.URLParam("account"))
-	password := strings.TrimSpace(ctx.URLParam("password"))
-	captcha := strings.TrimSpace(ctx.URLParam("captcha"))
+	params := simplejson.New()
+	err := ctx.ReadJSON(&params)
+	if err != nil {
+		common.Render(ctx, "27010102", nil)
+		return
+	}
+	account := strings.TrimSpace(params.Get("account").MustString())
+	password := strings.TrimSpace(params.Get("password").MustString())
+	captcha := strings.TrimSpace(params.Get("captcha").MustString())
 
 	/*判断不能为空*/
 	if account == "" {
@@ -113,6 +122,19 @@ func (self *LoginController) Login(ctx *iris.Context) {
 				return
 			}
 			sessionInfo.ActionList = actionList
+		}
+		elementIDs, err := permissionElementRelService.GetElementIDsByPermissionIDs(permissionIDs)
+		if err != nil {
+			common.Render(ctx, "27010119", nil)
+			return
+		}
+		if len(elementIDs) != 0 {
+			elementList, err := elementService.GetListByIDs(elementIDs)
+			if err != nil {
+				common.Render(ctx, "27010118", nil)
+				return
+			}
+			sessionInfo.ElementList = elementList
 		}
 	}
 	jsonObj, _ := json.Marshal(sessionInfo)
