@@ -123,7 +123,6 @@ func (self *UserController)Update(ctx *iris.Context) {
 	user.Mobile = strings.TrimSpace(user.Mobile)
 	user.Telephone = strings.TrimSpace(user.Telephone)
 	user.Address = strings.TrimSpace(user.Address)
-	user.Name = strings.TrimSpace(user.Name)
 	user.ID = id
 	entity, err := userService.Update(&user)
 	if err != nil {
