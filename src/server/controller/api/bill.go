@@ -389,9 +389,10 @@ func (self *DailyBillController) AlipayNotification(ctx *iris.Context) {
 	ctx.Response.SetBodyString("success")
 }
 
-func (self *BillController) WechatPay(bills interface{}) {
+func (self *BillController) WechatPay(ctx *iris.Context) {
 	billService := &service.BillService{}
 	billRelService := &service.BillRelService{}
+	common.Logger.Debugln("---------------------微信企业支付开始--------------")
 	bill, err := billService.GetFirstWechatBill()
 	if err != nil {
 		common.Logger.Debugln("获取微信账单失败")
@@ -431,6 +432,7 @@ func (self *BillController) WechatPay(bills interface{}) {
 				status = 3
 				billRel.IsSuccessed = false
 				billRel.Reason = "返回的随机串有问题"
+				common.Logger.Debugln("微信企业支付返回的随机串有问题,产生的随机串:",nonceStr,",接收的随机串:",respParams.GetString("nonce_str"))
 			}else{
 				billRel.IsSuccessed = true
 				billRel.Reason = respParams.GetString("return_msg")
@@ -450,5 +452,5 @@ func (self *BillController) WechatPay(bills interface{}) {
 	if rows == 0 {
 		common.Logger.Debugln("微信企业支付成功但插入回调记录成功数为0")
 	}
-
+	common.Logger.Debugln("---------------------微信企业支付成功--------------")
 }
