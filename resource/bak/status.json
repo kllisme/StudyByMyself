@@ -171,43 +171,5 @@
     "27070501": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
     "27070502": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "页面元素名不能为空", "isError": false },
     "27070503": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "图标不能为空", "isError": false },
-
-    "2708":"bill",
-    "270801":"ListByAccountType",
-    "27080100":{"status": "OK", "msg": "", "description": "获取账单列表成功", "isError": false },
-    "27080101":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "账号类型不能为空", "isError": false },
-    "27080102":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取账单列表失败", "isError": true },
-    "27080103":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取账单列表总数失败", "isError": true },
-    "27080104":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取当前操作用户角色失败", "isError": true },
-    "27080105":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取当前操作用户不具有权限", "isError": true },
-    "27070106":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取账单用户信息失败", "isError": true },
-
-    "270802":"BatchPay",
-    "27080200":{"status": "OK", "msg": "", "description": "批量支付成功", "isError": false },
-    "27080201":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "解析json异常", "isError": true },
-    "27080202":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取结算支付类型异常", "isError": true },
-    "27080203":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取bills异常", "isError": true },
-    "27080204":{"status": "NOT_FOUND_ENTITY", "msg": "未选择任何账单", "description": "未选择任何账单", "isError": true },
-    "27080205":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取账单列表失败", "isError": true },
-    "27080206":{"status": "UNPROCESSABLE_ENTITY", "msg": "所选账单中包含不是发起提现和结算失败的订单", "description": "所选账单中包含不是发起提现和结算失败的订单", "isError": false },
-    "27080207":{"status": "UNPROCESSABLE_ENTITY", "msg": "所选账单中包含已结账账单，请重新选择", "description": "所选账单中包含已结账账单，请重新选择", "isError": false },
-    "27080208":{"status": "UNPROCESSABLE_ENTITY", "msg": "错误结算类型", "description": "错误结算类型", "isError": true },
-    "27080209":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "更新账单为'结算中'失败", "isError": true },
-    "27080210":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "生成批次号失败", "isError": true },
-    "27080211":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "生成批次号信息失败", "isError": true },
-    "27080212":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "持久化批次号失败", "isError": true },
-    "27080213":{"status": "UNPROCESSABLE_ENTITY", "msg": "所选支付宝账单超出批次结算最大值1000", "description": "所选支付宝账单超出批次结算最大值1000", "isError": true },
-
-
-    "2709":"daily_bill",
-    "270901":"ListByBillId",
-    "27090100":{"status": "OK", "msg": "", "description": "获取日账单列表成功", "isError": false },
-    "27090101":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取日账单列表总数失败", "isError": true },
-    "27090102":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "日账单列表总数为0", "isError": true },
-    "27090103":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取日账单列表失败", "isError": true },
-    "27090104":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取日账单用户信息失败", "isError": true }
-
-
-
   }
 }

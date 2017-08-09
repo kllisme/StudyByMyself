@@ -1,0 +1,22 @@
+{
+  "2709":"daily_bill",
+  "270901":"ListByBillId",
+  "27090100":{"status": "OK", "msg": "", "description": "获取日账单列表成功", "isError": false },
+  "27090101":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取日账单列表总数失败", "isError": true },
+  "27090102":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "日账单列表总数为0", "isError": true },
+  "27090103":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取日账单列表失败", "isError": true },
+  "27090104":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取日账单用户信息失败", "isError": true },
+  "27090105":{"status": "UNPROCESSABLE_ENTITY", "msg": "错误的账单ID", "description": "账单ID为空", "isError": true },
+  "27090106":{"status": "NOT_FOUND", "msg": "账单不存在", "description": "账单不存在", "isError": true },
+
+  "2710":"daily_bill",
+  "271001":"DetailsById",
+  "27100100":{"status": "OK", "msg": "", "description": "获取指定日账单订单列表成功", "isError": false },
+  "27100101":{"status": "UNPROCESSABLE_ENTITY", "msg": "错误的日账单ID", "description": "错误的日账单ID", "isError": true },
+  "27100102":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取账单详情失败", "isError": true },
+  "27100103":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取日账单列表总数失败", "isError": true },
+  "27100104":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取日账单列表失败", "isError": true },
+  "27100105":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取票据设备详情失败", "isError": true }
+
+
+}
