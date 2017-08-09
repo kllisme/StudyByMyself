@@ -47,7 +47,7 @@ func (self *BillService) TotalByAccountType(accountType, status int, createdAt, 
 
 func (self *BillService) ListByAccountType(accountType, status, offset, limit int, createdAt, settledAt, keys string) ([]*model.Bill, error) {
 	billList := []*model.Bill{}
-	sql := "select * from bill where ( bill.deleted_at IS NULL "
+	sql := "select * from bill where bill.deleted_at IS NULL "
 	params := []interface{}{}
 	if status > 0 {
 		sql += " and bill.status = ? "
@@ -61,7 +61,6 @@ func (self *BillService) ListByAccountType(accountType, status, offset, limit in
 		sql += " and Date(bill.settled_at) = ? "
 		params = append(params, settledAt)
 	}
-	params = append(params, createdAt)
 	if keys != "" {
 		sql += " and (bill.user_name like ? or bill.account_name like ?) "
 		params = append(params, "%"+keys+"%")
@@ -69,9 +68,10 @@ func (self *BillService) ListByAccountType(accountType, status, offset, limit in
 	}
 	sql += " and bill.account_type = ? and user_id != 1 " // user_id != 1 过滤测试的账单
 	params = append(params, accountType)
+	common.Logger.Debugln("params : ",params)
 	// TODO 排序规则：等待结算的单排在最前面，然后到结算中→结算成功→结算失败，
 	// 	同状态的账单按申请时间先后排序，最新提交的提现申请排在最前面；
-	r := common.SodaMngDB_R.Raw(sql, params...).Order(" created_at desc ").Offset(offset).Limit(limit).Scan(&billList)
+	r := common.SodaMngDB_R.Raw(sql, params...).Limit(limit).Offset(offset).Order(" created_at desc ").Scan(&billList)
 	if r.Error != nil {
 		return nil, r.Error
 	}
@@ -125,6 +125,46 @@ func (self *BillService) GetFirstWechatBill() (*model.Bill, error) {
 	bill := &model.Bill{}
 	// 找到状态为3结账中和结算账号为微信的账单出来结算
 	r := common.SodaMngDB_R.Where(map[string]interface{}{"status": 3, "account_type": 2}).First(bill)
+	if r.Error != nil {
+		return nil, r.Error
+	}
+	return bill, r.Error
+}
+
+
+func (self *BillService) Updates(list *[]*model.Bill) (int, error) {
+	var rows int
+	rows = 0
+	tx := common.SodaMngDB_WR.Begin()
+	for _, _bill := range *list {
+		param := map[string]interface{}{
+			"status":     _bill.Status,
+			"settled_at": _bill.SettledAt,
+		}
+		r := tx.Model(&model.Bill{}).Where(" id = ? and status != 2 ", _bill.ID).Updates(param)
+		if r.Error != nil {
+			common.Logger.Warningln(r.Error.Error())
+			tx.Rollback()
+			return 0, r.Error
+		} else {
+			rows += int(r.RowsAffected)
+		}
+		r = tx.Model(&model.DailyBill{}).Where(" bill_id = ? and status != 2",_bill.BillId).Updates(param)
+		if r.Error != nil {
+			common.Logger.Warningln(r.Error.Error())
+			tx.Rollback()
+			return 0, r.Error
+		} else {
+			rows += int(r.RowsAffected)
+		}
+	}
+	tx.Commit()
+	return rows, nil
+}
+
+func (self *BillService)BasicById(id int)(*model.Bill,error){
+	bill := &model.Bill{}
+	r := common.SodaMngDB_R.Where(" id = ? ",id).Find(bill)
 	if r.Error != nil {
 		return nil, r.Error
 	}

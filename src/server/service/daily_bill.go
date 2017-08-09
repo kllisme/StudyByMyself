@@ -3,30 +3,18 @@ package service
 import (
 	"maizuo.com/soda/erp/api/src/server/model"
 	"maizuo.com/soda/erp/api/src/server/common"
-	"time"
-	"maizuo.com/soda/erp/api/src/server/model/soda"
 )
 
 type DailyBillService struct {
 }
 
 func (self *DailyBillService)TotalByBillId( billId string)(int,error){
-	type Result struct {
-		Total int
-	}
-	params := make([]interface{}, 0)
-	result := &Result{}
-	sql := "select count(*) as total from daily_bill where daily_bill.deleted_at IS NULL "
-	if billId != "" {
-		sql += " and daily_bill.bill_id = ? "
-		params = append(params, billId)
-	}
-	common.Logger.Debugln("TotalByBillId params===========", params)
-	r := common.SodaMngDB_R.Raw(sql, params...).Scan(&result)
+	var total int
+	r := common.SodaMngDB_R.Model(&model.DailyBill{}).Where(" bill_id = ? ",billId).Count(&total)
 	if r.Error != nil {
 		return -1, r.Error
 	}
-	return result.Total, nil
+	return total, nil
 }
 
 func (self *DailyBillService)ListByBillId(limit, offset int, billId string)([]*model.DailyBill,error){
@@ -84,3 +72,5 @@ func (self *DailyBillService)BasicById(id int)(*model.DailyBill,error){
 	}
 	return dailyBill,nil
 }
+
+

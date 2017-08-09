@@ -42,3 +42,11 @@ func (self *BillBatchNoService) BatchCreate(list *[]*model.BillBatchNo) (int, er
 	tx.Commit()
 	return int(rows), nil
 }
+
+func (self *BillBatchNoService) Delete(billIds ...interface{}) (int, error) {
+	r := common.SodaMngDB_WR.Where("bill_id in (?)", billIds...).Delete(&model.BillBatchNo{})
+	if r.Error != nil {
+		return 0, r.Error
+	}
+	return int(r.RowsAffected), nil
+}

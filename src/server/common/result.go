@@ -6,6 +6,7 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/spf13/viper"
 	"gopkg.in/kataras/iris.v5"
+	"encoding/json"
 )
 
 type Result struct {
@@ -31,6 +32,8 @@ func (self *Result) New(code string, data interface{}) *Result {
 		Code:        code,
 		IsError:     isError,
 	}
+	resultData,_ := json.Marshal(result)
+	Logger.Debugln("result : ",string(resultData))
 	switch data.(type) {
 	case *Result:
 		result.Data = nil

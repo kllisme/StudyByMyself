@@ -14,16 +14,17 @@ func Api(app *iris.Framework) {
 		userCtrl = &api.UserController{}
 		//public = &api.PublicController{}
 		captchaCtrl = &api.CaptchaController{}
-		loginCtrl = &api.LoginController{}
+		loginCtrl   = &api.LoginController{}
 
-		billCtrl = &api.BillController{}
+		billCtrl      = &api.BillController{}
 		dailyBillCtrl = &api.DailyBillController{}
-
 	)
 	v1 := app.Party("/v1", func(ctx *iris.Context) {
 		ctx.Next()
 	})
+
 	{
+
 		v1.Get("/captcha.png", captchaCtrl.Captcha)
 
 		//为跨域请求设定入口
@@ -33,23 +34,25 @@ func Api(app *iris.Framework) {
 		//v1.Get("/token", public.Token)
 		v1.Post("/login", loginCtrl.Login)
 
+
 		//jwt校验
 		v1.UseFunc(common.Authorization)
 		v1.Get("/profile/session", userCtrl.GetSessionInfo)
 
-		api := v1.Party("/api",func(ctx *iris.Context){
+		//v1.Get("/profile/user", userCtrl.GetSessionInfo)
+
+		api := v1.Party("/api", func(ctx *iris.Context) {
 			ctx.Next()
 		})
+		{
+			api.Get("/bills", billCtrl.ListByAccountType)
+			api.Get("/bills/:id", dailyBillCtrl.ListByBillId)
 
-		api.Get("/bills",billCtrl.ListByAccountType)
-		api.Get("/bills/:id",dailyBillCtrl.ListByBillId)
+			api.Get("/daily-bills/:id", dailyBillCtrl.DetailsById)
 
-		//api.Get()
-
-		api.Post("/settlement/actions/pay",billCtrl.BatchPay)
-		api.Post("/settlement/actions/cancel",billCtrl.BatchPay)
-
-		//v1.Get("/profile/user", userCtrl.GetSessionInfo)
+			api.Post("/settlement/actions/pay", billCtrl.BatchPay)
+			api.Post("/settlement/actions/cancel", billCtrl.BatchPay)
+		}
 
 		//控制访问权限的接口
 		accessControlledAPI := v1.UseFunc(middleware.AccessControlMiddleware)

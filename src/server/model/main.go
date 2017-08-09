@@ -1,10 +1,5 @@
 package model
 
-import (
-	"maizuo.com/soda/erp/api/src/server/model/soda"
-	"os/user"
-)
-
 func (self *Bill) Mapping(user *User) map[string]interface{} {
 	payName := ""
 	switch self.AccountType {
@@ -68,28 +63,28 @@ func (self *DailyBill) Mapping(user *User) map[string]interface{} {
 		"id":          self.ID,
 	}
 }
-func (self *DailyBill) MappingDetails(device *Device, ticket *soda.Ticket) map[string]interface{} {
-	return map[string]interface{}{
-		"createdAt": self.CreatedAt,
-		"updatedAt": self.UpdatedAt,
-		"settledAt": self.SettledAt,
-		"billAt":    self.BillAt,
-		"user": map[string]interface{}{
-			"id":     ticket.UserId,
-			"mobile": ticket.Mobile,
-		},
-		"device": {
-			"serial":  device.SerialNumber,
-			"address": device.Address,
-		},
-		"pay": {
-			"type":   ticket.PaymentId,
-			"amount": self.TotalAmount,
-		},
-		"totalAmount": self.TotalAmount,
-		"status":      ticket.Status,
-		"hasSettled":  self.SettledAt,
-		"id":          self.ID,
-		"type":        ticket.DeviceMode,
-	}
-}
+//func (self *DailyBill) MappingDetails(device *Device, ticket *soda.Ticket) map[string]interface{} {
+//	return map[string]interface{}{
+//		"createdAt": self.CreatedAt,
+//		"updatedAt": self.UpdatedAt,
+//		"settledAt": self.SettledAt,
+//		"billAt":    self.BillAt,
+//		"user": map[string]interface{}{
+//			"id":     ticket.UserId,
+//			"mobile": ticket.Mobile,
+//		},
+//		"device": {
+//			"serial":  device.SerialNumber,
+//			"address": device.Address,
+//		},
+//		"pay": {
+//			"type":   ticket.PaymentId,
+//			"amount": self.TotalAmount,
+//		},
+//		"totalAmount": self.TotalAmount,
+//		"status":      ticket.Status,
+//		"hasSettled":  self.SettledAt,
+//		"id":          self.ID,
+//		"type":        ticket.DeviceMode,
+//	}
+//}
