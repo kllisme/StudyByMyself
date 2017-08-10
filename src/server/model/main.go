@@ -9,10 +9,16 @@ func (self *Bill) Mapping(user *User) map[string]interface{} {
 		payName = "微信"
 
 	}
+	settledAt := ""
+	if &self.SettledAt != nil {
+		settledAt = ""
+	}else{
+		settledAt = self.SettledAt.Format("2006-01-02T15:04:05+00:00")
+	}
 	return map[string]interface{}{
 		"createdAt": self.CreatedAt,
 		"updatedAt": self.UpdatedAt,
-		"settledAt": self.SettledAt,
+		"settledAt": settledAt,
 		"user": map[string]interface{}{
 			"id":     user.ID,
 			"name":   user.Name,
