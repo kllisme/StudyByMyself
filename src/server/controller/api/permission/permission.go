@@ -52,8 +52,9 @@ func (self *PermissionController)Create(ctx *iris.Context) {
 	if name == "" {
 		common.Render(ctx, "27060302", nil)
 		return
-	} else if len(name) > 20 {
-		common.Render(ctx, "27020208", nil)
+	} else if len(name) > 30 {
+		common.Logger.Debug(name,len(name))
+		common.Render(ctx, "27060303", nil)
 		return
 	}
 	categoryID := params.Get("categoryId").MustInt()

@@ -32,7 +32,7 @@ func (self *ActionService)Paging(page int, perPage int, handlerName string, meth
 	}
 	if method != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("method = ?", method)
+			return db.Where("method like (?)","%" + method + "%")
 		})
 	}
 	if err := db.Model(&permission.Action{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Find(&actionList).Error; err != nil {

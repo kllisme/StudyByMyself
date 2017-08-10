@@ -139,7 +139,7 @@ func (self *UserController)Update(ctx *iris.Context) {
 	if user.Name == "" {
 		common.Render(ctx, "27020402", nil)
 		return
-	} else if len(user.Name) != 11 {
+	} else if len(user.Name) > 50 {
 		common.Render(ctx, "27020403", nil)
 		return
 	}
@@ -225,7 +225,7 @@ func (self *UserController)GetRoles(ctx *iris.Context) {
 	common.Render(ctx, "27021000", result)
 }
 
-func (self *UserController) GetById(ctx *iris.Context) {
+func (self *UserController) GetByID(ctx *iris.Context) {
 	userService := service.UserService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
