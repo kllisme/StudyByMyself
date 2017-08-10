@@ -70,8 +70,14 @@ func (self *BillService) ListByAccountType(accountType, status, offset, limit in
 	sql += " and bill.account_type = ? and user_id != 1 " // user_id != 1 过滤测试的账单
 	params = append(params, accountType)
 	common.Logger.Debugln("params : ",params)
-	// TODO 排序规则：等待结算的单排在最前面，然后到结算中→结算成功→结算失败，
+	// 排序规则：等待结算的单排在最前面，然后到结算中→结算成功→结算失败，
 	// 	同状态的账单按申请时间先后排序，最新提交的提现申请排在最前面；
+	sql += " order by case " +
+		"when bill.status=1 then 1 " +
+		"when bill.status=3 then 2 " +
+		"when bill.status=2 then 3 " +
+		"when bill.status=4 then 4 " +
+		"else 5 end asc, bill.created_at DESC "
 	r := common.SodaMngDB_R.Raw(sql, params...).Limit(limit).Offset(offset).Order(" created_at desc ").Scan(&billList)
 	if r.Error != nil {
 		return nil, r.Error
