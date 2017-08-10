@@ -42,7 +42,7 @@ func (self *Result) New(code string, data interface{}) *Result {
 	}
 	if result.IsError {
 		result.Exception = fmt.Sprintf("%v\n", errors.Wrap(data, 1).ErrorStack())[:500]
-		result.Data = nil
+		result.Data = struct {}{}
 	} else {
 		result.Exception = ""
 	}

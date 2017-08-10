@@ -29,7 +29,7 @@ func (self *Bill) Mapping(user *User) map[string]interface{} {
 		"rate":        self.Rate / 100,
 		"status":      self.Status,
 		"count":       self.Count,
-		"id":          self.ID,
+		"id":          self.BillId,
 	}
 }
 

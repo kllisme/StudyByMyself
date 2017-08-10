@@ -12,7 +12,7 @@
   "270802":"BatchPay",
   "27080200":{"status": "OK", "msg": "", "description": "批量支付成功", "isError": false },
   "27080201":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "解析json异常", "isError": true },
-  "27080202":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取结算支付类型异常", "isError": true },
+  "27080202":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取选取的账单结算类型失败", "isError": true },
   "27080203":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取bills异常", "isError": true },
   "27080204":{"status": "NOT_FOUND_ENTITY", "msg": "未选择任何账单", "description": "未选择任何账单", "isError": true },
   "27080205":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取账单列表失败", "isError": true },

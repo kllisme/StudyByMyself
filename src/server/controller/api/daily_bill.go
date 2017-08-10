@@ -14,19 +14,14 @@ type DailyBillController struct {
 
 func (slef *DailyBillController) ListByBillId(ctx *iris.Context) {
 	dailyBillService := &service.DailyBillService{}
-	billService := &service.BillService{}
 	userService := &service.UserService{}
-	id,_ := ctx.ParamInt("id") // 账单 ID
+	id := ctx.Param("id") // 账单 ID
 	limit, _ := ctx.URLParamInt("limit") // 返回最多数量:Default: 10
 	offset, _ := ctx.URLParamInt("offset")// 列表起始位: Default: 0
-	if id == 0{
+	if id == ""{
 		common.Render(ctx,"27090105",errors.New("billId为空"))
 	}
-	bill,err := billService.BasicById(id)
-	if err != nil {
-		common.Render(ctx,"27090106",errors.Errorf("id为%v的账单不存在",id))
-	}
-	total, err := dailyBillService.TotalByBillId(bill.BillId)
+	total, err := dailyBillService.TotalByBillId(id)
 	if err != nil {
 		common.Render(ctx,"27090101",err)
 		return
@@ -39,7 +34,7 @@ func (slef *DailyBillController) ListByBillId(ctx *iris.Context) {
 		limit = 10
 	}
 	objects := make([]interface{},0)
-	dailyBillList, err := dailyBillService.ListByBillId(limit, offset, bill.BillId)
+	dailyBillList, err := dailyBillService.ListByBillId(limit, offset,id)
 	if err != nil {
 		common.Render(ctx,"27090103",err)
 		return
@@ -54,7 +49,7 @@ func (slef *DailyBillController) ListByBillId(ctx *iris.Context) {
 		objects = append(objects,dailyBill.Mapping(user))
 	}
 	common.Render(ctx,"27090100",&entity.PaginationData{
-		Pagination:entity.Pagination{Total:total,From:offset,To:offset+limit},
+		Pagination:entity.Pagination{Total:total,From:offset,To:offset + limit - 1},
 		Objects:objects,
 	})
 	return
@@ -99,7 +94,7 @@ func (self *DailyBillController)DetailsById(ctx *iris.Context){
 		objects = append(objects,ticket.Mapping(device,dailyBill))
 	}
 	common.Render(ctx,"27100100",&entity.PaginationData{
-		Pagination:entity.Pagination{Total:total,From:offset,To:offset+limit},
+		Pagination:entity.Pagination{Total:total,From:offset,To:offset + limit - 1 },
 		Objects:objects,
 	})
 }

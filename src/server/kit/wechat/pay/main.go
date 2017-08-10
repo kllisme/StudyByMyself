@@ -16,8 +16,11 @@ import (
 	"maizuo.com/soda/erp/api/src/server/kit/functions"
 	"maizuo.com/soda/erp/api/src/server/kit/util"
 	"bytes"
-	"log"
-	"maizuo.com/soda/erp/api/src/server/kit/wechat"
+	"crypto/tls"
+	"io/ioutil"
+	"crypto/x509"
+	"net/http"
+	"github.com/go-errors/errors"
 )
 
 type WechatPayKit struct {
@@ -131,6 +134,34 @@ func (self *WechatPayKit) CreateNativePayURL(tradeNo string) string {
 		"&product_id=" + url.QueryEscape(tradeNo) +
 		"&time_stamp=" + url.QueryEscape(functions.Int64ToString(timeStamp)) +
 		"&nonce_str=" + url.QueryEscape(nonceStr)
+}
+
+
+func (self *WechatPayKit)CreateTLSClient(certFile, keyFile, rootcaFile string) (*http.Client, error) {
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		return nil, err
+	}
+	data, err := ioutil.ReadFile(rootcaFile)
+	if err != nil {
+		return nil, err
+	}
+	pool := x509.NewCertPool()
+	ok := pool.AppendCertsFromPEM(data)
+	if !ok {
+		return nil, errors.New("failed to parse root certificate")
+	}
+	conf := &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		RootCAs:      pool,
+	}
+	trans := &http.Transport{
+		TLSClientConfig: conf,
+	}
+	tlsClient := &http.Client{
+		Transport: trans,
+	}
+	return tlsClient, nil
 }
 
 /**
@@ -300,99 +331,4 @@ func (self *WechatPayKit) Refund(refundRequest *RefundRequest) (*map[string]stri
 }
 
 
-//func (self *WechatPayKit) BatchPay(batchPayRequest *BatchPayRequest) (map[string]string, error) {
-//
-//	mchId := viper.GetString("resource.pay.wechat.mch-id")// 微信支付商户平台商户号
-//	appId := viper.GetString("resource.pay.wechat.app-id")// 微信公众平台应用ID
-//	checkName := viper.GetString("resource.pay.wechat.check_name")
-//	ip := viper.GetString("resource.pay.ip")
-//	m := make(map[string]interface{}, 0)
-//
-//	m["appid"] = appId
-//	m["mch_id"] = mchId
-//	m["nonce_str"] = batchPayRequest.NonceStr
-//	m["partner_trade_no"] = batchPayRequest.PartnerTradeNo
-//	m["desc"] = batchPayRequest.Desc
-//	m["amount"] = batchPayRequest.Amount
-//	m["check_name"] = checkName
-//	m["re_user_name"] = batchPayRequest.ReUserName
-//	m["spbill_create_ip"] = ip
-//	m["openid"] = batchPayRequest.Openid
-//	batchPayRequest.Sign = self.CreateSign(m)
-//	requestBytes, err := xml.Marshal(batchPayRequest)
-//	if err != nil {
-//		common.Logger.Warningln("以xml形式编码发送错误, 原因:", err.Error())
-//		return nil, err
-//	}
-//	reqStr := string(requestBytes)
-//	reqStr = strings.Replace(reqStr, "BatchPayRequest", "xml", -1)
-//
-//	common.Logger.Debugln("微信企业支付接口请求参数:", reqStr)
-//
-//	requestBytes = []byte(reqStr)
-//	response, err := grequests.Post(batchPayUrl, &grequests.RequestOptions{
-//		XML: requestBytes,
-//		Headers: map[string]string{
-//			"Accept":       "application/xml",
-//			"Content-Type": "application/xml;charset=utf-8",
-//		},
-//	})
-//	if err != nil {
-//		common.Logger.Warningln("请求微信企业支付接口发送错误, 原因:", err.Error())
-//		return nil, err
-//	}
-//
-//	respMap, err := util.DecodeXMLToMap(bytes.NewReader(response.Bytes()))
-//	if err != nil {
-//		common.Logger.Warningln("解析xml形式编码错误, 原因:", err.Error())
-//		return respMap, err
-//	}
-//	return respMap, nil
-//}
 
-
-var (
-	mchId = viper.GetString("resource.pay.wechat.mch-id")// 微信支付商户平台商户号
-	appId = viper.GetString("resource.pay.wechat.app-id")// 微信公众平台应用ID
-	apiKey = "" // 微信支付商户平台API密钥
-
-	// 微信支付商户平台证书路径
-	certFile   = "cert/apiclient_cert.pem"
-	keyFile    = "cert/apiclient_key.pem"
-	rootcaFile = "cert/rootca.pem"
-)
-
-func (self *WechatPayKit)BatchPay(batchPayRequest *BatchPayRequest) wechat.Params{
-	c := wechat.NewClient(appId, mchId, apiKey)
-
-	// 附着商户证书
-	err := c.WithCert(certFile, keyFile, rootcaFile)
-	if err != nil {
-		common.Logger.Debugln("微信企业支付接口付上证书失败,原因:",err)
-	}
-
-	params := make(wechat.Params)
-	// 查询企业付款接口请求参数
-	params.SetString("appid", c.AppId)
-	params.SetString("mch_id", c.MchId)
-	params.SetString("nonce_str", batchPayRequest.NonceStr)  // 随机字符串
-	params.SetString("partner_trade_no", batchPayRequest.PartnerTradeNo) // 商户订单号
-	params.SetString("desc", batchPayRequest.Desc)
-	params.SetString("amount",batchPayRequest.Amount)
-	params.SetString("check_name",viper.GetString("resource.pay.wechat.check_name"))
-	params.SetString("re_user_name",batchPayRequest.ReUserName)
-	params.SetString("spbill_create_ip",viper.GetString("resource.pay.ip"))
-	params.SetString("openid",batchPayRequest.Openid)
-	params.SetString("sign", c.Sign(params))                           // 签名
-
-	// 查询企业付款接口请求URL
-	url := viper.GetString("resource.pay.wechat.batchpay-url")
-
-	// 发送查询企业付款请求
-	ret, err := c.Post(url, params, true)
-	if err != nil {
-		common.Logger.Debugln("微信企业支付接口Post失败,原因:",err)
-	}
-
-	return ret
-}

@@ -16,6 +16,12 @@ import (
 	"maizuo.com/soda/erp/api/src/server/kit/wechat/pay"
 	"maizuo.com/soda/erp/api/src/server/model"
 	"maizuo.com/soda/erp/api/src/server/service"
+	"github.com/levigross/grequests"
+	"bytes"
+	"fmt"
+	"github.com/fatih/structs"
+	"encoding/xml"
+	"maizuo.com/soda/erp/api/src/server/kit/util"
 )
 
 type BillController struct {
@@ -23,22 +29,7 @@ type BillController struct {
 
 // 根据微信支付或者支付宝来获取结算单列表
 func (self *BillController) ListByAccountType(ctx *iris.Context) {
-	// 或许可以放到中间件
-	//userRoleService := &permission.UserRoleRelService{}
 	userService := &service.UserService{}
-	//userId, _ := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
-	//userRoleList, err := userRoleService.GetRoleIDsByUserID(userId)
-	//if err != nil {
-	//	common.Logger.Debugln("获取当前操作用户角色失败 userId------", userId)
-	//	common.Render(ctx, "27070104", err)
-	//	return
-	//}
-	//// 判断是不是财务或者系统管理员,不是财务的不放行
-	//if functions.FindIndex(userRoleList, 3) == -1 && functions.FindIndex(userRoleList, 5) == -1 {
-	//	common.Logger.Debugln("获取当前操作用户不具有权限 userRoleList-----", userRoleList)
-	//	common.Render(ctx, "27070105", nil)
-	//	return
-	//}
 
 	limit, _ := ctx.URLParamInt("limit")      // Default: 10
 	offset, _ := ctx.URLParamInt("offset")    //  Default: 0 列表起始位:
@@ -51,7 +42,7 @@ func (self *BillController) ListByAccountType(ctx *iris.Context) {
 	billService := &service.BillService{}
 
 	if accountType == 0 {
-		common.Render(ctx, "27080101", nil)
+		common.Render(ctx, "27080101", struct {}{})
 		return
 	}
 	if offset == 0 {
@@ -83,7 +74,7 @@ func (self *BillController) ListByAccountType(ctx *iris.Context) {
 	}
 
 	common.Render(ctx, "27080100", &entity.PaginationData{
-		Pagination: entity.Pagination{Total: total, From: offset, To: offset + limit},
+		Pagination: entity.Pagination{Total: total, From: offset, To: offset + limit - 1},
 		Objects:    objects,
 	})
 	return
@@ -98,27 +89,22 @@ func (self *BillController) BatchPay(ctx *iris.Context) {
 		common.Render(ctx, "27080201", "解析json异常")
 		return
 	}
-	// 结算支付类型 1:支付宝 2:微信
-	payType, err := params.Get("type").Int()
-	if err == nil {
-		common.Logger.Debugln("获取结算支付类型异常")
-		common.Render(ctx, "27080202", "获取结算支付类型异常")
-		return
-	}
-	bills, err := params.Get("bills").Array()
+
+	billIds, err := params.Get("bills").Array()
 	if err == nil {
 		common.Logger.Debugln("获取bills异常")
 		common.Render(ctx, "27080203", "获取bills异常")
 		return
 	}
-	if len(bills) == 0 {
+	if len(billIds) == 0 {
 		common.Render(ctx, "27080204", "未选择任何账单")
 		return
 	}
-	billIds := make([]interface{}, 0)
-	for _, _param := range bills {
-		_map := _param.(map[string]interface{})
-		billIds = append(billIds, _map["billId"])
+	accountType,err := billService.BillTypeByBatchBill(billIds)
+	if err != nil && accountType == -1{
+		common.Logger.Debugln("获取选取的账单结算类型失败")
+		common.Render(ctx, "27080202", "获取选取的账单结算类型失败")
+		return
 	}
 	// 确定选取的是发起结算和结账失败的账单
 	statusList := []interface{}{1, 4}
@@ -138,10 +124,10 @@ func (self *BillController) BatchPay(ctx *iris.Context) {
 		return
 	}
 	code, data := "", make(map[string]string)
-	if payType == 1 {
+	if accountType == 1 {
 		// 支付宝,生成批次号并拼接支付宝支付的参数
 		data, code, err = BatchAlipay(billList)
-	} else if payType == 2 {
+	} else if accountType == 2 {
 		// 微信,无需做处理,只需要在下面统一改变bill和daily_bill的状态
 		err = nil
 	} else {
@@ -389,6 +375,47 @@ func (self *DailyBillController) AlipayNotification(ctx *iris.Context) {
 	ctx.Response.SetBodyString("success")
 }
 
+/**
+取消提交支付宝批量付款申请
+*/
+func (self *DailyBillController) CancelBatchAliPay(ctx *iris.Context) {
+	billService := &service.BillService{}
+	billBatchNoService := &service.BillBatchNoService{}
+	param:= simplejson.New()
+	err := ctx.ReadJSON(&param)
+	if err != nil {
+		common.Logger.Debugln("解析json失败")
+		common.Render(ctx,"CODE","解析json失败")
+		return
+	}
+	billIds,err := param.Get("bills").Array()
+	if err != nil {
+		common.Logger.Debugln("获取参数bills失败")
+		common.Render(ctx,"CODE","获取参数bills失败")
+		return
+	}
+	if len(billIds) <= 0 {
+		common.Logger.Debugln("bills为空列表")
+		common.Render(ctx,"CODE","bills为空列表")
+		return
+	}
+	//两个更新暂时没有保持事务
+	err = billService.BatchUpdateStatusById(1, billIds) //将"结算中"的状态改成"已申请"
+	if err != nil {
+		common.Logger.Debugln("更新账单状态'结算中'为'已申请'失败:", billIds)
+		common.Render(ctx,"CODE","更新账单状态'结算中'为'已申请'失败")
+		return
+	}
+	_, err = billBatchNoService.Delete(billIds)
+	if err != nil {
+		common.Logger.Debugln("取消批次号绑定失败:", billIds)
+		common.Render(ctx,"CODE","取消批次号绑定失败")
+		return
+	}
+	common.Render(ctx,"CODE","取消提交支付宝批量付款成功")
+}
+
+
 func (self *BillController) WechatPay(ctx *iris.Context) {
 	billService := &service.BillService{}
 	billRelService := &service.BillRelService{}
@@ -401,42 +428,51 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 	billIds := []interface{}{bill.BillId}
 	wechatPayKit := pay.WechatPayKit{}
 	nonceStr := wechatPayKit.CreateNonceStr(32)
-	batchPayRequest := &pay.BatchPayRequest{}
-	batchPayRequest.PartnerTradeNo = bill.BillId
-	batchPayRequest.Desc = bill.CreatedAt.Local().Format("01月02日") + "结算款"
-	batchPayRequest.Amount = strconv.Itoa(bill.Amount)
-	batchPayRequest.ReUserName = bill.AccountName
-	batchPayRequest.Openid = bill.Account
-	batchPayRequest.NonceStr = nonceStr
-	respParams := wechatPayKit.BatchPay(batchPayRequest)
+	batchPayRequest := &pay.BatchPayRequest{
+		PartnerTradeNo:bill.BillId,
+		AppId:"AppId",
+		MchId:"MchId",
+		NonceStr:nonceStr,
+		Openid:"ooGJsxO-atsgvFGKWUlMw6M4nmc8",
+		CheckName:      "FORCE_CHECK",
+		ReUserName:     "田丰",
+		Amount:         bill.Amount,
+		Desc:           "企业付款API测试"+bill.CreatedAt.Local().Format("01月02日") + "结算款",
+		SpbillCreateIp: "116.24.64.139",
+	}
+
+	respMap,err := BatchWechatPay(batchPayRequest)
+	if err != nil {
+		common.Logger.Debugln("微信企业支付请求失败,error:",err)
+	}
 	billRel := &model.BillRel{BillId: bill.BillId, BatchNo: bill.BillId, Type: 2}
-	if respParams.GetString("return_code") == "FAIL" {
-		common.Logger.Debugln("请求微信企业支付成功但通信失败,原因:", respParams.GetString("return_msg"))
+	if respMap["return_code"] == "FAIL" {
+		common.Logger.Debugln("请求微信企业支付成功但通信失败,原因:", respMap["return_msg"])
 		status = 4
 		billRel.IsSuccessed = false
-		billRel.Reason = respParams.GetString("return_msg")
+		billRel.Reason = respMap["return_msg"]
 	} else {
-		if respParams.GetString("result_code") == "FAIL" {
+		if respMap["result_code"] == "FAIL" {
 			billRel.IsSuccessed = false
-			billRel.Reason = respParams.GetString("return_msg")
-			if respParams.GetString("err_code") == "SYSTEMERROR" {
+			billRel.Reason = respMap["return_msg"]
+			if respMap["err_code"] == "SYSTEMERROR" {
 				// 系统错误，请重试 TODO 请使用原单号以及原请求参数重试，否则可能造成重复支付等资金风险
 			} else {
 				common.Logger.Debugln("请求微信企业支付通信成功但业务失败,错误码",
-					respParams.GetString("err_code"), ",原因:", respParams.GetString("err_code_des"))
+					respMap["err_code"], ",原因:", respMap["err_code_des"])
 				status = 4
 			}
 		} else {
-			if respParams.GetString("nonce_str") != nonceStr {
+			if respMap["nonce_str"] != nonceStr {
 				// 返回的随机串有问题
 				status = 3
 				billRel.IsSuccessed = false
 				billRel.Reason = "返回的随机串有问题"
-				common.Logger.Debugln("微信企业支付返回的随机串有问题,产生的随机串:",nonceStr,",接收的随机串:",respParams.GetString("nonce_str"))
+				common.Logger.Debugln("微信企业支付返回的随机串有问题,产生的随机串:",nonceStr,",接收的随机串:", respMap["nonce_str"])
 			}else{
 				billRel.IsSuccessed = true
-				billRel.Reason = respParams.GetString("return_msg")
-				billRel.OuterNo = respParams.GetString("payment_no")
+				billRel.Reason = respMap["return_msg"]
+				billRel.OuterNo = respMap["payment_no"]
 				status = 2
 			}
 		}
@@ -453,4 +489,53 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 		common.Logger.Debugln("微信企业支付成功但插入回调记录成功数为0")
 	}
 	common.Logger.Debugln("---------------------微信企业支付成功--------------")
+}
+
+func BatchWechatPay(batchPayRequest *pay.BatchPayRequest) (map[string]string,error){
+	m := structs.Map(batchPayRequest)
+	delete(m, "sign")
+	fmt.Println("m:", m)
+	wechatPayKit := pay.WechatPayKit{}
+	batchPayRequest.Sign = wechatPayKit.CreateSign(m)
+	requestBytes, err := xml.Marshal(batchPayRequest)
+	if err != nil {
+		common.Logger.Debugln("微信企业支付请求转XML失败,error=========",err)
+		return nil,err
+	}
+	reqStr := string(requestBytes)
+	common.Logger.Debugln("reqStr:", reqStr)
+	client, err := wechatPayKit.CreateTLSClient(
+		viper.GetString("certFile"),
+		viper.GetString("keyFile"),
+		viper.GetString("rootcaFile"),
+	)
+	if err != nil {
+		common.Logger.Debugln("微信企业支付请求转XML失败,error=========",err)
+		return nil,err
+	}
+	// client.Timeout=xxx
+	requestBytes = []byte(reqStr)
+	url := viper.GetString("resource.pay.wechat.batchPayUrl")
+	response, err := grequests.Post(url, &grequests.RequestOptions{
+		XML: requestBytes,
+		Headers: map[string]string{
+			"Accept":       "application/xml",
+			"Content-Type": "application/xml;charset=utf-8",
+		},
+		HTTPClient: client,
+	})
+	common.Logger.Debugln("response：", response.String())
+	if err != nil  {
+		common.Logger.Debugln("微信企业支付请求失败,err:", err.Error(),",statusCode:",response.StatusCode)
+		return nil,err
+	}
+	if response.StatusCode != 200 {
+		common.Logger.Debugln("微信企业支付请求返回错误码,statusCode:", response.StatusCode)
+	}
+	respMap, err := util.DecodeXMLToMap(bytes.NewReader(response.Bytes()))
+	if err != nil {
+		common.Logger.Debugln("解析xml形式编码错误, 原因:", err.Error())
+		return nil,err
+	}
+	return respMap,err
 }

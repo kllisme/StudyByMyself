@@ -191,17 +191,17 @@ type RefundResponse struct {
 */
 
 type BatchPayRequest struct {
-	AppId       string `xml:"appid"`
-	MchId       string `xml:"mch_id"`
-	NonceStr    string `xml:"nonce_str"`
-	PartnerTradeNo  string `xml:"partner_trade_no"`
-	Openid string `xml:"openid"`
-	Amount    string `xml:"amount"`
-	Desc   string `xml:"desc"`
-	CheckName    string `xml:"check_name"`
-	ReUserName    string `xml:"re_user_name"`
-	SpbillCreateIp    string `xml:"spbill_create_ip"`
-	Sign        string `xml:"sign"`
+	AppId          string `xml:"appid"`
+	MchId          string `xml:"mch_id"`
+	NonceStr       string `xml:"nonce_str"`
+	PartnerTradeNo string `xml:"partner_trade_no"`
+	Openid         string `xml:"openid"`
+	Amount         int `xml:"amount"`
+	Desc           string `xml:"desc"`
+	CheckName      string `xml:"check_name"`
+	ReUserName     string `xml:"re_user_name"`
+	SpbillCreateIp string `xml:"spbill_create_ip"`
+	Sign           string `xml:"sign"`
 }
 
 /**

@@ -5,6 +5,7 @@ import (
 
 	"maizuo.com/soda/erp/api/src/server/common"
 	"maizuo.com/soda/erp/api/src/server/model"
+	"github.com/go-errors/errors"
 )
 
 type BillService struct {
@@ -55,11 +56,11 @@ func (self *BillService) ListByAccountType(accountType, status, offset, limit in
 	}
 	if createdAt != "" {
 		sql += " and Date(bill.created_at) = ? "
-		params = append(params, createdAt)
+		params = append(params, []byte(createdAt)[0:10])
 	}
 	if settledAt != "" {
 		sql += " and Date(bill.settled_at) = ? "
-		params = append(params, settledAt)
+		params = append(params, []byte(settledAt)[0:10])
 	}
 	if keys != "" {
 		sql += " and (bill.user_name like ? or bill.account_name like ?) "
@@ -85,6 +86,29 @@ func (self *BillService) ListByBillIdsAndStatus(billIds []interface{}, status []
 		return nil, r.Error
 	}
 	return billList, nil
+}
+
+func(self *BillService) BillTypeByBatchBill(billIds []interface{}) (int, error) {
+	type Result struct {
+		AccountType int
+	}
+	result := &Result{}
+	accountType := -1
+	sql := "select account_type as `AccountType` from bill where bill.deleted_at IS NULL and bill_id = ? "
+	for _,billId := range billIds {
+		r := common.SodaMngDB_R.Where(sql, billId).Find(result)
+		if r.Error != nil {
+			return -1, r.Error
+		}
+		if accountType != 0 {
+			if accountType != result.AccountType {
+				return -1,errors.New("选取的账单存在不同的结算方式")
+			}
+		}else{
+			accountType = result.AccountType
+		}
+	}
+	return accountType, nil
 }
 
 func (self *BillService) BatchUpdateStatusById(status int, ids ...interface{}) error {
@@ -165,6 +189,15 @@ func (self *BillService) Updates(list *[]*model.Bill) (int, error) {
 func (self *BillService)BasicById(id int)(*model.Bill,error){
 	bill := &model.Bill{}
 	r := common.SodaMngDB_R.Where(" id = ? ",id).Find(bill)
+	if r.Error != nil {
+		return nil, r.Error
+	}
+	return bill, r.Error
+}
+
+func (self *BillService)BasicByBillId(billId string)(*model.Bill,error){
+	bill := &model.Bill{}
+	r := common.SodaMngDB_R.Where(" bill_id = ? ",billId).Find(bill)
 	if r.Error != nil {
 		return nil, r.Error
 	}
