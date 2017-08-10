@@ -25,6 +25,19 @@ func Api(app *iris.Framework) {
 
 	{
 
+		api := v1.Party("/api", func(ctx *iris.Context) {
+			ctx.Next()
+		})
+		{
+			//api.UseFunc(middleware.BillRoleControlMiddleware)
+			api.Get("/bills", billCtrl.ListByAccountType)
+			api.Get("/bills/:id", dailyBillCtrl.ListByBillId)
+
+			api.Get("/daily-bills/:id", dailyBillCtrl.DetailsById)
+
+			api.Post("/settlement/actions/pay", billCtrl.BatchPay)
+			api.Post("/settlement/actions/cancel", billCtrl.BatchPay)
+		}
 		v1.Get("/captcha.png", captchaCtrl.Captcha)
 
 		//为跨域请求设定入口
@@ -41,18 +54,7 @@ func Api(app *iris.Framework) {
 
 		//v1.Get("/profile/user", userCtrl.GetSessionInfo)
 
-		api := v1.Party("/api", func(ctx *iris.Context) {
-			ctx.Next()
-		})
-		{
-			api.Get("/bills", billCtrl.ListByAccountType)
-			api.Get("/bills/:id", dailyBillCtrl.ListByBillId)
 
-			api.Get("/daily-bills/:id", dailyBillCtrl.DetailsById)
-
-			api.Post("/settlement/actions/pay", billCtrl.BatchPay)
-			api.Post("/settlement/actions/cancel", billCtrl.BatchPay)
-		}
 
 		//控制访问权限的接口
 		accessControlledAPI := v1.UseFunc(middleware.AccessControlMiddleware)

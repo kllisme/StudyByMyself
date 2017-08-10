@@ -17,6 +17,9 @@
   "27050600": {"status": "OK", "msg": "", "description": "权限分配成功", "isError": false },
   "27050601": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
   "270507": "GetPermissions",
-  "27050700": {"status": "OK", "msg": "", "description": "获取角色的权限成功", "isError": false }
+  "27050700": {"status": "OK", "msg": "", "description": "获取角色的权限成功", "isError": false },
+
+  "270508":"BillRoleControlMiddleware",
+  "27050801":{ "status": "UNPROCESSABLE_ENTITY", "msg": "权限不足", "description": "当前登录用户不具有操作权限", "isError": true }
 
 }
