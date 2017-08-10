@@ -23,5 +23,22 @@
   "27080210":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "生成批次号失败", "isError": true },
   "27080211":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "生成批次号信息失败", "isError": true },
   "27080212":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "持久化批次号失败", "isError": true },
-  "27080213":{"status": "UNPROCESSABLE_ENTITY", "msg": "所选支付宝账单超出批次结算最大值1000", "description": "所选支付宝账单超出批次结算最大值1000", "isError": true }
+  "27080213":{"status": "UNPROCESSABLE_ENTITY", "msg": "所选支付宝账单超出批次结算最大值1000", "description": "所选支付宝账单超出批次结算最大值1000", "isError": false },
+
+  "270803":"CancelBatchAliPay",
+  "27080300":{"status": "OK", "msg": "", "description": "支付宝账单取消支付成功", "isError": false },
+  "27080301":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "解析json异常", "isError": true },
+  "27080302":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取参数bills失败", "isError": true },
+  "27080303":{"status": "UNPROCESSABLE_ENTITY", "msg": "bills为空列表", "description": "bills为空列表", "isError": true },
+  "27080304":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "更新账单状态'结算中'为'已申请'失败", "isError": true },
+  "27080305":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "取消批次号绑定失败", "isError": true },
+  "27080306":{"status": "UNPROCESSABLE_ENTITY", "msg": "非法账单数据", "description": "获取账单详情异常", "isError": true },
+  "27080307":{"status": "UNPROCESSABLE_ENTITY", "msg": "非法账单数据", "description": "存在支付类型不为支付宝的账单", "isError": true },
+  "27080308":{"status": "UNPROCESSABLE_ENTITY", "msg": "非法账单数据", "description": "存在状态不为'结算中'的账单", "isError": true },
+  "27080309":{"status": "UNPROCESSABLE_ENTITY", "msg": "非法账单数据", "description": "获取账单批次详情异常", "isError": true },
+  "27080310":{"status": "UNPROCESSABLE_ENTITY", "msg": "非法账单数据", "description": "账单无批次详情", "isError": true }
+
+
+
+
 }

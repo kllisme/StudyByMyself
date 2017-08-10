@@ -240,7 +240,7 @@ func GenerateBatchAliPay(batchNum int, batchFee int, aliPayDetailDataStr string)
 	return param
 }
 
-func (self *DailyBillController) AlipayNotification(ctx *iris.Context) {
+func (self *BillController) AlipayNotification(ctx *iris.Context) {
 	var err error
 	billService := &service.BillService{}
 	billBatchNoService := &service.BillBatchNoService{}
@@ -296,7 +296,7 @@ func (self *DailyBillController) AlipayNotification(ctx *iris.Context) {
 					_time := _info[7]     //完成时间
 					_settledAt, _ := time.Parse("20060102150405", _time)
 					_bill := &model.Bill{BillId: _billId, SettledAt: _settledAt, Status: 2} //已结账
-					_billRel := &model.BillRel{BillId: _billId, BatchNo: reqMap["batch_no"], Type: 1, IsSuccessed: true, Reason: _reason, OuterNo: _alipayno}
+					_billRel := &model.BillRel{BillId: _billId, BatchNo: reqMap["batch_no"], Type: 1,BillType:1, IsSuccessed: true, Reason: _reason, OuterNo: _alipayno}
 					if _flag == "S" {
 						billList = append(billList, _bill)
 						billRelList = append(billRelList, _billRel)
@@ -325,7 +325,7 @@ func (self *DailyBillController) AlipayNotification(ctx *iris.Context) {
 					_time := _info[7]
 					_settledAt, _ := time.Parse("20060102150405", _time)
 					_bill := &model.Bill{BillId: _billId, SettledAt: _settledAt, Status: 4} //结账失败
-					_billRel := &model.BillRel{BillId: _billId, BatchNo: reqMap["batch_no"], Type: 1, IsSuccessed: false, Reason: _reason, OuterNo: _alipayno}
+					_billRel := &model.BillRel{BillId: _billId, BatchNo: reqMap["batch_no"], Type: 1,BillType:1, IsSuccessed: false, Reason: _reason, OuterNo: _alipayno}
 					if _flag == "F" {
 						failureList = append(failureList, _bill)
 						billRelList = append(billRelList, _billRel)
@@ -378,41 +378,72 @@ func (self *DailyBillController) AlipayNotification(ctx *iris.Context) {
 /**
 取消提交支付宝批量付款申请
 */
-func (self *DailyBillController) CancelBatchAliPay(ctx *iris.Context) {
+func (self *BillController) CancelBatchAliPay(ctx *iris.Context) {
 	billService := &service.BillService{}
 	billBatchNoService := &service.BillBatchNoService{}
 	param:= simplejson.New()
 	err := ctx.ReadJSON(&param)
 	if err != nil {
-		common.Logger.Debugln("解析json失败")
-		common.Render(ctx,"CODE","解析json失败")
+		common.Logger.Debugln("解析json异常")
+		common.Render(ctx,"27080301","解析json异常")
 		return
 	}
 	billIds,err := param.Get("bills").Array()
 	if err != nil {
 		common.Logger.Debugln("获取参数bills失败")
-		common.Render(ctx,"CODE","获取参数bills失败")
+		common.Render(ctx,"27080302","获取参数bills失败")
 		return
 	}
 	if len(billIds) <= 0 {
 		common.Logger.Debugln("bills为空列表")
-		common.Render(ctx,"CODE","bills为空列表")
+		common.Render(ctx,"27080303","bills为空列表")
 		return
 	}
+	// 先确定这笔账单的状态是结账中,而且账单ID都存在于批次号表
+	for _,billId := range billIds {
+		bill,err := billService.BasicByBillId(billId.(string))
+		if err != nil {
+			common.Logger.Debugln("获取账单详情异常,原因:%v,账单ID:%v",err,billId)
+			common.Render(ctx,"27080306",err)
+			return
+		}
+		if bill.AccountType != 1 {
+			common.Logger.Debugln("存在支付类型不为支付宝的账单,账单ID:%v",billId)
+			common.Render(ctx,"27080307",nil)
+			return
+		}
+		if bill.Status != 3 {
+			common.Logger.Debugln("存在状态不为'结算中'的账单,账单ID:%v",billId)
+			common.Render(ctx,"27080308",nil)
+			return
+		}
+		billBatchNos,err := billBatchNoService.Baisc(billId)
+		if err != nil {
+			common.Logger.Debugln("获取账单批次详情异常,原因:%v,账单ID:%v",err,billId)
+			common.Render(ctx,"27080309",nil)
+			return
+		}
+		if len(*billBatchNos) <= 0 {
+			common.Logger.Debugln("账单无批次详情,账单ID:%v",billId)
+			common.Render(ctx,"27080310",nil)
+			return
+		}
+	}
+
 	//两个更新暂时没有保持事务
 	err = billService.BatchUpdateStatusById(1, billIds) //将"结算中"的状态改成"已申请"
 	if err != nil {
 		common.Logger.Debugln("更新账单状态'结算中'为'已申请'失败:", billIds)
-		common.Render(ctx,"CODE","更新账单状态'结算中'为'已申请'失败")
+		common.Render(ctx,"27080304","更新账单状态'结算中'为'已申请'失败")
 		return
 	}
 	_, err = billBatchNoService.Delete(billIds)
 	if err != nil {
 		common.Logger.Debugln("取消批次号绑定失败:", billIds)
-		common.Render(ctx,"CODE","取消批次号绑定失败")
+		common.Render(ctx,"27080305","取消批次号绑定失败")
 		return
 	}
-	common.Render(ctx,"CODE","取消提交支付宝批量付款成功")
+	common.Render(ctx,"27080300",nil)
 }
 
 
