@@ -54,7 +54,7 @@ func Api(app *iris.Framework) {
 			api.Get("/daily-bills/:id", dailyBillCtrl.DetailsById)
 
 			api.Post("/settlement/actions/pay", billCtrl.BatchPay)
-			api.Post("/settlement/actions/cancel", billCtrl.CancelBatchAliPay)
+			//api.Post("/settlement/actions/cancel", billCtrl.CancelBatchAliPay)
 		}
 
 		//控制访问权限的接口
