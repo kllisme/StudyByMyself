@@ -362,6 +362,10 @@
 			"Rev": "50df5ca198e569d06795909c091ac0cea62e925a"
 		},
 		{
+			"ImportPath": "github.com/square/go-jose/cipher",
+			"Rev": "50df5ca198e569d06795909c091ac0cea62e925a"
+		},
+		{
 			"ImportPath": "github.com/square/go-jose/json",
 			"Rev": "50df5ca198e569d06795909c091ac0cea62e925a"
 		},
