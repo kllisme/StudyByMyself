@@ -60,6 +60,36 @@ module.exports = Object.assign({}, {
     "maxSmsRequest": 3,
     "maxResetRequest": 3
   },
+  "pay": {
+    "aliPay": {
+      "service": {
+        "batchTransNotify": "batch_trans_notify"
+      },
+      "partner": "",
+      "inputCharset": "utf-8",
+      "key": "",
+      "notifyUrl": "",
+      "accountName": "深圳市华策网络科技有限公司",
+      "email": "laura@maizuo.com",
+      "signType": "MD5",
+      "requestUrl": "https://mapi.alipay.com/gateway.do"
+    },
+    "wechat": {
+      "mchAppId": "",
+      "mchId": "",
+      "apiKey": "",
+      "tlsFile": {
+        "cert": "",
+        "key": "",
+        "root": ""
+      },
+      "checkName": "FORCE_CHECK",
+      "requestUrl": {
+        "createTransfers": "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers",
+        "getTransfer": "https://api.mch.weixin.qq.com/mmpaymkttransfers/gettransferinfo"
+      }
+    }
+  },
   "resource": {
     "database": {
       "soda-manager": {
