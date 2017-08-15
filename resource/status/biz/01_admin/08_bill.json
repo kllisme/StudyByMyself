@@ -2,7 +2,7 @@
   "2708":"bill",
   "270801":"ListByAccountType",
   "27080100":{ "status": "OK", "msg": "", "description": "获取账单列表成功", "isError": false },
-  "27080101":{ "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "账号类型不能为空", "isError": false },
+  "27080101":{ "status": "UNPROCESSABLE_ENTITY", "msg": "错误的账号类型", "description": "账号类型不能为空", "isError": false },
   "27080102":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取账单列表总数失败", "isError": true },
   "27080103":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取账单列表失败", "isError": true },
   "27080104":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取当前操作用户角色失败", "isError": true },

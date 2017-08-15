@@ -78,7 +78,7 @@ func (self *BillService) ListByAccountType(accountType, status, offset, limit in
 		"when bill.status=2 then 3 " +
 		"when bill.status=4 then 4 " +
 		"else 5 end asc, bill.created_at DESC "
-	r := common.SodaMngDB_R.Raw(sql, params...).Limit(limit).Offset(offset).Order(" created_at desc ").Scan(&billList)
+	r := common.SodaMngDB_R.Raw(sql, params...).Limit(limit).Offset(offset).Scan(&billList)
 	if r.Error != nil {
 		return nil, r.Error
 	}
@@ -87,7 +87,7 @@ func (self *BillService) ListByAccountType(accountType, status, offset, limit in
 
 func (self *BillService) ListByBillIdsAndStatus(billIds []interface{}, status []interface{}) ([]*model.Bill, error) {
 	billList := []*model.Bill{}
-	r := common.SodaMngDB_R.Where(" bill_id in (?) ", billIds...).Where(" status in (?) ", status...).Find(billList)
+	r := common.SodaMngDB_R.Where(" bill_id in (?) ", billIds).Where(" status in (?) ", status).Find(&billList)
 	if r.Error != nil {
 		return nil, r.Error
 	}
@@ -100,13 +100,13 @@ func(self *BillService) BillTypeByBatchBill(billIds []interface{}) (int, error) 
 	}
 	result := &Result{}
 	accountType := -1
-	sql := "select account_type as `AccountType` from bill where bill.deleted_at IS NULL and bill_id = ? "
+	sql := "select account_type from bill where bill.deleted_at IS NULL and bill_id = ? "
 	for _,billId := range billIds {
-		r := common.SodaMngDB_R.Where(sql, billId).Find(result)
+		r := common.SodaMngDB_R.Raw(sql, billId).Scan(result)
 		if r.Error != nil {
 			return -1, r.Error
 		}
-		if accountType != 0 {
+		if accountType != -1 {
 			if accountType != result.AccountType {
 				return -1,errors.New("选取的账单存在不同的结算方式")
 			}
@@ -117,7 +117,7 @@ func(self *BillService) BillTypeByBatchBill(billIds []interface{}) (int, error) 
 	return accountType, nil
 }
 
-func (self *BillService) BatchUpdateStatusById(status int, ids ...interface{}) error {
+func (self *BillService) BatchUpdateStatusById(status int, ids []interface{}) error {
 	tx := common.SodaMngDB_WR.Begin()
 	param := make(map[string]interface{}, 0)
 	param["status"] = status
@@ -129,7 +129,7 @@ func (self *BillService) BatchUpdateStatusById(status int, ids ...interface{}) e
 		//修改状态为"结账中",需更新"结账中时间"
 		param["submitted_at"] = time.Now()
 	}
-	r := tx.Model(&model.Bill{}).Where(" bill_id in (?) ", ids...).Update(param)
+	r := tx.Model(&model.Bill{}).Where(" bill_id in (?) ", ids).Update(param)
 	if r.Error != nil {
 		tx.Rollback()
 		return r.Error
@@ -148,6 +148,7 @@ func (self *BillService) BatchUpdateStatusById(status int, ids ...interface{}) e
 		tx.Rollback()
 		return r.Error
 	}
+	tx.Commit()
 	return nil
 }
 

@@ -19,6 +19,7 @@ func Api(app *iris.Framework) {
 		billCtrl      = &api.BillController{}
 		dailyBillCtrl = &api.DailyBillController{}
 	)
+	app.Get("/alipay/notification",billCtrl.AlipayNotification)
 	v1 := app.Party("/v1", func(ctx *iris.Context) {
 		ctx.Next()
 	})
@@ -49,7 +50,6 @@ func Api(app *iris.Framework) {
 			//api.UseFunc(middleware.BillRoleControlMiddleware)
 			api.Get("/bills", billCtrl.ListByAccountType)
 			api.Get("/bills/:id", dailyBillCtrl.ListByBillId)
-			api.Get("/bills/AlipayNotification",billCtrl.AlipayNotification)
 
 			api.Get("/daily-bills/:id", dailyBillCtrl.DetailsById)
 

@@ -15,7 +15,7 @@ type DailyBillController struct {
 func (slef *DailyBillController) ListByBillId(ctx *iris.Context) {
 	dailyBillService := &service.DailyBillService{}
 	userService := &service.UserService{}
-	id := ctx.Param("id") // 账单 ID
+	id := ctx.Param("id") // 账单 ID 不是真正的id,而是bill中的bill_id
 	limit, _ := ctx.URLParamInt("limit") // 返回最多数量:Default: 10
 	offset, _ := ctx.URLParamInt("offset")// 列表起始位: Default: 0
 	if id == ""{

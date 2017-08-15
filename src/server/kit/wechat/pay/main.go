@@ -30,7 +30,7 @@ type WechatPayKit struct {
 微信支付计算签名的函数
 */
 func (self *WechatPayKit) CreateSign(m interface{}) (string) {
-	apiKey := viper.GetString("resource.pay.wechat.api-key")
+	apiKey := viper.GetString("pay.wechat.apiKey")
 	//apiKey := os.Getenv("APIKEY")
 	common.Logger.Debugln("微信支付签名计算, API KEY:", apiKey)
 	//STEP 1, 对key进行升序排序.
