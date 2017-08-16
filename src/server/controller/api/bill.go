@@ -449,7 +449,7 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 	common.Logger.Debugln("---------------------微信企业支付开始--------------")
 	bill, err := billService.GetFirstWechatBill()
 	if err != nil {
-		common.Logger.Debugln("获取微信账单失败")
+		common.Render(ctx,"",errors.Errorf("获取微信账单失败,err:",err))
 	}
 	status := 3
 	billIds := []interface{}{bill.BillId}
@@ -470,12 +470,12 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 	billRel := &model.BillRel{BillId: bill.BillId, BatchNo: bill.BillId, Type: 2}
 	respMap, err := BatchWechatPay(batchPayRequest)
 	if err != nil {
-		common.Logger.Debugln("微信企业支付请求失败,error:", err)
+		common.Render(ctx,"",errors.Errorf("微信企业支付请求失败,error:",err))
 		return
 	}
 
 	if respMap["return_code"] == "FAIL" {
-		common.Logger.Debugln("请求微信企业支付成功但通信失败,原因:", respMap["return_msg"])
+		common.Render(ctx,"",errors.Errorf("请求微信企业支付成功但通信失败,原因:", respMap["return_msg"]))
 		status = 4
 		billRel.IsSuccessed = false
 		billRel.Reason = respMap["return_msg"]
@@ -488,8 +488,8 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 				// 系统错误，请重试 TODO 请使用原单号以及原请求参数重试，否则可能造成重复支付等资金风险
 
 			} else {
-				common.Logger.Debugln("请求微信企业支付通信成功但业务失败,错误码",
-					respMap["err_code"], ",原因:", respMap["err_code_des"])
+				common.Render(ctx,"",errors.Errorf("请求微信企业支付通信成功但业务失败,错误码",
+					respMap["err_code"], ",原因:", respMap["err_code_des"]))
 				status = 4
 			}
 		} else {
@@ -498,7 +498,7 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 				status = 3
 				billRel.IsSuccessed = false
 				billRel.Reason = "返回的随机串有问题"
-				common.Logger.Debugln("微信企业支付返回的随机串有问题,产生的随机串:", nonceStr, ",接收的随机串:", respMap["nonce_str"])
+				common.Render(ctx,"",errors.Errorf("微信企业支付返回的随机串有问题,产生的随机串:", nonceStr, ",接收的随机串:", respMap["nonce_str"]))
 			} else {
 				billRel.IsSuccessed = true
 				billRel.Reason = respMap["return_msg"]
@@ -510,19 +510,19 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 
 	err = billService.BatchUpdateStatusById(status, billIds)
 	if err != nil {
-		common.Logger.Debugln("微信企业支付成功但更改账单状态失败,原因:", err)
+		common.Render(ctx,"",errors.Errorf("微信企业支付成功但更改账单状态失败,原因:", err))
 		return
 	}
 	rows, err := billRelService.Create(billRel)
 	if err != nil {
-		common.Logger.Debugln("微信企业支付成功但插入回调记录失败,原因:", err)
+		common.Render(ctx,"",errors.Errorf("微信企业支付成功但插入回调记录失败,原因:", err))
 		return
 	}
 	if rows == 0 {
-		common.Logger.Debugln("微信企业支付成功但插入回调记录成功数为0")
+		common.Render(ctx,"",errors.Errorf("微信企业支付成功但插入回调记录成功数为0"))
 		return
 	}
-	common.Logger.Debugln("---------------------微信企业支付成功--------------")
+	common.Render(ctx,"",errors.Errorf("---------------------微信企业支付成功--------------"))
 	return
 }
 
