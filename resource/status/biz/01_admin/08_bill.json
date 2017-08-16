@@ -36,9 +36,17 @@
   "27080307":{"status": "UNPROCESSABLE_ENTITY", "msg": "非法账单数据", "description": "存在支付类型不为支付宝的账单", "isError": true },
   "27080308":{"status": "UNPROCESSABLE_ENTITY", "msg": "非法账单数据", "description": "存在状态不为'结算中'的账单", "isError": true },
   "27080309":{"status": "UNPROCESSABLE_ENTITY", "msg": "非法账单数据", "description": "获取账单批次详情异常", "isError": true },
-  "27080310":{"status": "UNPROCESSABLE_ENTITY", "msg": "非法账单数据", "description": "账单无批次详情", "isError": true }
+  "27080310":{"status": "UNPROCESSABLE_ENTITY", "msg": "非法账单数据", "description": "账单无批次详情", "isError": true },
 
-
+  "270804":"WechatPay",
+  "27080400":{"status": "OK", "msg": "", "description": "微信企业支付成功", "isError": true },
+  "27080401":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取微信账单失败", "isError": true },
+  "27080402":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "请求微信企业支付失败", "isError": true },
+  "27080403":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "请求微信企业支付成功但通信失败", "isError": true },
+  "27080404":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "请求微信企业支付通信成功但业务失败", "isError": true },
+  "27080405":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "随机串校验不通过", "isError": true },
+  "27080406":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "更改账单状态失败", "isError": true },
+  "27080407":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "插入回调记录失败", "isError": true }
 
 
 }
