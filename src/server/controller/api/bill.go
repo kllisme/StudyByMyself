@@ -446,10 +446,11 @@ func (self *BillController) CancelBatchAliPay(ctx *iris.Context) {
 func (self *BillController) WechatPay(ctx *iris.Context) {
 	billService := &service.BillService{}
 	billRelService := &service.BillRelService{}
-	common.Logger.Debugln("---------------------微信企业支付开始--------------")
+	common.Logger.Warnln("---------------------微信企业支付开始--------------")
 	bill, err := billService.GetFirstWechatBill()
 	if err != nil {
-		common.Render(ctx,"",errors.Errorf("获取微信账单失败,err:",err))
+		common.Render(ctx,"27080401",err)
+		return
 	}
 	status := 3
 	billIds := []interface{}{bill.BillId}
@@ -470,26 +471,24 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 	billRel := &model.BillRel{BillId: bill.BillId, BatchNo: bill.BillId, Type: 2}
 	respMap, err := BatchWechatPay(batchPayRequest)
 	if err != nil {
-		common.Render(ctx,"",errors.Errorf("微信企业支付请求失败,error:",err))
+		common.Render(ctx,"27080402",err)
 		return
 	}
 
 	if respMap["return_code"] == "FAIL" {
-		common.Render(ctx,"",errors.Errorf("请求微信企业支付成功但通信失败,原因:", respMap["return_msg"]))
 		status = 4
 		billRel.IsSuccessed = false
 		billRel.Reason = respMap["return_msg"]
-		return
+		common.Logger.Warnln("请求微信企业支付成功但通信失败,err : ", respMap["return_msg"])
 	} else {
 		if respMap["result_code"] == "FAIL" {
 			billRel.IsSuccessed = false
 			billRel.Reason = respMap["return_msg"]
 			if respMap["err_code"] == "SYSTEMERROR" {
 				// 系统错误，请重试 TODO 请使用原单号以及原请求参数重试，否则可能造成重复支付等资金风险
-
+				common.Logger.Warnln("请求微信企业支付通信成功但业务失败,错误码:",respMap["err_code"], ",原因:", respMap["err_code_des"])
 			} else {
-				common.Render(ctx,"",errors.Errorf("请求微信企业支付通信成功但业务失败,错误码",
-					respMap["err_code"], ",原因:", respMap["err_code_des"]))
+				common.Logger.Warnln("请求微信企业支付通信成功但业务失败,错误码:",respMap["err_code"], ",原因:", respMap["err_code_des"])
 				status = 4
 			}
 		} else {
@@ -497,32 +496,30 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 				// 返回的随机串有问题
 				status = 3
 				billRel.IsSuccessed = false
-				billRel.Reason = "返回的随机串有问题"
-				common.Render(ctx,"",errors.Errorf("微信企业支付返回的随机串有问题,产生的随机串:", nonceStr, ",接收的随机串:", respMap["nonce_str"]))
+				billRel.Reason = "随机串校验不通过"
+				common.Logger.Warnln(errors.Errorf("随机串校验不通过,产生的随机串:", nonceStr, ",接收的随机串:", respMap["nonce_str"]))
 			} else {
 				billRel.IsSuccessed = true
 				billRel.Reason = respMap["return_msg"]
 				billRel.OuterNo = respMap["payment_no"]
 				status = 2
+				common.Logger.Warnln("微信企业支付业务成功")
 			}
 		}
 	}
 
 	err = billService.BatchUpdateStatusById(status, billIds)
 	if err != nil {
-		common.Render(ctx,"",errors.Errorf("微信企业支付成功但更改账单状态失败,原因:", err))
+		common.Render(ctx,"27080406", err)
 		return
 	}
-	rows, err := billRelService.Create(billRel)
+	_, err = billRelService.Create(billRel)
 	if err != nil {
-		common.Render(ctx,"",errors.Errorf("微信企业支付成功但插入回调记录失败,原因:", err))
+		common.Render(ctx,"27080407", err)
 		return
 	}
-	if rows == 0 {
-		common.Render(ctx,"",errors.Errorf("微信企业支付成功但插入回调记录成功数为0"))
-		return
-	}
-	common.Render(ctx,"",errors.Errorf("---------------------微信企业支付成功--------------"))
+	common.Render(ctx,"27080400",nil)
+	common.Logger.Warnln("---------------------微信企业支付完成--------------")
 	return
 }
 
@@ -535,7 +532,7 @@ func BatchWechatPay(batchPayRequest *pay.BatchPayRequest) (map[string]string, er
 	batchPayRequest.Sign = wechatPayKit.CreateSign(m)
 	requestBytes, err := xml.Marshal(batchPayRequest)
 	if err != nil {
-		common.Logger.Debugln("微信企业支付请求转XML失败,error=========", err)
+		common.Logger.Warnln("微信企业支付请求转XML失败,error=========", err)
 		return nil, err
 	}
 	reqStr := string(requestBytes)
@@ -546,7 +543,7 @@ func BatchWechatPay(batchPayRequest *pay.BatchPayRequest) (map[string]string, er
 		viper.GetString("pay.wechat.rootcaFile"),
 	)
 	if err != nil {
-		common.Logger.Debugln("微信企业支付请求CreateTLSClient失败,error=========", err)
+		common.Logger.Warnln("微信企业支付请求CreateTLSClient失败,error=========", err)
 		return nil, err
 	}
 	// client.Timeout=xxx
@@ -560,17 +557,19 @@ func BatchWechatPay(batchPayRequest *pay.BatchPayRequest) (map[string]string, er
 		},
 		HTTPClient: client,
 	})
-	common.Logger.Debugln("response：", response.String())
+	common.Logger.Warnln("response：", response.String())
 	if err != nil {
-		common.Logger.Debugln("微信企业支付请求失败,err:", err.Error(), ",statusCode:", response.StatusCode)
+		common.Logger.Warnln("微信企业支付请求失败,err:", err.Error(), ",statusCode:", response.StatusCode)
 		return nil, err
 	}
 	if response.StatusCode != 200 {
-		common.Logger.Debugln("微信企业支付请求返回错误码,statusCode:", response.StatusCode)
+		common.Logger.Warnln("微信企业支付请求返回错误码,statusCode:", response.StatusCode)
+		return nil,errors.New(response.StatusCode)
+
 	}
 	respMap, err := util.DecodeXMLToMap(bytes.NewReader(response.Bytes()))
 	if err != nil {
-		common.Logger.Debugln("解析xml形式编码错误, 原因:", err.Error())
+		common.Logger.Warnln("解析xml形式编码错误, 原因:", err.Error())
 		return nil, err
 	}
 	return respMap, err
