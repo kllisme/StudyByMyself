@@ -19,13 +19,16 @@ func Api(app *iris.Framework) {
 		billCtrl      = &api.BillController{}
 		dailyBillCtrl = &api.DailyBillController{}
 	)
-	app.Get("/alipay/notification",billCtrl.AlipayNotification)
+
+
 	v1 := app.Party("/v1", func(ctx *iris.Context) {
 		ctx.Next()
 	})
 
 	{
 
+		v1.Post("/settlement/actions/wechatPay", billCtrl.WechatPay)
+		v1.Get("/alipay/notification",billCtrl.AlipayNotification)
 
 		v1.Get("/captcha.png", captchaCtrl.Captcha)
 
@@ -54,7 +57,7 @@ func Api(app *iris.Framework) {
 			api.Get("/daily-bills/:id", dailyBillCtrl.DetailsById)
 
 			api.Post("/settlement/actions/pay", billCtrl.BatchPay)
-			api.Post("/settlement/actions/wechatPay", billCtrl.WechatPay)
+
 
 			//api.Post("/settlement/actions/cancel", billCtrl.CancelBatchAliPay)
 		}

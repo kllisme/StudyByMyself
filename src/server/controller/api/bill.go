@@ -546,7 +546,7 @@ func BatchWechatPay(batchPayRequest *pay.BatchPayRequest) (map[string]string, er
 		viper.GetString("pay.wechat.rootcaFile"),
 	)
 	if err != nil {
-		common.Logger.Debugln("微信企业支付请求转XML失败,error=========", err)
+		common.Logger.Debugln("微信企业支付请求CreateTLSClient失败,error=========", err)
 		return nil, err
 	}
 	// client.Timeout=xxx
