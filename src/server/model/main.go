@@ -40,14 +40,6 @@ func (self *Bill) Mapping(user *User) map[string]interface{} {
 }
 
 func (self *DailyBill) Mapping(user *User) map[string]interface{} {
-	payName := ""
-	switch self.AccountType {
-	case 1:
-		payName = "支付宝"
-	case 2:
-		payName = "微信"
-
-	}
 	return map[string]interface{}{
 		"createdAt": self.CreatedAt,
 		"updatedAt": self.UpdatedAt,
@@ -60,8 +52,8 @@ func (self *DailyBill) Mapping(user *User) map[string]interface{} {
 		},
 		"account": map[string]interface{}{
 			"type":    self.AccountType,
-			"payName": payName,
-			"name":    self.AccountName,
+			"payName": self.AccountName,
+			"name":    self.RealName,
 		},
 		"totalAmount": self.TotalAmount,
 		"status":      self.Status,

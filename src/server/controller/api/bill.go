@@ -7,7 +7,6 @@ import (
 
 	"bytes"
 	"encoding/xml"
-	"fmt"
 	"github.com/bitly/go-simplejson"
 	"github.com/fatih/structs"
 	"github.com/go-errors/errors"
@@ -528,9 +527,10 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 }
 
 func BatchWechatPay(batchPayRequest *pay.BatchPayRequest) (map[string]string, error) {
+	common.Logger.Debugln("batchPayRequest--------------------->",batchPayRequest)
 	m := structs.Map(batchPayRequest)
 	delete(m, "sign")
-	fmt.Println("m:", m)
+	common.Logger.Debugln("m:", m)
 	wechatPayKit := pay.WechatPayKit{}
 	batchPayRequest.Sign = wechatPayKit.CreateSign(m)
 	requestBytes, err := xml.Marshal(batchPayRequest)
