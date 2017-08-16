@@ -70,19 +70,19 @@ func (self *PermissionService)Create(permission *permission.Permission) (*permis
 
 func (self *PermissionService)Delete(id int) error {
 	tx := common.SodaMngDB_WR.Begin()
-	if err := tx.Delete(&permission.Permission{}, id).Error; err != nil {
+	if err := tx.Unscoped().Delete(&permission.Permission{}, id).Error; err != nil {
 		tx.Rollback()
 		return err
-	} else if err := tx.Where("permission_id = ?", id).Delete(&permission.RolePermissionRel{}).Error; err != nil {
+	} else if err := tx.Unscoped().Where("permission_id = ?", id).Delete(&permission.RolePermissionRel{}).Error; err != nil {
 		tx.Rollback()
 		return err
-	} else if err := tx.Where("permission_id = ?", id).Delete(&permission.PermissionActionRel{}).Error; err != nil {
+	} else if err := tx.Unscoped().Where("permission_id = ?", id).Delete(&permission.PermissionActionRel{}).Error; err != nil {
 		tx.Rollback()
 		return err
-	} else if err := tx.Where("permission_id = ?", id).Delete(&permission.PermissionElementRel{}).Error; err != nil {
+	} else if err := tx.Unscoped().Where("permission_id = ?", id).Delete(&permission.PermissionElementRel{}).Error; err != nil {
 		tx.Rollback()
 		return err
-	} else if err := tx.Where("permission_id = ?", id).Delete(&permission.PermissionMenuRel{}).Error; err != nil {
+	} else if err := tx.Unscoped().Where("permission_id = ?", id).Delete(&permission.PermissionMenuRel{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

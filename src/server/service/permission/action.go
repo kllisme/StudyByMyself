@@ -64,10 +64,10 @@ func (self *ActionService)Create(action *permission.Action) error {
 
 func (self *ActionService)Delete(id int) error {
 	tx := common.SodaMngDB_WR.Begin()
-	if err := tx.Delete(&permission.Action{}, id).Error; err != nil {
+	if err := tx.Unscoped().Delete(&permission.Action{}, id).Error; err != nil {
 		tx.Rollback()
 		return err
-	} else if err := tx.Where("action_id = ?", id).Delete(&permission.PermissionActionRel{}).Error; err != nil {
+	} else if err := tx.Unscoped().Where("action_id = ?", id).Delete(&permission.PermissionActionRel{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

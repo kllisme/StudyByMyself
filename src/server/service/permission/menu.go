@@ -64,10 +64,10 @@ func (self *MenuService)Update(menu *permission.Menu) (*permission.Menu, error) 
 
 func (self *MenuService)Delete(id int) error {
 	tx := common.SodaMngDB_WR.Begin()
-	if err := tx.Delete(&permission.Menu{}, id).Error; err != nil {
+	if err := tx.Unscoped().Delete(&permission.Menu{}, id).Error; err != nil {
 		tx.Rollback()
 		return err
-	} else if err := tx.Where("menu_id = ?", id).Delete(&permission.PermissionMenuRel{}).Error; err != nil {
+	} else if err := tx.Unscoped().Where("menu_id = ?", id).Delete(&permission.PermissionMenuRel{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
