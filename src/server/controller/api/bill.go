@@ -462,7 +462,7 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 		NonceStr:       nonceStr,
 		OpenId:         bill.Account,
 		CheckName:      viper.GetString("pay.wechat.checkName"),
-		ReUserName:     bill.AccountName,
+		ReUserName:     bill.RealName,
 		Amount:         bill.Amount,
 		Desc:           "企业付款API测试" + bill.CreatedAt.Local().Format("01月02日") + "结算款",
 		SPBillCreateIP: "116.24.64.139",
