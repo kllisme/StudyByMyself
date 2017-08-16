@@ -16,6 +16,7 @@
 # config
 /config/local.json
 /config/private.json
+/config/cert/
 
 # runtime
 /log/
