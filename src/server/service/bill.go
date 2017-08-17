@@ -10,6 +10,24 @@ import (
 
 type BillService struct {
 }
+// 有些函数需要连表查询
+func (self *BillService)userIdByUserCondition(sql string, value []interface{})([]int,error) {
+	ids := make([]int,0)
+	var id int
+	r,err := common.SodaMngDB_R.Model(model.User{}).Select("id").Where(sql,value...).Rows()
+	if err != nil {
+		return ids,err
+	}
+	defer r.Close()
+	for r.Next() {
+		err = r.Scan(&id)
+		if err != nil {
+			return ids,err
+		}
+		ids = append(ids,id)
+	}
+	return ids,nil
+}
 
 func (self *BillService) TotalByAccountType(accountType, status int, createdAt, settledAt, keys string) (int, error) {
 	type Result struct {
@@ -25,17 +43,21 @@ func (self *BillService) TotalByAccountType(accountType, status int, createdAt, 
 
 	if createdAt != "" {
 		sql += " and Date(bill.created_at) = ? "
-		params = append(params, createdAt)
+		params = append(params, createdAt[:10])
 	}
 	if settledAt != "" {
 		sql += " and Date(bill.settled_at) = ? "
-		params = append(params, settledAt)
+		params = append(params, settledAt[:10])
 	}
 
 	if keys != "" {
-		sql += " and (bill.user_name like ? or bill.account_name like ?) "
-		params = append(params, "%"+keys+"%")
-		params = append(params, "%"+keys+"%")
+		userSql := " user.name like ? or user.account like ? "
+		userId,err := self.userIdByUserCondition(userSql,[]interface{}{"%"+keys+"%","%"+keys+"%"})
+		if err != nil {
+			return -1,err
+		}
+		sql += " and bill.user_id in (?)"
+		params = append(params, userId)
 	}
 	sql += " and bill.account_type = ? and user_id != 1 " // user_id != 1 过滤测试的账单
 	params = append(params, accountType)
@@ -56,16 +78,21 @@ func (self *BillService) ListByAccountType(accountType, status, offset, limit in
 	}
 	if createdAt != "" {
 		sql += " and Date(bill.created_at) = ? "
-		params = append(params, []byte(createdAt)[0:10])
+		params = append(params, []byte(createdAt)[:10])
 	}
 	if settledAt != "" {
 		sql += " and Date(bill.settled_at) = ? "
-		params = append(params, []byte(settledAt)[0:10])
+		params = append(params, []byte(settledAt)[:10])
 	}
+		// 运营商名称/登录账号
 	if keys != "" {
-		sql += " and (bill.user_name like ? or bill.account_name like ?) "
-		params = append(params, "%"+keys+"%")
-		params = append(params, "%"+keys+"%")
+		userSql := " user.name like ? or user.account like ? "
+		userId,err := self.userIdByUserCondition(userSql,[]interface{}{"%"+keys+"%","%"+keys+"%"})
+		if err != nil {
+			return nil,err
+		}
+		sql += " and bill.user_id in (?) "
+		params = append(params, userId)
 	}
 	sql += " and bill.account_type = ? and user_id != 1 " // user_id != 1 过滤测试的账单
 	params = append(params, accountType)
@@ -116,13 +143,78 @@ func(self *BillService) BillTypeByBatchBill(billIds []interface{}) (int, error) 
 	}
 	return accountType, nil
 }
+/*func (self *BillService) BatchUpdateStatusById(status int, ids []interface{}) error {
+	tx := common.SodaMngDB_WR.Begin()
+	param := make(map[string]interface{}, 0)
+	param["status"] = status
+	r := tx.Model(&model.Bill{}).Where(" bill_id in (?) ", ids).Update(param)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	}
+	// 接着更新daily_bill
+	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) ", ids).Update(param)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	}
+	tx.Commit()
+	return nil
+}*/
 
+func (self *BillService) BatchUpdateStatusAndSettleAtById(status int, ids []interface{}) error {
+	tx := common.SodaMngDB_WR.Begin()
+	param := make(map[string]interface{}, 0)
+	param["status"] = status
+	// 先更新bill
+	param["settled_at"] = time.Now()
+	r := tx.Model(&model.Bill{}).Where(" bill_id in (?) ", ids).Update(param)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	}
+	// 接着更新daily_bill
+	dailyBillParam := make(map[string]interface{}, 0)
+	timeNow := time.Now().Local().Format("2006-01-02 15:04:05")
+	dailyBillParam["settled_at"] = timeNow
+	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) ", ids).Update(param)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	}
+	tx.Commit()
+	return nil
+}
+
+func (self *BillService) BatchUpdateSubmitAtById(status int, ids []interface{}) error {
+	tx := common.SodaMngDB_WR.Begin()
+	param := make(map[string]interface{}, 0)
+	param["status"] = status
+	// 先更新bill
+	//修改状态为"结账中",需更新"结账中时间"
+	param["submitted_at"] = time.Now()
+	r := tx.Model(&model.Bill{}).Where(" bill_id in (?) ", ids).Update(param)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	}
+	dailyBillParam := make(map[string]interface{}, 0)
+	// 接着更新daily_bill
+	dailyBillParam["submit_at"] = time.Now()
+	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) ", ids).Update(param)
+	if r.Error != nil {
+		tx.Rollback()
+		return r.Error
+	}
+	tx.Commit()
+	return nil
+}
 func (self *BillService) BatchUpdateStatusById(status int, ids []interface{}) error {
 	tx := common.SodaMngDB_WR.Begin()
 	param := make(map[string]interface{}, 0)
 	param["status"] = status
 	// 先更新bill
-	if status == 2 {
+	if status == 2 || status == 4{
 		param["settled_at"] = time.Now()
 	}
 	if status == 3 {
@@ -137,7 +229,7 @@ func (self *BillService) BatchUpdateStatusById(status int, ids []interface{}) er
 	dailyBillParam := make(map[string]interface{}, 0)
 	// 接着更新daily_bill
 	timeNow := time.Now().Local().Format("2006-01-02 15:04:05")
-	if status == 2 {
+	if status == 2 || status == 4 {
 		dailyBillParam["settled_at"] = timeNow
 	}
 	if status == 3 {

@@ -9,6 +9,7 @@ type BillRel struct {
 	Reason      string `json:"reason"`
 	OuterNo     string `json:"outerNo"`
 	BillType    int    `json:"billType"`
+	ErrCode     string `json:"errCode"`
 }
 
 func (BillRel) TableName() string {

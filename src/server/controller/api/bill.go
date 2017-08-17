@@ -446,6 +446,7 @@ func (self *BillController) CancelBatchAliPay(ctx *iris.Context) {
 func (self *BillController) WechatPay(ctx *iris.Context) {
 	billService := &service.BillService{}
 	billRelService := &service.BillRelService{}
+	billBatchNoService := &service.BillBatchNoService{}
 	common.Logger.Warnln("---------------------微信企业支付开始--------------")
 	bill, err := billService.GetFirstWechatBill()
 	if err != nil {
@@ -468,46 +469,95 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 		Desc:           "企业付款API测试" + bill.CreatedAt.Local().Format("01月02日") + "结算款",
 		SPBillCreateIP: "116.24.64.139",
 	}
-	billRel := &model.BillRel{BillId: bill.BillId, BatchNo: bill.BillId, Type: 2}
+	billRel := &model.BillRel{BillId: bill.BillId, BatchNo: bill.BillId, BillType:1,Type: 2}// type=2代表微信,billType=1代表记录来源于bill
 	respMap, err := BatchWechatPay(batchPayRequest)
 	if err != nil {
 		common.Render(ctx,"27080402",err)
 		return
 	}
 
-	if respMap["return_code"] == "FAIL" {
+	if returnCode,ok := respMap["return_code"] ; ok == true && returnCode== "FAIL" {
 		status = 4
 		billRel.IsSuccessed = false
 		billRel.Reason = respMap["return_msg"]
-		common.Logger.Warnln("请求微信企业支付成功但通信失败,err : ", respMap["return_msg"])
-	} else {
-		if respMap["result_code"] == "FAIL" {
+		billRel.ErrCode = "return_code : "+respMap["return_code"]
+		common.Logger.Warnln("request wechat transfer pay return_code is fail,err : ", respMap["return_msg"])
+	} else if ok == true && returnCode== "SUCCESS" {
+		if resultCode,ok := respMap["result_code"] ; ok == true && resultCode== "FAIL"  {
 			billRel.IsSuccessed = false
-			billRel.Reason = respMap["return_msg"]
-			if respMap["err_code"] == "SYSTEMERROR" {
-				// 系统错误，请重试 TODO 请使用原单号以及原请求参数重试，否则可能造成重复支付等资金风险
-				common.Logger.Warnln("请求微信企业支付通信成功但业务失败,错误码:",respMap["err_code"], ",原因:", respMap["err_code_des"])
-			} else {
-				common.Logger.Warnln("请求微信企业支付通信成功但业务失败,错误码:",respMap["err_code"], ",原因:", respMap["err_code_des"])
-				status = 4
-			}
+			billRel.ErrCode = respMap["err_code"]
+			billRel.Reason = respMap["err_code_des"]
+			common.Log(ctx,&common.Result{
+				Status:"UNPROCESSABLE_ENTITY",
+				Data:errors.Errorf("err_code : %v,reason : %v",respMap["err_code"],respMap["err_code_des"]),
+				Description:"请求微信企业支付通信成功但业务失败",
+				Msg:"请求微信企业支付通信成功但业务失败",
+				Exception:"",
+				Code:"27080408",
+				IsError:false,
+			})
+			status = 4
 		} else {
+			billRel.ErrCode = respMap["result_code"]
+			if respMap["partner_trade_no"] != bill.BillId {
+				status = 3
+				billRel.IsSuccessed = false
+				billRel.Reason = "商户订单号不一致"
+				common.Log(ctx,&common.Result{
+					Status:"UNPROCESSABLE_ENTITY",
+					Data:errors.Errorf("bill_id : %v,reason : %v",bill.BillId,respMap["partner_trade_no"]),
+					Description:"商户订单号不一致",
+					Msg:"商户订单号不一致",
+					Exception:"",
+					Code:"27080409",
+					IsError:false,
+				})
+			}
 			if respMap["nonce_str"] != nonceStr {
 				// 返回的随机串有问题
 				status = 3
 				billRel.IsSuccessed = false
 				billRel.Reason = "随机串校验不通过"
-				common.Logger.Warnln(errors.Errorf("随机串校验不通过,产生的随机串:", nonceStr, ",接收的随机串:", respMap["nonce_str"]))
+				common.Log(ctx,&common.Result{
+					Status:"UNPROCESSABLE_ENTITY",
+					Data:errors.Errorf("nonceStr : %v,respMap['nonce_str'] : %v",nonceStr,respMap["nonce_str"]),
+					Description:"随机串校验不通过",
+					Msg:"随机串校验不通过",
+					Exception:"",
+					Code:"27080410",
+					IsError:false,
+				})
 			} else {
 				billRel.IsSuccessed = true
 				billRel.Reason = respMap["return_msg"]
 				billRel.OuterNo = respMap["payment_no"]
 				status = 2
-				common.Logger.Warnln("微信企业支付业务成功")
+				common.Logger.Warnln("微信企业支付业务成功,payment_no,",respMap["payment_no"])
 			}
 		}
+	}else{
+		billRel.IsSuccessed = false
+		billRel.ErrCode = ""
+		billRel.Reason = "微信企业支付return_code数据出错"
+		common.Log(ctx,&common.Result{
+			Status:"UNPROCESSABLE_ENTITY",
+			Data:respMap,
+			Description:"the most serious condition--wechat return an err packet",
+			Msg:"the most serious condition--wechat return an err packet",
+			Exception:"",
+			Code:"27080411",
+			IsError:false,
+		})
 	}
-
+	// 表示业务失败了
+	if billRel.IsSuccessed != true {
+		//软删除失败订单的批次号
+		_, err = billBatchNoService.Delete(bill.BillId)
+		if err != nil {
+			common.Logger.Debugln("01060502", "failureBillIds==", bill.BillId, ":", err.Error())
+			return
+		}
+	}
 	err = billService.BatchUpdateStatusById(status, billIds)
 	if err != nil {
 		common.Render(ctx,"27080406", err)
