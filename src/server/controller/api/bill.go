@@ -166,9 +166,9 @@ func BatchAlipay(billList []*model.Bill) (map[string]string, string, error) {
 		_remark := bill.CreatedAt.Format("01月02日") + "洗衣结算款"
 
 		aliPayDetailDataStr += bill.BillId + "^" + bill.Account + "^" + bill.RealName +
-			"^" + functions.Float64ToString(float64(bill.TotalAmount)/100.00, 2) + "^" + _remark + "|" //组装支付宝支付data_detail
+			"^" + functions.Float64ToString(float64(bill.Amount)/100.00, 2) + "^" + _remark + "|" //组装支付宝支付data_detail
 		//aliPayBillIds = append(aliPayBillIds,bill.BillId) //组装需要修改为"结账中"状态的支付宝订单
-		batchFee += bill.TotalAmount
+		batchFee += bill.Amount
 		batchNum++ //计算批量结算请求中支付宝结算的日订单数,不可超过1000
 	}
 
