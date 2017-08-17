@@ -28,7 +28,7 @@ func Api(app *iris.Framework) {
 	{
 
 		v1.Post("/settlement/actions/wechatPay", billCtrl.WechatPay)
-		v1.Get("/settlement/alipay/notification",billCtrl.AlipayNotification)
+		v1.Post("/settlement/alipay/notification",billCtrl.AlipayNotification)
 
 		v1.Get("/captcha.png", captchaCtrl.Captcha)
 
