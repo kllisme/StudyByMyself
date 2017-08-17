@@ -5,8 +5,8 @@ import (
 	"maizuo.com/soda/erp/api/src/server/common"
 	"maizuo.com/soda/erp/api/src/server/service"
 	"github.com/spf13/viper"
-	"github.com/square/go-jose/json"
 	"maizuo.com/soda/erp/api/src/server/payload"
+	permissionModel "maizuo.com/soda/erp/api/src/server/model/permission"
 	"github.com/bitly/go-simplejson"
 	"maizuo.com/soda/erp/api/src/server/model"
 	"strings"
@@ -241,11 +241,72 @@ func (self *UserController) GetByID(ctx *iris.Context) {
 }
 
 //GetSessionInfo	use for pull info which shown on pages after login
-func (self *UserController)GetSessionInfo(ctx *iris.Context) {
-	sessionInfo := new(payload.SessionInfo)
-	currentUserJson := ctx.Session().GetString(viper.GetString("server.session.user.key"))
-	if err := json.Unmarshal([]byte(currentUserJson), sessionInfo); err != nil {
-		common.Render(ctx, "27020101", nil)
+func (self *UserController)GetProfile(ctx *iris.Context) {
+	var (
+		userService = service.UserService{}
+		menuService = permission.MenuService{}
+		userRoleRelService = permission.UserRoleRelService{}
+		roleMenuRelService = permission.PermissionMenuRelService{}
+		rolePermissionRelService = permission.RolePermissionRelService{}
+		permissionElementRelService = permission.PermissionElementRelService{}
+		elementService = permission.ElementService{}
+	)
+
+	id, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
+	if err != nil {
+		common.Render(ctx, "000001", nil)
+		return
+	}
+
+	userEntity, err := userService.GetById(id)
+	if err != nil {
+		common.Render(ctx, "27010108", nil)
+		return
+	}
+
+	sessionInfo := payload.SessionInfo{
+		User:        userEntity,
+		MenuList:    &[]*permissionModel.Menu{},
+		ElementList: &[]*permissionModel.Element{},
+	}
+	//获取权限
+	roleIDs, err := userRoleRelService.GetRoleIDsByUserID(userEntity.ID)
+	if err != nil {
+		common.Render(ctx, "27010112", nil)
+		return
+	}
+	permissionIDs, err := rolePermissionRelService.GetPermissionIDsByRoleIDs(roleIDs)
+	if err != nil {
+		common.Render(ctx, "27010117", nil)
+		return
+	}
+	if len(permissionIDs) != 0 {
+		menuIDs, err := roleMenuRelService.GetMenuIDsByPermissionIDs(permissionIDs)
+		if err != nil {
+			common.Render(ctx, "27010113", nil)
+			return
+		}
+		if len(menuIDs) != 0 {
+			menuList, err := menuService.GetListByIDs(menuIDs)
+			if err != nil {
+				common.Render(ctx, "27010114", nil)
+				return
+			}
+			sessionInfo.MenuList = menuList
+		}
+		elementIDs, err := permissionElementRelService.GetElementIDsByPermissionIDs(permissionIDs)
+		if err != nil {
+			common.Render(ctx, "27010119", nil)
+			return
+		}
+		if len(elementIDs) != 0 {
+			elementList, err := elementService.GetListByIDs(elementIDs)
+			if err != nil {
+				common.Render(ctx, "27010118", nil)
+				return
+			}
+			sessionInfo.ElementList = elementList
+		}
 	}
 	//userEntity, _ := userService.GetById(user.ID)
 	common.Render(ctx, "27020100", sessionInfo)

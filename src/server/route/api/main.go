@@ -31,7 +31,7 @@ func Api(app *iris.Framework) {
 
 		//jwt校验
 		v1.UseFunc(common.Authorization)
-		v1.Get("/profile/session", userCtrl.GetSessionInfo)
+		v1.Get("/profile/session", userCtrl.GetProfile)
 
 		//v1.Get("/profile/user", userCtrl.GetSessionInfo)
 
