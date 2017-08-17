@@ -3,10 +3,11 @@ package common
 import (
 	"fmt"
 
+	"maizuo.com/soda/erp/api/src/server/entity"
+
 	"github.com/go-errors/errors"
 	"github.com/spf13/viper"
 	"gopkg.in/kataras/iris.v5"
-	"encoding/json"
 )
 
 type Result struct {
@@ -32,17 +33,21 @@ func (self *Result) New(code string, data interface{}) *Result {
 		Code:        code,
 		IsError:     isError,
 	}
-	resultData,_ := json.Marshal(result)
-	Logger.Debugln("result : ",string(resultData))
 	switch data.(type) {
 	case *Result:
-		result.Data = nil
+		result.Data = struct{}{}
+	case *entity.Pagination:
+		result.Data = struct{}{}
 	default:
 		result.Data = data
 	}
 	if result.IsError {
-		result.Exception = fmt.Sprintf("%v\n", errors.Wrap(data, 1).ErrorStack())[:500]
-		result.Data = struct {}{}
+		errorStack := fmt.Sprintf("%v\n", errors.Wrap(data, 1).ErrorStack())
+		if len(errorStack) > 500 {
+			errorStack = errorStack[:500]
+		}
+		result.Exception = errorStack
+		result.Data = struct{}{}
 	} else {
 		result.Exception = ""
 	}
@@ -63,7 +68,11 @@ func Error(code string, data interface{}) *Result {
 		Code:        code,
 	}
 	if data == nil {
-		result.Exception = fmt.Sprintf("%v\n", errors.Wrap(data, 1).ErrorStack())[:500]
+		errorStack := fmt.Sprintf("%v\n", errors.Wrap(data, 1).ErrorStack())
+		if len(errorStack) > 500 {
+			errorStack = errorStack[:500]
+		}
+		result.Exception = errorStack
 	}
 	return result
 }
