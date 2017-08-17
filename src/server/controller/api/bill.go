@@ -83,14 +83,14 @@ func (self *BillController) BatchPay(ctx *iris.Context) {
 	params := simplejson.New()
 	err := ctx.ReadJSON(params)
 	if err != nil {
-		common.Logger.Debugln("解析json异常,err : ", err)
+		common.Logger.Warnln("解析json异常,err : ", err)
 		common.Render(ctx, "27080201", "解析json异常")
 		return
 	}
 
 	billIds, err := params.Get("bills").Array()
 	if err != nil {
-		common.Logger.Debugln("获取bills异常,err : ", err)
+		common.Logger.Warnln("获取bills异常,err : ", err)
 		common.Render(ctx, "27080203", "获取bills异常")
 		return
 	}
@@ -100,7 +100,7 @@ func (self *BillController) BatchPay(ctx *iris.Context) {
 	}
 	accountType, err := billService.BillTypeByBatchBill(billIds)
 	if err != nil && accountType == -1 {
-		common.Logger.Debugln("获取选取的账单结算类型失败,err : ", err)
+		common.Logger.Warnln("获取选取的账单结算类型失败,err : ", err)
 		common.Render(ctx, "27080202", "获取选取的账单结算类型失败")
 		return
 	}
@@ -140,7 +140,7 @@ func (self *BillController) BatchPay(ctx *iris.Context) {
 	// 不用区分微信还是支付宝的单,统一改变bill和daily_bill的状态
 	err = billService.BatchUpdateStatusById(3, billIds)
 	if err != nil {
-		common.Logger.Debugln("更新账单为'结算中'失败:", err.Error())
+		common.Logger.Warnln("更新账单为'结算中'失败:", err.Error())
 		common.Render(ctx, "27080209", err)
 		return
 	}
@@ -194,7 +194,7 @@ func BatchAlipay(billList []*model.Bill) (map[string]string, string, error) {
 		}
 		_, err := billBatchNoService.BatchCreate(&billBatchNoList)
 		if err != nil {
-			common.Logger.Debugln("持久化批次号失败:", err.Error())
+			common.Logger.Warnln("持久化批次号失败:", err.Error())
 			return nil, "27080212", errors.New("支付宝结算更新状态失败")
 		}
 
@@ -217,7 +217,7 @@ func GenerateBatchAliPay(batchNum int, batchFee int, aliPayDetailDataStr string)
 	if strings.HasSuffix(aliPayDetailDataStr, "|") {
 		aliPayDetailDataStr = aliPayDetailDataStr[:len(aliPayDetailDataStr)-1]
 	}
-	common.Logger.Debugln("aliPayDetailDataStr====================", aliPayDetailDataStr)
+	common.Logger.Warnln("aliPayDetailDataStr====================", aliPayDetailDataStr)
 	alipayKit := alipay.AlipayKit{}
 	param["service"] = viper.GetString("pay.aliPay.service.batchTransNotify")
 	param["partner"] = viper.GetString("pay.aliPay.partner")
@@ -233,8 +233,8 @@ func GenerateBatchAliPay(batchNum int, batchFee int, aliPayDetailDataStr string)
 	param["sign"] = alipayKit.CreateSign(param)
 	param["sign_type"] = viper.GetString("pay.aliPay.signType")
 	param["request_url"] = viper.GetString("pay.aliPay.requestUrl")
-	common.Logger.Debugln("batchNum======================", batchNum)
-	common.Logger.Debugln("param======================", param)
+	common.Logger.Warnln("batchNum======================", batchNum)
+	common.Logger.Warnln("param======================", param)
 	return param
 }
 
@@ -266,7 +266,7 @@ func (self *BillController) AlipayNotification(ctx *iris.Context) {
 	reqMap["success_details"] = ctx.FormValueString("success_details")
 	reqMap["fail_details"] = ctx.FormValueString("fail_details")
 	common.Logger.Debugln("signType=============", ctx.FormValueString("sign_type"))
-	common.Logger.Debugln("reqMap===========================", reqMap)
+	common.Logger.Warnln("reqMap===========================", reqMap)
 	if !alipayKit.VerifySign(reqMap, ctx.FormValueString("sign")) {
 		common.Logger.Warningln("回调数据校验失败")
 		ctx.Response.SetBodyString("fail")
@@ -341,10 +341,10 @@ func (self *BillController) AlipayNotification(ctx *iris.Context) {
 		ctx.Response.SetBodyString("fail")
 		return
 	} else {
-		_, err = billService.Updates(&billList)
+		err = billService.Updates(&billList)
 		if err != nil {
 			//更新支付宝账单结账状态失败
-			common.Logger.Debugln("更新支付宝账单结账状态失败,原因", ":", err.Error())
+			common.Logger.Warnln("更新支付宝账单结账状态失败,原因", ":", err.Error())
 			ctx.Response.SetBodyString("fail")
 			return
 		}
@@ -354,7 +354,7 @@ func (self *BillController) AlipayNotification(ctx *iris.Context) {
 	if len(failureBillIds) > 0 {
 		_, err = billBatchNoService.Delete(failureBillIds)
 		if err != nil {
-			common.Logger.Debugln("01060502", "failureBillIds==", failureBillIds, ":", err.Error())
+			common.Logger.Warnln("01060502", "failureBillIds==", failureBillIds, ":", err.Error())
 			ctx.Response.SetBodyString("fail")
 			return
 		}
@@ -363,12 +363,12 @@ func (self *BillController) AlipayNotification(ctx *iris.Context) {
 	if len(billRelList) > 0 {
 		_, err := billRelService.Create(billRelList...)
 		if err != nil {
-			common.Logger.Debugln("01060503", ":", err.Error())
+			common.Logger.Warnln("01060503", ":", err.Error())
 			ctx.Response.SetBodyString("fail")
 			return
 		}
 	}
-	common.Logger.Debugln("回调成功单数:", successedNum, ",失败单数:", failureNum)
+	common.Logger.Warnln("回调成功单数:", successedNum, ",失败单数:", failureNum)
 	common.Logger.Warningln("======================支付宝回调结束======================")
 	ctx.Response.SetBodyString("success")
 }
@@ -470,32 +470,32 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 		Desc:           "企业付款API测试" + bill.CreatedAt.Local().Format("01月02日") + "结算款",
 		SPBillCreateIP: "116.24.64.139",
 	}
-	billRel := &model.BillRel{BillId: bill.BillId, BatchNo: bill.BillId, BillType:1,Type: 2}// type=2代表微信,billType=1代表记录来源于bill
+	billRel := &model.BillRel{BillId: bill.BillId, BatchNo: bill.BillId, BillType: 1, Type: 2} // type=2代表微信,billType=1代表记录来源于bill
 	respMap, err := BatchWechatPay(batchPayRequest)
 	if err != nil {
 		common.Render(ctx, "27080402", err)
 		return
 	}
 
-	if returnCode,ok := respMap["return_code"] ; ok == true && returnCode== "FAIL" {
+	if returnCode, ok := respMap["return_code"]; ok == true && returnCode == "FAIL" {
 		status = 4
 		billRel.IsSuccessed = false
 		billRel.Reason = respMap["return_msg"]
-		billRel.ErrCode = "return_code : "+respMap["return_code"]
+		billRel.ErrCode = "return_code : " + respMap["return_code"]
 		common.Logger.Warnln("request wechat transfer pay return_code is fail,err : ", respMap["return_msg"])
-	} else if ok == true && returnCode== "SUCCESS" {
-		if resultCode,ok := respMap["result_code"] ; ok == true && resultCode== "FAIL"  {
+	} else if ok == true && returnCode == "SUCCESS" {
+		if resultCode, ok := respMap["result_code"]; ok == true && resultCode == "FAIL" {
 			billRel.IsSuccessed = false
 			billRel.ErrCode = respMap["err_code"]
 			billRel.Reason = respMap["err_code_des"]
-			common.Log(ctx,&common.Result{
-				Status:"UNPROCESSABLE_ENTITY",
-				Data:errors.Errorf("err_code : %v,reason : %v",respMap["err_code"],respMap["err_code_des"]),
-				Description:"请求微信企业支付通信成功但业务失败",
-				Msg:"请求微信企业支付通信成功但业务失败",
-				Exception:"",
-				Code:"27080408",
-				IsError:false,
+			common.Log(ctx, &common.Result{
+				Status:      "UNPROCESSABLE_ENTITY",
+				Data:        errors.Errorf("err_code : %v,reason : %v", respMap["err_code"], respMap["err_code_des"]),
+				Description: "请求微信企业支付通信成功但业务失败",
+				Msg:         "请求微信企业支付通信成功但业务失败",
+				Exception:   "",
+				Code:        "27080408",
+				IsError:     false,
 			})
 			status = 4
 		} else {
@@ -504,14 +504,14 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 				status = 3
 				billRel.IsSuccessed = false
 				billRel.Reason = "商户订单号不一致"
-				common.Log(ctx,&common.Result{
-					Status:"UNPROCESSABLE_ENTITY",
-					Data:errors.Errorf("bill_id : %v,reason : %v",bill.BillId,respMap["partner_trade_no"]),
-					Description:"商户订单号不一致",
-					Msg:"商户订单号不一致",
-					Exception:"",
-					Code:"27080409",
-					IsError:false,
+				common.Log(ctx, &common.Result{
+					Status:      "UNPROCESSABLE_ENTITY",
+					Data:        errors.Errorf("bill_id : %v,reason : %v", bill.BillId, respMap["partner_trade_no"]),
+					Description: "商户订单号不一致",
+					Msg:         "商户订单号不一致",
+					Exception:   "",
+					Code:        "27080409",
+					IsError:     false,
 				})
 			}
 			if respMap["nonce_str"] != nonceStr {
@@ -519,35 +519,35 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 				status = 3
 				billRel.IsSuccessed = false
 				billRel.Reason = "随机串校验不通过"
-				common.Log(ctx,&common.Result{
-					Status:"UNPROCESSABLE_ENTITY",
-					Data:errors.Errorf("nonceStr : %v,respMap['nonce_str'] : %v",nonceStr,respMap["nonce_str"]),
-					Description:"随机串校验不通过",
-					Msg:"随机串校验不通过",
-					Exception:"",
-					Code:"27080410",
-					IsError:false,
+				common.Log(ctx, &common.Result{
+					Status:      "UNPROCESSABLE_ENTITY",
+					Data:        errors.Errorf("nonceStr : %v,respMap['nonce_str'] : %v", nonceStr, respMap["nonce_str"]),
+					Description: "随机串校验不通过",
+					Msg:         "随机串校验不通过",
+					Exception:   "",
+					Code:        "27080410",
+					IsError:     false,
 				})
 			} else {
 				billRel.IsSuccessed = true
 				billRel.Reason = respMap["return_msg"]
 				billRel.OuterNo = respMap["payment_no"]
 				status = 2
-				common.Logger.Warnln("微信企业支付业务成功,payment_no,",respMap["payment_no"])
+				common.Logger.Warnln("微信企业支付业务成功,payment_no,", respMap["payment_no"])
 			}
 		}
-	}else{
+	} else {
 		billRel.IsSuccessed = false
 		billRel.ErrCode = ""
 		billRel.Reason = "微信企业支付return_code数据出错"
-		common.Log(ctx,&common.Result{
-			Status:"UNPROCESSABLE_ENTITY",
-			Data:respMap,
-			Description:"the most serious condition--wechat return an err packet",
-			Msg:"the most serious condition--wechat return an err packet",
-			Exception:"",
-			Code:"27080411",
-			IsError:false,
+		common.Log(ctx, &common.Result{
+			Status:      "UNPROCESSABLE_ENTITY",
+			Data:        respMap,
+			Description: "the most serious condition--wechat return an err packet",
+			Msg:         "the most serious condition--wechat return an err packet",
+			Exception:   "",
+			Code:        "27080411",
+			IsError:     false,
 		})
 	}
 	// 表示业务失败了
@@ -586,7 +586,7 @@ func BatchWechatPay(batchPayRequest *pay.BatchPayRequest) (map[string]string, er
 		return nil, err
 	}
 	reqStr := string(requestBytes)
-	common.Logger.Debugln("reqStr:", reqStr)
+	common.Logger.Warnln("reqStr:", reqStr)
 	client, err := wechatPayKit.CreateTLSClient(
 		viper.GetString("pay.wechat.tlsFile.cert"),
 		viper.GetString("pay.wechat.tlsFile.key"),
