@@ -19,8 +19,8 @@ type Bill struct {
 	Amount      int       `json:"amount"`
 	SubmittedAt time.Time `json:"submittedAt"`
 	Mobile      string    `json:"mobile"`
-	RealName    string    `json:"real_name"`
-	BankName    string    `json:"bank_name"`
+	RealName    string    `json:"realName"`
+	BankName    string    `json:"bankName"`
 	Status      int       `json:"status"`
 }
 
