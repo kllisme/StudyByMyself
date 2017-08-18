@@ -3,9 +3,15 @@ package soda
 import "maizuo.com/soda/erp/api/src/server/model"
 
 func (self *Ticket) Mapping(device *model.Device, dailyBill *model.DailyBill) map[string]interface{} {
+	settledAt := ""
+	if &dailyBill.SettledAt != nil {
+		settledAt = ""
+	} else {
+		settledAt = dailyBill.SettledAt.Format("2006-01-02T15:04:05+00:00")
+	}
 	return map[string]interface{}{
 		"createdAt": self.CreatedAt,
-		"settledAt": dailyBill.SettledAt,
+		"settledAt": settledAt,
 		"user": map[string]interface{}{
 			"id":     self.UserId,
 			"mobile": self.Mobile,

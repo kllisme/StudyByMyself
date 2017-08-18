@@ -176,10 +176,7 @@ func (self *BillService) BatchUpdateStatusAndSettleAtById(status int, ids []inte
 		return r.Error
 	}
 	// 接着更新daily_bill
-	dailyBillParam := make(map[string]interface{}, 0)
-	timeNow := time.Now().Local().Format("2006-01-02 15:04:05")
-	dailyBillParam["settled_at"] = timeNow
-	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) ", ids).Update(dailyBillParam)
+	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) ", ids).Update(param)
 	if r.Error != nil {
 		tx.Rollback()
 		return r.Error
@@ -270,7 +267,6 @@ func (self *BillService) Updates(list *[]*model.Bill) error {
 		}
 	}
 
-	timeNow := time.Now().Local().Format("2006-01-02 15:04:05")
 
 	r := tx.Model(&model.Bill{}).Where(" bill_id in (?) and status != 2 ", successBillIDs).Updates(map[string]interface{}{
 		"status":     2,
@@ -291,7 +287,7 @@ func (self *BillService) Updates(list *[]*model.Bill) error {
 
 	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) and status != 2 ", successBillIDs).Updates(map[string]interface{}{
 		"status":     2,
-		"settled_at": timeNow,
+		"settled_at": time.Now(),
 	})
 	if r.Error != nil {
 		tx.Rollback()
@@ -299,7 +295,7 @@ func (self *BillService) Updates(list *[]*model.Bill) error {
 	}
 	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) and status != 2 ", failBillIDs).Updates(map[string]interface{}{
 		"status":     4,
-		"settled_at": timeNow,
+		"settled_at": time.Now(),
 	})
 	if r.Error != nil {
 		tx.Rollback()

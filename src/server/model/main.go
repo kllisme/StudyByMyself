@@ -38,10 +38,16 @@ func (self *Bill) Mapping(user *User, userCashAccount *UserCashAccount) map[stri
 
 func (self *DailyBill) Mapping(user *User) map[string]interface{} {
 	user = user.Mapping()
+	settledAt := ""
+	if &self.SettledAt != nil {
+		settledAt = ""
+	} else {
+		settledAt = self.SettledAt.Format("2006-01-02T15:04:05+00:00")
+	}
 	return map[string]interface{}{
 		"createdAt": self.CreatedAt,
 		"updatedAt": self.UpdatedAt,
-		"settledAt": self.SettledAt,
+		"settledAt": settledAt,
 		"billAt":    self.BillAt,
 		"user": map[string]interface{}{
 			"id":          user.ID,
