@@ -30,7 +30,7 @@ type BillController struct {
 // 根据微信支付或者支付宝来获取结算单列表
 func (self *BillController) ListByAccountType(ctx *iris.Context) {
 	userService := &service.UserService{}
-
+	userCashService := &service.UserCashAccountService{}
 	limit, _ := ctx.URLParamInt("limit")      // Default: 10
 	offset, _ := ctx.URLParamInt("offset")    //  Default: 0 列表起始位:
 	createdAt := ctx.URLParam("createdAt")    // 申请时间
@@ -67,7 +67,13 @@ func (self *BillController) ListByAccountType(ctx *iris.Context) {
 			common.Render(ctx, "27080106", err)
 			return
 		}
-		objects = append(objects, bill.Mapping(user))
+		userCashAccount,err := userCashService.BasicByUserId(bill.UserId)
+		if err != nil {
+			common.Logger.Debugln("获取账单用户信息失败err----------", err)
+			common.Render(ctx, "27080106", err)
+			return
+		}
+		objects = append(objects, bill.Mapping(user,userCashAccount))
 	}
 
 	common.Render(ctx, "27080100", &entity.PaginationData{

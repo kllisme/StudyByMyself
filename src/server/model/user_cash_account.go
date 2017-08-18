@@ -11,6 +11,7 @@ type UserCashAccount struct {
 	Mobile       string `json:"mobile"`
 	CityId       int    `json:"cityId"`
 	ProvinceId   int    `json:"provinceId"`
+	Mode         int    `json:"mode"`
 }
 
 func (UserCashAccount) TableName() string {

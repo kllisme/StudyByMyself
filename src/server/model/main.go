@@ -1,6 +1,6 @@
 package model
 
-func (self *Bill) Mapping(user *User) map[string]interface{} {
+func (self *Bill) Mapping(user *User, userCashAccount *UserCashAccount) map[string]interface{} {
 	settledAt := ""
 	if &self.SettledAt != nil {
 		settledAt = ""
@@ -12,9 +12,10 @@ func (self *Bill) Mapping(user *User) map[string]interface{} {
 		"updatedAt": self.UpdatedAt,
 		"settledAt": settledAt,
 		"user": map[string]interface{}{
-			"id":     user.ID,
-			"name":   user.Name,
-			"mobile": user.Mobile,
+			"id":          user.ID,
+			"name":        user.Name,
+			"mobile":      user.Mobile,
+			"accountName": user.Account,
 		},
 		"account": map[string]interface{}{
 			"type":     self.AccountType,
@@ -29,6 +30,7 @@ func (self *Bill) Mapping(user *User) map[string]interface{} {
 		"status":      self.Status,
 		"count":       self.Count,
 		"id":          self.BillId,
+		"isMode":      userCashAccount.Mode,
 	}
 }
 
@@ -44,10 +46,10 @@ func (self *DailyBill) Mapping(user *User) map[string]interface{} {
 			"mobile": user.Mobile,
 		},
 		"account": map[string]interface{}{
-			"type":    self.AccountType,
-			"payName": self.AccountName,
-			"name":    self.Account,
-			"realName":self.RealName,
+			"type":     self.AccountType,
+			"payName":  self.AccountName,
+			"name":     self.Account,
+			"realName": self.RealName,
 		},
 		"totalAmount": self.TotalAmount,
 		"status":      self.Status,
@@ -55,4 +57,3 @@ func (self *DailyBill) Mapping(user *User) map[string]interface{} {
 		"id":          self.ID,
 	}
 }
-

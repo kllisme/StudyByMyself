@@ -1,8 +1,8 @@
 package service
 
 import (
-	"maizuo.com/soda-manager/src/server/common"
-	"maizuo.com/soda-manager/src/server/model"
+	"maizuo.com/soda/erp/api/src/server/common"
+	"maizuo.com/soda/erp/api/src/server/model"
 )
 
 type UserCashAccountService struct {
