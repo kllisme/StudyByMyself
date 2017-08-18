@@ -5,8 +5,8 @@ import (
 	"maizuo.com/soda/erp/api/src/server/common"
 	"maizuo.com/soda/erp/api/src/server/service"
 	"github.com/spf13/viper"
-	"github.com/square/go-jose/json"
 	"maizuo.com/soda/erp/api/src/server/payload"
+	permissionModel "maizuo.com/soda/erp/api/src/server/model/permission"
 	"github.com/bitly/go-simplejson"
 	"maizuo.com/soda/erp/api/src/server/model"
 	"strings"
@@ -44,12 +44,12 @@ func (self *UserController)Create(ctx *iris.Context) {
 		return
 	}
 	account := strings.TrimSpace(params.Get("account").MustString())
-	if _, err := userService.GetByAccount(account); err == nil {
-		common.Render(ctx, "27020206", nil)
-		return
-	}
+
 	if account == "" {
 		common.Render(ctx, "27020202", nil)
+		return
+	} else if len(account) < 5 || len(account) > 50 {
+		common.Render(ctx, "27020208", nil)
 		return
 	}
 	password := strings.TrimSpace(params.Get("password").MustString())
@@ -58,28 +58,40 @@ func (self *UserController)Create(ctx *iris.Context) {
 		return
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
+	if name == "" {
+		common.Render(ctx, "27020202", nil)
+		return
+	} else if len(name) > 50 {
+		common.Render(ctx, "27020209", nil)
+		return
+	}
 	contact := strings.TrimSpace(params.Get("contact").MustString())
 	if contact == "" {
 		common.Render(ctx, "27020203", nil)
 		return
 	}
 	mobile := strings.TrimSpace(params.Get("mobile").MustString())
-	parentID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
-	if err != nil {
-		common.Render(ctx, "000001", nil)
-		return
-	}
-	telephone := strings.TrimSpace(params.Get("telephone").MustString())
-	if telephone == "" {
+	if mobile == "" {
 		common.Render(ctx, "27020204", nil)
 		return
+	} else if len(mobile) != 11 {
+		common.Render(ctx, "27020210", nil)
+		return
 	}
+
+	telephone := strings.TrimSpace(params.Get("telephone").MustString())
 
 	address := strings.TrimSpace(params.Get("address").MustString())
 	if address == "" {
 		common.Render(ctx, "27020205", nil)
 		return
 	}
+	parentID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
+	if err != nil {
+		common.Render(ctx, "000001", nil)
+		return
+	}
+
 	user := model.User{
 		Account:account,
 		Name:name,
@@ -89,6 +101,11 @@ func (self *UserController)Create(ctx *iris.Context) {
 		Telephone:telephone,
 		Address:address,
 		Password:password,
+	}
+
+	if _, err := userService.GetByAccount(account); err == nil {
+		common.Render(ctx, "27020206", nil)
+		return
 	}
 	entity, err := userService.Create(&user)
 	if err != nil {
@@ -119,11 +136,24 @@ func (self *UserController)Update(ctx *iris.Context) {
 	}
 
 	user.Name = strings.TrimSpace(user.Name)
+	if user.Name == "" {
+		common.Render(ctx, "27020402", nil)
+		return
+	} else if len(user.Name) > 50 {
+		common.Render(ctx, "27020403", nil)
+		return
+	}
 	user.Contact = strings.TrimSpace(user.Contact)
 	user.Mobile = strings.TrimSpace(user.Mobile)
+	if user.Mobile == "" {
+		common.Render(ctx, "27020404", nil)
+		return
+	} else if len(user.Mobile) != 11 {
+		common.Render(ctx, "27020405", nil)
+		return
+	}
 	user.Telephone = strings.TrimSpace(user.Telephone)
 	user.Address = strings.TrimSpace(user.Address)
-	user.Name = strings.TrimSpace(user.Name)
 	user.ID = id
 	entity, err := userService.Update(&user)
 	if err != nil {
@@ -195,7 +225,7 @@ func (self *UserController)GetRoles(ctx *iris.Context) {
 	common.Render(ctx, "27021000", result)
 }
 
-func (self *UserController) GetById(ctx *iris.Context) {
+func (self *UserController) GetByID(ctx *iris.Context) {
 	userService := service.UserService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
@@ -211,11 +241,72 @@ func (self *UserController) GetById(ctx *iris.Context) {
 }
 
 //GetSessionInfo	use for pull info which shown on pages after login
-func (self *UserController)GetSessionInfo(ctx *iris.Context) {
-	sessionInfo := new(payload.SessionInfo)
-	currentUserJson := ctx.Session().GetString(viper.GetString("server.session.user.key"))
-	if err := json.Unmarshal([]byte(currentUserJson), sessionInfo); err != nil {
-		common.Render(ctx, "27020101", nil)
+func (self *UserController)GetProfile(ctx *iris.Context) {
+	var (
+		userService = service.UserService{}
+		menuService = permission.MenuService{}
+		userRoleRelService = permission.UserRoleRelService{}
+		roleMenuRelService = permission.PermissionMenuRelService{}
+		rolePermissionRelService = permission.RolePermissionRelService{}
+		permissionElementRelService = permission.PermissionElementRelService{}
+		elementService = permission.ElementService{}
+	)
+
+	id, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
+	if err != nil {
+		common.Render(ctx, "000001", nil)
+		return
+	}
+
+	userEntity, err := userService.GetById(id)
+	if err != nil {
+		common.Render(ctx, "000001", nil)
+		return
+	}
+
+	sessionInfo := payload.SessionInfo{
+		User:        userEntity,
+		MenuList:    &[]*permissionModel.Menu{},
+		ElementList: &[]*permissionModel.Element{},
+	}
+	//获取权限
+	roleIDs, err := userRoleRelService.GetRoleIDsByUserID(userEntity.ID)
+	if err != nil {
+		common.Render(ctx, "27020112", nil)
+		return
+	}
+	permissionIDs, err := rolePermissionRelService.GetPermissionIDsByRoleIDs(roleIDs)
+	if err != nil {
+		common.Render(ctx, "27020117", nil)
+		return
+	}
+	if len(permissionIDs) != 0 {
+		menuIDs, err := roleMenuRelService.GetMenuIDsByPermissionIDs(permissionIDs)
+		if err != nil {
+			common.Render(ctx, "27020113", nil)
+			return
+		}
+		if len(menuIDs) != 0 {
+			menuList, err := menuService.GetListByIDs(menuIDs)
+			if err != nil {
+				common.Render(ctx, "27020114", nil)
+				return
+			}
+			sessionInfo.MenuList = menuList
+		}
+		elementIDs, err := permissionElementRelService.GetElementIDsByPermissionIDs(permissionIDs)
+		if err != nil {
+			common.Render(ctx, "27020119", nil)
+			return
+		}
+		if len(elementIDs) != 0 {
+			elementList, err := elementService.GetListByIDs(elementIDs)
+			if err != nil {
+				common.Render(ctx, "27020118", nil)
+				return
+			}
+			sessionInfo.ElementList = elementList
+		}
 	}
 	//userEntity, _ := userService.GetById(user.ID)
 	common.Render(ctx, "27020100", sessionInfo)

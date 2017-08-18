@@ -1,14 +1,10 @@
 package api
 
 import (
-	"encoding/json"
 	"github.com/spf13/viper"
 	"gopkg.in/kataras/iris.v5"
 	"maizuo.com/soda/erp/api/src/server/common"
-	permissionModel "maizuo.com/soda/erp/api/src/server/model/permission"
-	"maizuo.com/soda/erp/api/src/server/payload"
 	"maizuo.com/soda/erp/api/src/server/service"
-	"maizuo.com/soda/erp/api/src/server/service/permission"
 	"strings"
 	"github.com/bitly/go-simplejson"
 )
@@ -21,14 +17,6 @@ func (self *LoginController) Login(ctx *iris.Context) {
 		captchaKey = viper.GetString("server.captcha.key")
 		userService = service.UserService{}
 		tokenService = service.TokenService{}
-		menuService = permission.MenuService{}
-		userRoleRelService = permission.UserRoleRelService{}
-		roleMenuRelService = permission.PermissionMenuRelService{}
-		permissionActionRelService = permission.PermissionActionRelService{}
-		actionService = permission.ActionService{}
-		rolePermissionRelService = permission.RolePermissionRelService{}
-		permissionElementRelService = permission.PermissionElementRelService{}
-		elementService = permission.ElementService{}
 	)
 
 	//每次调用返回时都清一次图片验证码
@@ -79,73 +67,12 @@ func (self *LoginController) Login(ctx *iris.Context) {
 		return
 	}
 
-	sessionInfo := payload.SessionInfo{
-		User:        userEntity,
-		MenuList:    &[]*permissionModel.Menu{},
-		ActionList:  &[]*permissionModel.Action{},
-		ElementList: &[]*permissionModel.Element{},
-	}
-	//获取权限
-	roleIDs, err := userRoleRelService.GetRoleIDsByUserID(userEntity.ID)
-	if err != nil {
-		common.Render(ctx, "27010112", nil)
-		return
-	}
-	permissionIDs, err := rolePermissionRelService.GetPermissionIDsByRoleIDs(roleIDs)
-	if err != nil {
-		common.Render(ctx, "27010117", nil)
-		return
-	}
-	if len(permissionIDs) != 0 {
-		menuIDs, err := roleMenuRelService.GetMenuIDsByPermissionIDs(permissionIDs)
-		if err != nil {
-			common.Render(ctx, "27010113", nil)
-			return
-		}
-		if len(menuIDs) != 0 {
-			menuList, err := menuService.GetListByIDs(menuIDs)
-			if err != nil {
-				common.Render(ctx, "27010114", nil)
-				return
-			}
-			sessionInfo.MenuList = menuList
-		}
-		actionIDs, err := permissionActionRelService.GetActionIDsByPermissionIDs(permissionIDs)
-		if err != nil {
-			common.Render(ctx, "27010115", nil)
-			return
-		}
-		if len(actionIDs) != 0 {
-			actionList, err := actionService.GetListByIDs(actionIDs)
-			if err != nil {
-				common.Render(ctx, "27010116", nil)
-				return
-			}
-			sessionInfo.ActionList = actionList
-		}
-		elementIDs, err := permissionElementRelService.GetElementIDsByPermissionIDs(permissionIDs)
-		if err != nil {
-			common.Render(ctx, "27010119", nil)
-			return
-		}
-		if len(elementIDs) != 0 {
-			elementList, err := elementService.GetListByIDs(elementIDs)
-			if err != nil {
-				common.Render(ctx, "27010118", nil)
-				return
-			}
-			sessionInfo.ElementList = elementList
-		}
-	}
-	jsonObj, _ := json.Marshal(sessionInfo)
-	jsonString := string(jsonObj)
-	ctx.Session().Set(viper.GetString("server.session.user.key"), jsonString)
-	ctx.Session().Set(viper.GetString("server.session.user.id"), userEntity.ID)
 	token, err := tokenService.Token(ctx)
 	if err != nil {
 		common.Render(ctx, "27010110", err)
 		return
 	}
+	ctx.Session().Set(viper.GetString("server.session.user.id"), userEntity.ID)
 	common.Render(ctx, "27010100", token)
 }
 

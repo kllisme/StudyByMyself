@@ -31,14 +31,14 @@ func Api(app *iris.Framework) {
 
 		//jwt校验
 		v1.UseFunc(common.Authorization)
-		v1.Get("/profile/session", userCtrl.GetSessionInfo)
+		v1.Get("/profile", userCtrl.GetProfile)
 
 		//v1.Get("/profile/user", userCtrl.GetSessionInfo)
 
 		//控制访问权限的接口
 		accessControlledAPI := v1.UseFunc(middleware.AccessControlMiddleware)
 		{
-			accessControlledAPI.Get("/logout", loginCtrl.Logout)
+			accessControlledAPI.Post("/logout", loginCtrl.Logout)
 			accessControlledAPI.Put("/profile/password", userCtrl.ChangePassword)
 			//本系统账号及权限管理
 			admin.Setup(accessControlledAPI)

@@ -17,7 +17,7 @@ func Setup(v iris.MuxAPI) {
 	)
 	_api := v.Party("/")
 	_api.Post("/users", userCtrl.Create)
-	_api.Get("/users/:id", userCtrl.GetById)
+	_api.Get("/users/:id", userCtrl.GetByID)
 	_api.Get("/users", userCtrl.Paging)
 	_api.Put("/users/:id", userCtrl.Update)
 	_api.Delete("/users/:id", userCtrl.Delete)
@@ -56,7 +56,7 @@ func Setup(v iris.MuxAPI) {
 	_api.Delete("/actions/:id", actionCtrl.Delete)
 	_api.Put("/actions/:id", actionCtrl.Update)
 	_api.Get("/actions/:id", actionCtrl.GetByID)
-	_api.Get("/actions", actionCtrl.Query)
+	_api.Get("/actions", actionCtrl.Paging)
 
 	_api.Post("/elements", elementCtrl.Create)
 	_api.Delete("/elements/:id", elementCtrl.Delete)

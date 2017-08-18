@@ -46,13 +46,13 @@ func (self *RoleService)Create(role *permission.Role) (*permission.Role, error) 
 
 func (self *RoleService)Delete(id int) error {
 	tx := common.SodaMngDB_WR.Begin()
-	if err := tx.Delete(&permission.Role{}, id).Error; err != nil {
+	if err := tx.Unscoped().Delete(&permission.Role{}, id).Error; err != nil {
 		tx.Rollback()
 		return err
-	} else if err := tx.Where("role_id = ?", id).Delete(&permission.UserRoleRel{}).Error; err != nil {
+	} else if err := tx.Unscoped().Where("role_id = ?", id).Delete(&permission.UserRoleRel{}).Error; err != nil {
 		tx.Rollback()
 		return err
-	} else if err := tx.Where("role_id = ?", id).Delete(&permission.RolePermissionRel{}).Error; err != nil {
+	} else if err := tx.Unscoped().Where("role_id = ?", id).Delete(&permission.RolePermissionRel{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

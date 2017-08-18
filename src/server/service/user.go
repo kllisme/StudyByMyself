@@ -114,7 +114,7 @@ func (self *UserService) DeleteById(id int) error {
 	if err := tx.Delete(&model.User{}, id).Error; err != nil {
 		tx.Rollback()
 		return err
-	} else if err := tx.Where("user_id = ?", id).Delete(&permission.UserRoleRel{}).Error; err != nil {
+	} else if err := tx.Unscoped().Where("user_id = ?", id).Delete(&permission.UserRoleRel{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

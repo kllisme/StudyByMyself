@@ -52,6 +52,10 @@ func (self *PermissionController)Create(ctx *iris.Context) {
 	if name == "" {
 		common.Render(ctx, "27060302", nil)
 		return
+	} else if len(name) > 30 {
+		common.Logger.Debug(name,len(name))
+		common.Render(ctx, "27060303", nil)
+		return
 	}
 	categoryID := params.Get("categoryId").MustInt()
 	status := params.Get("status").MustInt()
@@ -70,7 +74,7 @@ func (self *PermissionController)Create(ctx *iris.Context) {
 
 func (self *PermissionController)Update(ctx *iris.Context) {
 	permissionService := permission.PermissionService{}
-	permission:= model.Permission{}
+	permission := model.Permission{}
 
 	if err := ctx.ReadJSON(&permission); err != nil {
 		common.Render(ctx, "27060501", nil)
@@ -92,6 +96,9 @@ func (self *PermissionController)Update(ctx *iris.Context) {
 	permission.Name = strings.TrimSpace(permission.Name)
 	if permission.Name == "" {
 		common.Render(ctx, "27060502", nil)
+		return
+	} else if len(permission.Name) > 20 {
+		common.Render(ctx, "27060503", nil)
 		return
 	}
 	permission.ID = id

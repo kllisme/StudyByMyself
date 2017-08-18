@@ -68,10 +68,10 @@ func (self *ElementService)Update(element *permission.Element) (*permission.Elem
 
 func (self *ElementService)Delete(id int) error {
 	tx := common.SodaMngDB_WR.Begin()
-	if err := tx.Delete(&permission.Element{}, id).Error; err != nil {
+	if err := tx.Unscoped().Delete(&permission.Element{}, id).Error; err != nil {
 		tx.Rollback()
 		return err
-	} else if err := tx.Where("element_id = ?", id).Delete(&permission.PermissionElementRel{}).Error; err != nil {
+	} else if err := tx.Unscoped().Where("element_id = ?", id).Delete(&permission.PermissionElementRel{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

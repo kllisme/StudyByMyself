@@ -25,25 +25,18 @@ func (self *ActionController)GetByID(ctx *iris.Context) {
 	common.Render(ctx, "27040100", action)
 }
 
-func (self *ActionController)Query(ctx *iris.Context) {
+func (self *ActionController)Paging(ctx *iris.Context) {
 	actionService := permission.ActionService{}
-	conditions := model.Action{}
-
 	method := strings.TrimSpace(ctx.URLParam("method"))
-	handlerName := ctx.URLParam("handler_name")
-	//TODO complete all query conditions
-	if method != "" {
-		conditions.Method = method
-	}
-	if handlerName != "" {
-		conditions.HandlerName = handlerName
-	}
-	actionList, err := actionService.Query(&conditions)
+	handlerName := strings.TrimSpace(ctx.URLParam("handler_name"))
+	page, _ := ctx.URLParamInt("page")
+	perPage, _ := ctx.URLParamInt("per_page")
+	result, err := actionService.Paging(page,perPage,handlerName,method)
 	if err != nil {
 		common.Render(ctx, "000002", nil)
 		return
 	}
-	common.Render(ctx, "27040200", actionList)
+	common.Render(ctx, "27040200", result)
 }
 
 func (self *ActionController)Create(ctx *iris.Context) {
