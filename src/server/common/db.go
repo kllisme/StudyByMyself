@@ -1,10 +1,11 @@
 package common
 
+
 import (
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/hoisie/mustache"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func _SetupDB(name string, readOnly bool) *gorm.DB {

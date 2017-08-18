@@ -3,6 +3,8 @@ package common
 import (
 	"fmt"
 
+	"maizuo.com/soda/erp/api/src/server/entity"
+
 	"github.com/go-errors/errors"
 	"github.com/spf13/viper"
 	"gopkg.in/kataras/iris.v5"
@@ -33,13 +35,19 @@ func (self *Result) New(code string, data interface{}) *Result {
 	}
 	switch data.(type) {
 	case *Result:
-		result.Data = nil
+		result.Data = struct{}{}
+	case *entity.Pagination:
+		result.Data = struct{}{}
 	default:
 		result.Data = data
 	}
 	if result.IsError {
-		result.Exception = fmt.Sprintf("%v\n", errors.Wrap(data, 1).ErrorStack())[:500]
-		result.Data = nil
+		errorStack := fmt.Sprintf("%v\n", errors.Wrap(data, 1).ErrorStack())
+		if len(errorStack) > 500 {
+			errorStack = errorStack[:500]
+		}
+		result.Exception = errorStack
+		result.Data = struct{}{}
 	} else {
 		result.Exception = ""
 	}
@@ -60,7 +68,11 @@ func Error(code string, data interface{}) *Result {
 		Code:        code,
 	}
 	if data == nil {
-		result.Exception = fmt.Sprintf("%v\n", errors.Wrap(data, 1).ErrorStack())[:500]
+		errorStack := fmt.Sprintf("%v\n", errors.Wrap(data, 1).ErrorStack())
+		if len(errorStack) > 500 {
+			errorStack = errorStack[:500]
+		}
+		result.Exception = errorStack
 	}
 	return result
 }
@@ -69,5 +81,5 @@ func Render(ctx *iris.Context, code string, data interface{}) {
 	result := &Result{}
 	_result := result.New(code, data)
 	ctx.JSON(iris.StatusOK, _result)
-	//Log(ctx, _result)
+	Log(ctx, _result)
 }

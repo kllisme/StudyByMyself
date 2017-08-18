@@ -37,10 +37,10 @@ func CreateSign(secret string, mReq interface{}) string {
 		value := ""
 		switch mValue := mReq.(type) {
 		case map[string]interface{}:
-			fmt.Printf("k=%v, v=%v\n", k, mValue[k])
+			common.Logger.Debugln("k=%v, v=%v\n", k, mValue[k])
 			value = fmt.Sprintf("%v", mValue[k])
 		case map[string]string:
-			fmt.Printf("k=%v, v=%v\n", k, mValue[k])
+			common.Logger.Debugln("k=%v, v=%v\n", k, mValue[k])
 			value = fmt.Sprintf("%v", mValue[k])
 		}
 		if value != "" {

@@ -72,6 +72,8 @@ var (
 		if _status != 0 && err == nil {
 			_interface = "error:" + _interface
 			alarmID = "1"
+		} else {
+			result.Data = struct{}{}
 		}
 
 		userId, _ := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
