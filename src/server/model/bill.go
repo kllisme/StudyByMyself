@@ -22,6 +22,7 @@ type Bill struct {
 	RealName    string    `json:"realName"`
 	BankName    string    `json:"bankName"`
 	Status      int       `json:"status"`
+	Mode        int       `json:"mode"`
 }
 
 func (Bill) TableName() string {
