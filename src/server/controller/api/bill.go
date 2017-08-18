@@ -333,6 +333,7 @@ func (self *BillController) AlipayNotification(ctx *iris.Context) {
 					if _flag == "F" {
 						failureList = append(failureList, _bill)
 						billRelList = append(billRelList, _billRel)
+						failureBillIds = append(failureBillIds, _billId)
 						billIdSettledAtMap[_billId] = _settledAt
 						failureNum++
 					}
@@ -553,7 +554,6 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 				status = 2
 				common.Logger.Warnln("微信企业支付业务成功,payment_no,", respMap["payment_no"])
 				billService.BatchUpdateStatusAndSettleAtById(status,billIds)
-				_, err = billRelService.Create(billRel)
 				if err != nil {
 					common.Render(ctx, "27080407", err)
 					return
