@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+	"regexp"
+	"strings"
 )
 
 //int数组去重
@@ -102,7 +104,7 @@ func RandInt64(min, max int64) int64 {
 		return max
 	}
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	return r.Int63n(max-min) + min
+	return r.Int63n(max - min) + min
 }
 
 func ResponseMap(response *grequests.Response, errMsg string) (map[string]interface{}, error) {
@@ -121,4 +123,16 @@ func ResponseMap(response *grequests.Response, errMsg string) (map[string]interf
 		return nil, err
 	}
 	return respMap, nil
+}
+
+func ExtractHandlerName(handlerName string) string {
+	reg := regexp.MustCompile(`([\w]+)`)
+	nameList := reg.FindAllString(handlerName, -1)
+	for idx, name := range nameList {
+		if name == "controller" {
+			nameList = nameList[idx + 1:len(nameList) - 1]
+			break
+		}
+	}
+	return strings.Join(nameList, `_`)
 }

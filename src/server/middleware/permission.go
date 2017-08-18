@@ -6,6 +6,7 @@ import (
 	"maizuo.com/soda/erp/api/src/server/common"
 	"github.com/spf13/viper"
 	"maizuo.com/soda/erp/api/src/server/service/permission"
+	"maizuo.com/soda/erp/api/src/server/kit/functions"
 )
 
 //检验控制器访问权限的中间件
@@ -45,7 +46,7 @@ func AccessControlMiddleware(ctx *iris.Context) {
 				return
 			}
 			for _, action := range *actionList {
-				if strings.EqualFold(action.HandlerName, ctx.GetHandlerName()) {
+				if strings.EqualFold(action.HandlerName, functions.ExtractHandlerName(ctx.GetHandlerName())) {
 					ctx.Next()
 					return
 				}
