@@ -199,6 +199,7 @@ func (self *BillService) BatchUpdateSubmitAtById(status int, ids []interface{}) 
 	}
 	dailyBillParam := make(map[string]interface{}, 0)
 	// 接着更新daily_bill
+	dailyBillParam["status"] = status
 	dailyBillParam["submit_at"] = time.Now()
 	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) ", ids).Update(dailyBillParam)
 	if r.Error != nil {
