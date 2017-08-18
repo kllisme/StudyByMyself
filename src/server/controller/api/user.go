@@ -260,7 +260,7 @@ func (self *UserController)GetProfile(ctx *iris.Context) {
 
 	userEntity, err := userService.GetById(id)
 	if err != nil {
-		common.Render(ctx, "27010108", nil)
+		common.Render(ctx, "000001", nil)
 		return
 	}
 
@@ -272,37 +272,37 @@ func (self *UserController)GetProfile(ctx *iris.Context) {
 	//获取权限
 	roleIDs, err := userRoleRelService.GetRoleIDsByUserID(userEntity.ID)
 	if err != nil {
-		common.Render(ctx, "27010112", nil)
+		common.Render(ctx, "27020112", nil)
 		return
 	}
 	permissionIDs, err := rolePermissionRelService.GetPermissionIDsByRoleIDs(roleIDs)
 	if err != nil {
-		common.Render(ctx, "27010117", nil)
+		common.Render(ctx, "27020117", nil)
 		return
 	}
 	if len(permissionIDs) != 0 {
 		menuIDs, err := roleMenuRelService.GetMenuIDsByPermissionIDs(permissionIDs)
 		if err != nil {
-			common.Render(ctx, "27010113", nil)
+			common.Render(ctx, "27020113", nil)
 			return
 		}
 		if len(menuIDs) != 0 {
 			menuList, err := menuService.GetListByIDs(menuIDs)
 			if err != nil {
-				common.Render(ctx, "27010114", nil)
+				common.Render(ctx, "27020114", nil)
 				return
 			}
 			sessionInfo.MenuList = menuList
 		}
 		elementIDs, err := permissionElementRelService.GetElementIDsByPermissionIDs(permissionIDs)
 		if err != nil {
-			common.Render(ctx, "27010119", nil)
+			common.Render(ctx, "27020119", nil)
 			return
 		}
 		if len(elementIDs) != 0 {
 			elementList, err := elementService.GetListByIDs(elementIDs)
 			if err != nil {
-				common.Render(ctx, "27010118", nil)
+				common.Render(ctx, "27020118", nil)
 				return
 			}
 			sessionInfo.ElementList = elementList

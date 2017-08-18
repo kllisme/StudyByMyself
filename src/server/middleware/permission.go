@@ -24,24 +24,24 @@ func AccessControlMiddleware(ctx *iris.Context) {
 
 	roleIDs, err := userRoleRelService.GetRoleIDsByUserID(currentUserID)
 	if err != nil {
-		common.Render(ctx, "27010112", nil)
+		common.Render(ctx, "000005", nil)
 		return
 	}
 	permissionIDs, err := rolePermissionRelService.GetPermissionIDsByRoleIDs(roleIDs)
 	if err != nil {
-		common.Render(ctx, "27010117", nil)
+		common.Render(ctx, "000005", nil)
 		return
 	}
 	if len(permissionIDs) != 0 {
 		actionIDs, err := permissionActionRelService.GetActionIDsByPermissionIDs(permissionIDs)
 		if err != nil {
-			common.Render(ctx, "27010115", nil)
+			common.Render(ctx, "000005", nil)
 			return
 		}
 		if len(actionIDs) != 0 {
 			actionList, err := actionService.GetListByIDs(actionIDs)
 			if err != nil {
-				common.Render(ctx, "27010116", nil)
+				common.Render(ctx, "000002", nil)
 				return
 			}
 			for _, action := range *actionList {
