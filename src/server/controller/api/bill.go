@@ -171,7 +171,7 @@ func BatchAlipay(billList []*model.Bill) (map[string]string, string, error) {
 	for _, bill := range billList {
 		//_remark := bill.CreatedAt.Format("01月02日") + "洗衣结算款"
 
-		_remark := "8.08-8.17日洗衣结算款"
+		_remark := "8.08-8.17日未结洗衣款"
 
 		aliPayDetailDataStr += bill.BillId + "^" + bill.Account + "^" + bill.RealName +
 			"^" + functions.Float64ToString(float64(bill.Amount)/100.00, 2) + "^" + _remark + "|" //组装支付宝支付data_detail
