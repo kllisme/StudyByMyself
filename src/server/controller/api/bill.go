@@ -144,7 +144,7 @@ func (self *BillController) BatchPay(ctx *iris.Context) {
 		common.Render(ctx, code, err)
 	}
 	// 不用区分微信还是支付宝的单,统一改变bill和daily_bill的状态
-	err = billService.BatchUpdateStatusById(3, billIds)
+	err = billService.BatchUpdateSubmitAtById(3, billIds)
 	if err != nil {
 		common.Logger.Debugln("更新账单为'结算中'失败:", err.Error())
 		common.Render(ctx, "27080209", err)
@@ -564,12 +564,16 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 			common.Logger.Debugln("01060502", "failureBillIds==", bill.BillId, ":", err.Error())
 			return
 		}
+
+	}else{
+
+		err = billService.BatchUpdateStatusById(status, billIds)
+		if err != nil {
+			common.Render(ctx, "27080406", err)
+			return
+		}
 	}
-	err = billService.BatchUpdateStatusById(status, billIds)
-	if err != nil {
-		common.Render(ctx, "27080406", err)
-		return
-	}
+	billService.BatchUpdateStatusAndSettleAtById(status,billIds)
 	_, err = billRelService.Create(billRel)
 	if err != nil {
 		common.Render(ctx, "27080407", err)

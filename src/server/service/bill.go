@@ -165,7 +165,7 @@ func(self *BillService) BillTypeByBatchBill(billIds []interface{}) (int, error) 
 func (self *BillService) BatchUpdateStatusAndSettleAtById(status int, ids []interface{}) error {
 	tx := common.SodaMngDB_WR.Begin()
 	param := make(map[string]interface{}, 0)
-	param["status"] = status
+	param["status"] = status // 只能2或者4
 	// 先更新bill
 	param["settled_at"] = time.Now()
 	r := tx.Model(&model.Bill{}).Where(" bill_id in (?) ", ids).Update(param)
@@ -177,7 +177,7 @@ func (self *BillService) BatchUpdateStatusAndSettleAtById(status int, ids []inte
 	dailyBillParam := make(map[string]interface{}, 0)
 	timeNow := time.Now().Local().Format("2006-01-02 15:04:05")
 	dailyBillParam["settled_at"] = timeNow
-	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) ", ids).Update(param)
+	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) ", ids).Update(dailyBillParam)
 	if r.Error != nil {
 		tx.Rollback()
 		return r.Error
@@ -189,7 +189,7 @@ func (self *BillService) BatchUpdateStatusAndSettleAtById(status int, ids []inte
 func (self *BillService) BatchUpdateSubmitAtById(status int, ids []interface{}) error {
 	tx := common.SodaMngDB_WR.Begin()
 	param := make(map[string]interface{}, 0)
-	param["status"] = status
+	param["status"] = status // 只能是3
 	// 先更新bill
 	//修改状态为"结账中",需更新"结账中时间"
 	param["submitted_at"] = time.Now()
@@ -201,7 +201,7 @@ func (self *BillService) BatchUpdateSubmitAtById(status int, ids []interface{}) 
 	dailyBillParam := make(map[string]interface{}, 0)
 	// 接着更新daily_bill
 	dailyBillParam["submit_at"] = time.Now()
-	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) ", ids).Update(param)
+	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) ", ids).Update(dailyBillParam)
 	if r.Error != nil {
 		tx.Rollback()
 		return r.Error
@@ -235,7 +235,7 @@ func (self *BillService) BatchUpdateStatusById(status int, ids []interface{}) er
 	if status == 3 {
 		dailyBillParam["submit_at"] = time.Now()
 	}
-	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) ", ids).Update(param)
+	r = tx.Model(&model.DailyBill{}).Where(" bill_id in (?) ", ids).Update(dailyBillParam)
 	if r.Error != nil {
 		tx.Rollback()
 		return r.Error

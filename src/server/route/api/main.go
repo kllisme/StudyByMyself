@@ -46,7 +46,7 @@ func Api(app *iris.Framework) {
 
 		//v1.Get("/profile/user", userCtrl.GetSessionInfo)
 
-		api := v1.Party("/api", func(ctx *iris.Context) {
+		api := v1.Party("", func(ctx *iris.Context) {
 			ctx.Next()
 		})
 		{
