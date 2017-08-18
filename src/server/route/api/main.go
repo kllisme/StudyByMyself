@@ -20,7 +20,6 @@ func Api(app *iris.Framework) {
 		dailyBillCtrl = &api.DailyBillController{}
 	)
 
-
 	v1 := app.Party("/v1", func(ctx *iris.Context) {
 		ctx.Next()
 	})
@@ -28,7 +27,7 @@ func Api(app *iris.Framework) {
 	{
 
 		v1.Post("/settlement/actions/wechatPay", billCtrl.WechatPay)
-		v1.Post("/settlement/alipay/notification",billCtrl.AlipayNotification)
+		v1.Post("/settlement/alipay/notification", billCtrl.AlipayNotification)
 
 		v1.Get("/captcha.png", captchaCtrl.Captcha)
 
@@ -38,7 +37,6 @@ func Api(app *iris.Framework) {
 
 		//v1.Get("/token", public.Token)
 		v1.Post("/login", loginCtrl.Login)
-
 
 		//jwt校验
 		v1.UseFunc(common.Authorization)
@@ -58,14 +56,13 @@ func Api(app *iris.Framework) {
 
 			api.Post("/settlement/actions/pay", billCtrl.BatchPay)
 
-
 			//api.Post("/settlement/actions/cancel", billCtrl.CancelBatchAliPay)
 		}
 
 		//控制访问权限的接口
 		accessControlledAPI := v1.UseFunc(middleware.AccessControlMiddleware)
 		{
-			accessControlledAPI.Post("/logout", loginCtrl.Logout)
+			accessControlledAPI.Get("/logout", loginCtrl.Logout)
 			accessControlledAPI.Put("/profile/password", userCtrl.ChangePassword)
 			//本系统账号及权限管理
 			admin.Setup(accessControlledAPI)
