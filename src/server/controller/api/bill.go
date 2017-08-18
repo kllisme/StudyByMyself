@@ -489,6 +489,12 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 		billRel.Reason = respMap["return_msg"]
 		billRel.ErrCode = "return_code : " + respMap["return_code"]
 		common.Logger.Warnln("request wechat transfer pay return_code is fail,err : ", respMap["return_msg"])
+		billService.BatchUpdateStatusAndSettleAtById(status,billIds)
+		_, err = billRelService.Create(billRel)
+		if err != nil {
+			common.Render(ctx, "27080407", err)
+			return
+		}
 	} else if ok == true && returnCode == "SUCCESS" {
 		if resultCode, ok := respMap["result_code"]; ok == true && resultCode == "FAIL" {
 			billRel.IsSuccessed = false
@@ -504,6 +510,12 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 				IsError:     false,
 			})
 			status = 4
+			billService.BatchUpdateStatusAndSettleAtById(status,billIds)
+			_, err = billRelService.Create(billRel)
+			if err != nil {
+				common.Render(ctx, "27080407", err)
+				return
+			}
 		} else {
 			billRel.ErrCode = respMap["result_code"]
 			if respMap["partner_trade_no"] != bill.BillId {
@@ -519,8 +531,8 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 					Code:        "27080409",
 					IsError:     false,
 				})
-			}
-			if respMap["nonce_str"] != nonceStr {
+
+			}else if respMap["nonce_str"] != nonceStr {
 				// 返回的随机串有问题
 				status = 3
 				billRel.IsSuccessed = false
@@ -540,12 +552,25 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 				billRel.OuterNo = respMap["payment_no"]
 				status = 2
 				common.Logger.Warnln("微信企业支付业务成功,payment_no,", respMap["payment_no"])
+				billService.BatchUpdateStatusAndSettleAtById(status,billIds)
+				_, err = billRelService.Create(billRel)
+				if err != nil {
+					common.Render(ctx, "27080407", err)
+					return
+				}
+			}
+			billService.BatchUpdateStatusById(status,billIds)
+			_, err = billRelService.Create(billRel)
+			if err != nil {
+				common.Render(ctx, "27080407", err)
+				return
 			}
 		}
 	} else {
 		billRel.IsSuccessed = false
 		billRel.ErrCode = ""
 		billRel.Reason = "微信企业支付return_code数据出错"
+		status = 4
 		common.Log(ctx, &common.Result{
 			Status:      "UNPROCESSABLE_ENTITY",
 			Data:        respMap,
@@ -555,6 +580,12 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 			Code:        "27080411",
 			IsError:     false,
 		})
+		billService.BatchUpdateStatusAndSettleAtById(status,billIds)
+		_, err = billRelService.Create(billRel)
+		if err != nil {
+			common.Render(ctx, "27080407", err)
+			return
+		}
 	}
 	// 表示业务失败了
 	if billRel.IsSuccessed != true {
@@ -565,20 +596,8 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 			return
 		}
 
-	}else{
+	}
 
-		err = billService.BatchUpdateStatusById(status, billIds)
-		if err != nil {
-			common.Render(ctx, "27080406", err)
-			return
-		}
-	}
-	billService.BatchUpdateStatusAndSettleAtById(status,billIds)
-	_, err = billRelService.Create(billRel)
-	if err != nil {
-		common.Render(ctx, "27080407", err)
-		return
-	}
 	common.Render(ctx, "27080400", nil)
 	common.Logger.Warningln("---------------------微信企业支付完成--------------")
 	return

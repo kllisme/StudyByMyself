@@ -145,7 +145,7 @@ func (self *BillService) BillTypeByBatchBill(billIds []interface{}) (int, error)
 	return accountType, nil
 }
 
-/*func (self *BillService) BatchUpdateStatusById(status int, ids []interface{}) error {
+func (self *BillService) BatchUpdateStatusById(status int, ids []interface{}) error {
 	tx := common.SodaMngDB_WR.Begin()
 	param := make(map[string]interface{}, 0)
 	param["status"] = status
@@ -162,7 +162,7 @@ func (self *BillService) BillTypeByBatchBill(billIds []interface{}) (int, error)
 	}
 	tx.Commit()
 	return nil
-}*/
+}
 
 func (self *BillService) BatchUpdateStatusAndSettleAtById(status int, ids []interface{}) error {
 	tx := common.SodaMngDB_WR.Begin()
@@ -211,7 +211,7 @@ func (self *BillService) BatchUpdateSubmitAtById(status int, ids []interface{}) 
 	tx.Commit()
 	return nil
 }
-func (self *BillService) BatchUpdateStatusById(status int, ids []interface{}) error {
+/*func (self *BillService) BatchUpdateStatusById(status int, ids []interface{}) error {
 	tx := common.SodaMngDB_WR.Begin()
 	param := make(map[string]interface{}, 0)
 	param["status"] = status
@@ -244,7 +244,7 @@ func (self *BillService) BatchUpdateStatusById(status int, ids []interface{}) er
 	}
 	tx.Commit()
 	return nil
-}
+}*/
 
 func (self *BillService) GetFirstWechatBill() (*model.Bill, error) {
 	bill := &model.Bill{}
@@ -274,7 +274,7 @@ func (self *BillService) Updates(list *[]*model.Bill) error {
 
 	r := tx.Model(&model.Bill{}).Where(" bill_id in (?) and status != 2 ", successBillIDs).Updates(map[string]interface{}{
 		"status":     2,
-		"settled_at": timeNow,
+		"settled_at": time.Now(),
 	})
 	if r.Error != nil {
 		tx.Rollback()
@@ -282,7 +282,7 @@ func (self *BillService) Updates(list *[]*model.Bill) error {
 	}
 	r = tx.Model(&model.Bill{}).Where(" bill_id in (?) and status != 2 ", failBillIDs).Updates(map[string]interface{}{
 		"status":     4,
-		"settled_at": timeNow,
+		"settled_at": time.Now(),
 	})
 	if r.Error != nil {
 		tx.Rollback()
