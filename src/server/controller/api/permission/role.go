@@ -7,6 +7,7 @@ import (
 	"strings"
 	"github.com/bitly/go-simplejson"
 	model "maizuo.com/soda/erp/api/src/server/model/permission"
+	"maizuo.com/soda/erp/api/src/server/kit/functions"
 )
 
 type RoleController struct {
@@ -34,7 +35,7 @@ func (self *RoleController)Create(ctx *iris.Context) {
 	if name == "" {
 		common.Render(ctx, "27050302", nil)
 		return
-	} else if len(name) > 20 {
+	} else if functions.CountRune(name) > 20 {
 		common.Render(ctx, "27050303", nil)
 		return
 	}
@@ -101,7 +102,7 @@ func (self *RoleController)Update(ctx *iris.Context) {
 	if name == "" {
 		common.Render(ctx, "27050502", nil)
 		return
-	} else if len(name) > 20 {
+	} else if functions.CountRune(name) > 20 {
 		common.Render(ctx, "27050503", nil)
 		return
 	}

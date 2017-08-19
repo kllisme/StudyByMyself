@@ -136,3 +136,9 @@ func ExtractHandlerName(handlerName string) string {
 	}
 	return strings.Join(nameList, `_`)
 }
+
+//CountRune 统计字符串中的字符数量，可以解决len()无法将一个中文汉字识别为1的问题
+func CountRune(str string) int {
+	runes := []rune(str)
+	return len(runes)
+}
