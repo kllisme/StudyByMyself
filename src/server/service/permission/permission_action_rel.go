@@ -20,7 +20,7 @@ func (self *PermissionActionRelService) GetActionIDsByPermissionIDs(permissionID
 
 func (self *PermissionActionRelService) AssignActions(permissionID int, actionIDs []int) (*[]int, error) {
 	tx := common.SodaMngDB_R.Begin()
-	err := tx.Delete(permission.PermissionActionRel{}, "permission_id = ?", permissionID).Error
+	err := tx.Unscoped().Delete(permission.PermissionActionRel{}, "permission_id = ?", permissionID).Error
 	if err != nil {
 		tx.Rollback()
 		return nil, err

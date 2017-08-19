@@ -11,6 +11,7 @@ import (
 	"maizuo.com/soda/erp/api/src/server/model"
 	"strings"
 	"maizuo.com/soda/erp/api/src/server/service/permission"
+	"maizuo.com/soda/erp/api/src/server/kit/functions"
 )
 
 type UserController struct{}
@@ -48,7 +49,7 @@ func (self *UserController)Create(ctx *iris.Context) {
 	if account == "" {
 		common.Render(ctx, "27020202", nil)
 		return
-	} else if len(account) < 5 || len(account) > 50 {
+	} else if functions.CountRune(account) < 5 || functions.CountRune(account) > 50 {
 		common.Render(ctx, "27020208", nil)
 		return
 	}
@@ -61,7 +62,7 @@ func (self *UserController)Create(ctx *iris.Context) {
 	if name == "" {
 		common.Render(ctx, "27020202", nil)
 		return
-	} else if len(name) > 50 {
+	} else if functions.CountRune(name) > 50 {
 		common.Render(ctx, "27020209", nil)
 		return
 	}
@@ -139,7 +140,7 @@ func (self *UserController)Update(ctx *iris.Context) {
 	if user.Name == "" {
 		common.Render(ctx, "27020402", nil)
 		return
-	} else if len(user.Name) > 50 {
+	} else if functions.CountRune(user.Name) > 50 {
 		common.Render(ctx, "27020403", nil)
 		return
 	}
