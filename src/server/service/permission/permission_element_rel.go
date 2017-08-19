@@ -20,7 +20,7 @@ func (self *PermissionElementRelService) GetElementIDsByPermissionIDs(permission
 
 func (self *PermissionElementRelService) AssignElements(permissionID int, elementIDs []int) (*[]int, error) {
 	tx := common.SodaMngDB_R.Begin()
-	err := tx.Delete(permission.PermissionElementRel{}, "permission_id = ?", permissionID).Error
+	err := tx.Unscoped().Delete(permission.PermissionElementRel{}, "permission_id = ?", permissionID).Error
 	if err != nil {
 		tx.Rollback()
 		return nil, err

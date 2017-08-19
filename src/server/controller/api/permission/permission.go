@@ -7,6 +7,7 @@ import (
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
 	"github.com/bitly/go-simplejson"
+	"maizuo.com/soda/erp/api/src/server/kit/functions"
 )
 
 type PermissionController struct {
@@ -52,8 +53,7 @@ func (self *PermissionController)Create(ctx *iris.Context) {
 	if name == "" {
 		common.Render(ctx, "27060302", nil)
 		return
-	} else if len(name) > 30 {
-		common.Logger.Debug(name,len(name))
+	} else if functions.CountRune(name) > 20 {
 		common.Render(ctx, "27060303", nil)
 		return
 	}
@@ -97,7 +97,7 @@ func (self *PermissionController)Update(ctx *iris.Context) {
 	if permission.Name == "" {
 		common.Render(ctx, "27060502", nil)
 		return
-	} else if len(permission.Name) > 20 {
+	} else if functions.CountRune(permission.Name) > 20 {
 		common.Render(ctx, "27060503", nil)
 		return
 	}

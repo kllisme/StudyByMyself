@@ -20,7 +20,7 @@ func (self *RolePermissionRelService) GetPermissionIDsByRoleIDs(roleIDs ...inter
 
 func (self *RolePermissionRelService) AssignPermissions(roleID int, permissionIDs []int) (*[]int, error) {
 	tx := common.SodaMngDB_R.Begin()
-	err := tx.Delete(permission.RolePermissionRel{}, "role_id = ?", roleID).Error
+	err := tx.Unscoped().Delete(permission.RolePermissionRel{}, "role_id = ?", roleID).Error
 	if err != nil {
 		tx.Rollback()
 		return nil, err

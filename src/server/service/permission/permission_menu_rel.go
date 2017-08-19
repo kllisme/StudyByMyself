@@ -20,7 +20,7 @@ func (self *PermissionMenuRelService) GetMenuIDsByPermissionIDs(permissionIDs ..
 
 func (self *PermissionMenuRelService) AssignMenus(permissionID int, menuIDs []int) (*[]int, error) {
 	tx := common.SodaMngDB_R.Begin()
-	err := tx.Delete(permission.PermissionMenuRel{}, "permission_id = ?", permissionID).Error
+	err := tx.Unscoped().Delete(permission.PermissionMenuRel{}, "permission_id = ?", permissionID).Error
 	if err != nil {
 		tx.Rollback()
 		return nil, err
