@@ -10,13 +10,13 @@ import (
 	"maizuo.com/soda/erp/api/src/server/route/api"
 )
 
-func SetUpServer() {
+func SetupServer() {
 
 	isDevelopment := viper.GetBool("isDevelopment")
 
 	iris.Config.IsDevelopment = isDevelopment
 
-	app := iris.Default //如果使用iris.New(),之前设置的iris.Config无法生效
+	app := iris.Default
 
 	app.Use(common.NewRecover())
 
@@ -27,7 +27,7 @@ func SetUpServer() {
 	app.UseFunc(func(ctx *iris.Context) {
 		startAt := time.Now().UnixNano() / 1000000
 		ctx.Set("startAt", startAt)
-		ctx.SetHeader("X-Powered-By", "soda-erp-api/"+viper.GetString("version"))
+		ctx.SetHeader("X-Powered-By", viper.GetString("name")+"/"+viper.GetString("version"))
 		ctx.Next()
 	})
 

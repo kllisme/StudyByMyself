@@ -1,8 +1,2 @@
 {
-  "server": {
-    "port": 9999,
-    "log": {
-      "path": "/data/logs/maizuo.log"
-    }
-  }
 }

@@ -3,8 +3,9 @@ package common
 import (
 	"os"
 	"strconv"
-	"strings"
 	"time"
+
+	"maizuo.com/soda/erp/api/src/server/kit/functions"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -42,68 +43,73 @@ func TeardownLogger() {
 	logFile.Close()
 }
 
+func _Log(ctx *iris.Context, result *Result) {
+	var processTime int64
+	startAt := ctx.Get("startAt")
+	if startAt != nil {
+		startAt := startAt.(int64)
+		endAt := time.Now().UnixNano() / 1000000
+		processTime = endAt - startAt
+	} else {
+		processTime = -1
+	}
+
+	body := string(ctx.Request.Body()[:])
+
+	alarmID := "0"
+	appName := viper.GetString("name")
+
+	_interface := functions.ExtractHandlerName(ctx.GetHandlerName())
+	_status := -1
+	var err error
+	if len(result.Status) >= 2 {
+		_status, err = strconv.Atoi(result.Status[len(result.Status)-2 : len(result.Status)])
+	} else {
+		_status, err = strconv.Atoi(result.Status)
+	}
+	if _status != 0 && err == nil {
+		_interface = "error:" + _interface
+		alarmID = "1"
+	} else {
+		result.Data = struct{}{}
+	}
+
+	userId, _ := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
+	Logger := logrus.WithFields(logrus.Fields{
+		"@source":    ctx.LocalIP().String(),
+		"@timestamp": time.Now().Format(time.RFC3339),
+		"@fields": map[string]interface{}{
+			"userId":      userId,
+			"fromtype":    appName,
+			"host":        ctx.HostString(),
+			"interface":   _interface,
+			"method":      ctx.MethodString(),
+			"ip":          ctx.RemoteAddr(),
+			"query":       ctx.URLParams(),
+			"param":       ctx.ParamsSentence(),
+			"body":        body,
+			"alarmID":     alarmID,
+			"path":        ctx.PathString(),
+			"processTime": processTime,
+			"result":      result,
+			"msg":         result.Msg,
+			"data":        result.Data,
+			"status":      result.Status,
+			"exception":   result.Exception,
+			"appCode":     appName + ":" + result.Code,
+			"system":      appName,
+			"totype":      appName,
+		},
+	})
+	Logger.Warningln(result.Status)
+}
+
 var (
 	Logger  *logrus.Entry
 	logFile *os.File
-	Log     = func(ctx *iris.Context, result *Result) {
-		var processTime int64
-		startAt := ctx.Get("startAt")
-		if startAt != nil {
-			startAt := startAt.(int64)
-			endAt := time.Now().UnixNano() / 1000000
-			processTime = endAt - startAt
-		} else {
-			processTime = -1
-		}
-
-		body := string(ctx.Request.Body()[:])
-
-		alarmID := "0"
-
-		handle := strings.Split(ctx.GetHandlerName(), "/")
-		_interface := handle[1] + ":" + handle[len(handle)-2] + ":" + handle[len(handle)-1]
-		_status := -1
-		var err error
-		if len(result.Status) >= 2 {
-			_status, err = strconv.Atoi(result.Status[len(result.Status)-2 : len(result.Status)])
-		} else {
-			_status, err = strconv.Atoi(result.Status)
-		}
-		if _status != 0 && err == nil {
-			_interface = "error:" + _interface
-			alarmID = "1"
-		} else {
-			result.Data = struct{}{}
-		}
-
-		userId, _ := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
-		appName := viper.GetString("name")
-		Logger := logrus.WithFields(logrus.Fields{
-			"@source":    ctx.LocalIP().String(),
-			"@timestamp": time.Now().Format(time.RFC3339),
-			"@fields": map[string]interface{}{
-				"userId":      userId,
-				"fromtype":    appName,
-				"host":        ctx.HostString(),
-				"interface":   _interface,
-				"method":      ctx.MethodString(),
-				"ip":          ctx.RemoteAddr(),
-				"query":       ctx.URLParams(),
-				"param":       ctx.ParamsSentence(),
-				"body":        body,
-				"alarmID":     alarmID,
-				"path":        ctx.PathString(),
-				"processTime": processTime,
-				"result":      result,
-				"msg":         result.Msg,
-				"data":        result.Data,
-				"status":      result.Status,
-				"exception":   result.Exception,
-				"appCode":     appName + ":" + result.Code,
-				"system":      appName,
-				"totype":      appName,
-			},
-		})
-		Logger.Warningln(result.Status)
+	Log     = func(ctx *iris.Context, code string, data interface{}) {
+		result := &Result{}
+		_result := result.New(code, data)
+		_Log(ctx, _result)
 	}
 )

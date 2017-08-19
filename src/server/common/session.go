@@ -13,7 +13,7 @@ import (
 func SetupSession() {
 
 	iris.Config.Sessions.Cookie = viper.GetString("server.session.cookie")
-	iris.Config.Sessions.Expires = time.Duration(viper.GetInt("server.session.expires")) * time.Hour
+	iris.Config.Sessions.Expires = time.Duration(viper.GetInt("server.session.expires")) * time.Second
 	iris.Config.Sessions.DisableSubdomainPersistence = true
 
 	db := redis.New(service.Config{

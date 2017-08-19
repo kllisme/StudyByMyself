@@ -14,7 +14,7 @@ module.exports = Object.assign({}, {
         "key": "USER"
       },
       "cookie": "sess",
-      "expires": 24
+      "expires": 3600
     },
     "static": {
       "dir": "./build/static",
@@ -42,8 +42,8 @@ module.exports = Object.assign({}, {
       "secret": "secret",
       "cookieName": "Authorization",
       "cookieDomain": "api.erp.sodalife.dev",
-      "cookieExpire": 24,
-      "tokenExpire": 24,
+      "cookieExpire": 3600,
+      "tokenExpire": 3600,
       "issuer": "api.erp.sodalife.xyz"
     },
     "cors": {
@@ -155,8 +155,7 @@ module.exports = Object.assign({}, {
         "max-idle": 20,
         "maxActive": 50,
         "idleTimeout": 60,
-        "maxAgeSeconds": 3600,
-        "expires": 24
+        "maxAgeSeconds": 3600
       },
       "rate": {
         "addr": "192.168.1.204:6379",

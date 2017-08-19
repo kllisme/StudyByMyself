@@ -23,5 +23,5 @@ func main() {
 
 	common.SetupDB()
 
-	server.SetUpServer()
+	server.SetupServer()
 }

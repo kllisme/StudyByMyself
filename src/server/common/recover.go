@@ -50,8 +50,7 @@ func NewRecover() iris.HandlerFunc {
 				_result := result.New("000002", nil)
 				fmt.Println("isError:", _result.IsError)
 				_result.Exception = logMessage
-				Log(ctx, _result)
-
+				_Log(ctx, _result)
 			}
 		}()
 
