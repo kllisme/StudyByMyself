@@ -25,11 +25,11 @@ func (self *DailyBillService) ListByBillId(limit, offset int, billId string) ([]
 		sql += " and daily_bill.bill_id = ? "
 		params = append(params, billId)
 	}
-	sql += " limit ? offset ? "
+	sql += " limit ? offset ? order by id desc"
 	params = append(params, limit)
 	params = append(params, offset)
 	common.Logger.Debugln("ListByBillId params===========", params)
-	r := common.SodaMngDB_R.Raw(sql, params...).Order("id desc").Scan(&list)
+	r := common.SodaMngDB_R.Raw(sql, params...).Scan(&list)
 	if r.Error != nil {
 		return nil, r.Error
 	}
