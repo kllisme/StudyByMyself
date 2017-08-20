@@ -25,7 +25,7 @@ func (self *DailyBillService) ListByBillId(limit, offset int, billId string) ([]
 		sql += " and daily_bill.bill_id = ? "
 		params = append(params, billId)
 	}
-	sql += " limit ? offset ? order by id desc"
+	sql += " order by id desc limit ? offset ?"
 	params = append(params, limit)
 	params = append(params, offset)
 	common.Logger.Debugln("ListByBillId params===========", params)
