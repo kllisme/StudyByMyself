@@ -6,7 +6,6 @@ import (
 )
 
 type PermissionMenuRelService struct {
-
 }
 
 func (self *PermissionMenuRelService) GetMenuIDsByPermissionIDs(permissionIDs ...interface{}) ([]int, error) {
@@ -19,7 +18,7 @@ func (self *PermissionMenuRelService) GetMenuIDsByPermissionIDs(permissionIDs ..
 }
 
 func (self *PermissionMenuRelService) AssignMenus(permissionID int, menuIDs []int) (*[]int, error) {
-	tx := common.SodaMngDB_R.Begin()
+	tx := common.SodaMngDB_WR.Begin()
 	err := tx.Unscoped().Delete(permission.PermissionMenuRel{}, "permission_id = ?", permissionID).Error
 	if err != nil {
 		tx.Rollback()
@@ -27,8 +26,8 @@ func (self *PermissionMenuRelService) AssignMenus(permissionID int, menuIDs []in
 	}
 	for _, v := range menuIDs {
 		err := tx.Create(&permission.PermissionMenuRel{
-			PermissionID:permissionID,
-			MenuID:v,
+			PermissionID: permissionID,
+			MenuID:       v,
 		}).Error
 		if err != nil {
 			tx.Rollback()
