@@ -105,7 +105,7 @@ func (self *BillService) ListByAccountType(accountType, status, offset, limit in
 		"when bill.status=3 then 2 " +
 		"when bill.status=2 then 3 " +
 		"when bill.status=4 then 4 " +
-		"else 5 end asc, bill.created_at DESC "
+		"else 5 end asc, bill.id DESC "
 	r := common.SodaMngDB_R.Raw(sql, params...).Limit(limit).Offset(offset).Scan(&billList)
 	if r.Error != nil {
 		return nil, r.Error
@@ -209,6 +209,7 @@ func (self *BillService) BatchUpdateSubmitAtById(status int, ids []interface{}) 
 	tx.Commit()
 	return nil
 }
+
 /*func (self *BillService) BatchUpdateStatusById(status int, ids []interface{}) error {
 	tx := common.SodaMngDB_WR.Begin()
 	param := make(map[string]interface{}, 0)
@@ -267,7 +268,6 @@ func (self *BillService) Updates(list *[]*model.Bill) error {
 			failBillIDs = append(failBillIDs, _bill.BillId)
 		}
 	}
-
 
 	r := tx.Model(&model.Bill{}).Where(" bill_id in (?) and status != 2 ", successBillIDs).Updates(map[string]interface{}{
 		"status":     2,
