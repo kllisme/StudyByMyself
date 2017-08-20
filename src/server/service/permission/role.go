@@ -20,7 +20,7 @@ func (self *RoleService)GetByID(id int) (*permission.Role, error) {
 
 func (self *RoleService)GetAll() (*[]*permission.Role, error) {
 	roleList := make([]*permission.Role, 0)
-	if err := common.SodaMngDB_R.Find(&roleList).Error; err != nil {
+	if err := common.SodaMngDB_R.Order("id desc").Find(&roleList).Error; err != nil {
 		return nil, err
 	}
 	return &roleList, nil
@@ -29,7 +29,7 @@ func (self *RoleService)GetAll() (*[]*permission.Role, error) {
 
 func (self *RoleService)GetListByIDs(ids ...interface{}) (*[]*permission.Role, error) {
 	roleList := make([]*permission.Role, 0)
-	err := common.SodaMngDB_R.Where("id in (?)", ids...).Find(&roleList).Error
+	err := common.SodaMngDB_R.Where("id in (?)", ids...).Order("id desc").Find(&roleList).Error
 	if err != nil {
 		return nil, err
 	}

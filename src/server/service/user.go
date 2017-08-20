@@ -46,7 +46,7 @@ func (self *UserService)Paging(name string, account string, id int, roleID int, 
 			return db.Joins("left join erp_user_role_rel rel on rel.user_id = user.id and rel.role_id = ?", roleID)
 		})
 	}
-	if err := db.Model(&model.User{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Find(&userList).Error; err != nil {
+	if err := db.Model(&model.User{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&userList).Error; err != nil {
 		return nil, err
 	}
 	pagination.Pagination.From = (page - 1) * perPage

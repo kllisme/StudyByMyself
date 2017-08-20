@@ -13,7 +13,7 @@ type ElementService struct {
 
 func (self *ElementService)GetListByIDs(ids ...interface{}) (*[]*permission.Element, error) {
 	elementList := make([]*permission.Element, 0)
-	err := common.SodaMngDB_R.Where("id in (?)", ids...).Find(&elementList).Error
+	err := common.SodaMngDB_R.Where("id in (?)", ids...).Order("id desc").Find(&elementList).Error
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (self *ElementService)Paging(page int, perPage int) (*entity.PaginationData
 	elementList := make([]*permission.Element, 0)
 	db := common.SodaMngDB_R
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
-	if err := db.Model(&permission.Element{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Find(&elementList).Error; err != nil {
+	if err := db.Model(&permission.Element{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&elementList).Error; err != nil {
 		return nil, err
 	}
 	pagination.Pagination.From = (page - 1) * perPage

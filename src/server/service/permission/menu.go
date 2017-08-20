@@ -13,7 +13,7 @@ type MenuService struct {
 
 func (self *MenuService)GetListByIDs(ids ...interface{}) (*[]*permission.Menu, error) {
 	menuList := make([]*permission.Menu, 0)
-	err := common.SodaMngDB_R.Where("id in (?)", ids...).Find(&menuList).Error
+	err := common.SodaMngDB_R.Where("id in (?)", ids...).Order("id desc").Find(&menuList).Error
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (self *MenuService)Paging(page int, perPage int) (*entity.PaginationData, e
 	menuList := make([]*permission.Menu, 0)
 	db := common.SodaMngDB_R
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
-	if err := db.Model(&permission.Menu{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Find(&menuList).Error; err != nil {
+	if err := db.Model(&permission.Menu{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&menuList).Error; err != nil {
 		return nil, err
 	}
 	pagination.Pagination.From = (page - 1) * perPage

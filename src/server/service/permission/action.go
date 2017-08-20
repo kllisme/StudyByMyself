@@ -35,7 +35,7 @@ func (self *ActionService)Paging(page int, perPage int, handlerName string, meth
 			return db.Where("method like (?)","%" + method + "%")
 		})
 	}
-	if err := db.Model(&permission.Action{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Find(&actionList).Error; err != nil {
+	if err := db.Model(&permission.Action{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&actionList).Error; err != nil {
 		return nil, err
 	}
 	pagination.Pagination.From = (page - 1) * perPage
@@ -50,7 +50,7 @@ func (self *ActionService)Paging(page int, perPage int, handlerName string, meth
 
 func (self *ActionService)GetListByIDs(ids ...interface{}) (*[]*permission.Action, error) {
 	actionList := make([]*permission.Action, 0)
-	err := common.SodaMngDB_R.Where("id in (?)", ids...).Find(&actionList).Error
+	err := common.SodaMngDB_R.Where("id in (?)", ids...).Order("id desc").Find(&actionList).Error
 	if err != nil {
 		return nil, err
 	}

@@ -22,7 +22,7 @@ func (self *PermissionService)GetByID(id int) (*permission.Permission, error) {
 
 func (self *PermissionService)GetAll() (*[]*permission.Permission, error) {
 	permissionList := make([]*permission.Permission, 0)
-	if err := common.SodaMngDB_R.Find(&permissionList).Error; err != nil {
+	if err := common.SodaMngDB_R.Order("id desc").Find(&permissionList).Error; err != nil {
 		return nil, err
 	}
 	return &permissionList, nil
@@ -39,7 +39,7 @@ func (self *PermissionService)Paging(_type int, page int, perPage int) (*entity.
 			return db.Where("type = ?", _type)
 		})
 	}
-	if err := db.Model(&permission.Permission{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Find(&permissionList).Error; err != nil {
+	if err := db.Model(&permission.Permission{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&permissionList).Error; err != nil {
 		return nil, err
 	}
 	pagination.Pagination.From = (page - 1) * perPage
@@ -53,7 +53,7 @@ func (self *PermissionService)Paging(_type int, page int, perPage int) (*entity.
 
 func (self *PermissionService)GetListByIDs(ids ...interface{}) (*[]*permission.Permission, error) {
 	permissionList := make([]*permission.Permission, 0)
-	err := common.SodaMngDB_R.Where("id in (?)", ids...).Find(&permissionList).Error
+	err := common.SodaMngDB_R.Where("id in (?)", ids...).Order("id desc").Find(&permissionList).Error
 	if err != nil {
 		return nil, err
 	}
