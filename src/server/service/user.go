@@ -71,7 +71,7 @@ func (self *UserService) GetById(id int) (*model.User, error) {
 func (self *UserService) GetByAccount(account string) (*model.User, error) {
 	db := common.SodaMngDB_R
 	result := model.User{}
-	if err := db.Where(&model.User{Account:account}).First(&result).Error; err != nil {
+	if err := db.Unscoped().Where(&model.User{Account:account}).First(&result).Error; err != nil {
 		return nil, err
 	}
 	return &result, nil
