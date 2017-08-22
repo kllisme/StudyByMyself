@@ -33,29 +33,31 @@ type BillController struct {
 func (self *BillController) ListByAccountType(ctx *iris.Context) {
 	userService := &service.UserService{}
 	userCashService := &service.UserCashAccountService{}
-	limit, _ := ctx.URLParamInt("limit")      // Default: 10
-	offset, _ := ctx.URLParamInt("offset")    //  Default: 0 列表起始位:
-	createdAt := ctx.URLParam("createdAt")    // 申请时间
-	settledAt := ctx.URLParam("settledAt")    // 结算时间
-	keys := ctx.URLParam("keys")              // 运营商名称、帐号名称
-	accountType, _ := ctx.URLParamInt("type") // 结算支付类型 1:支付宝 2:微信
-	status, _ := ctx.URLParamInt("status")    // 账单状态 1:结算成功 2:等待结算 3:结算中 4:结算失败
+	limit, _ := ctx.URLParamInt("limit")       // Default: 10
+	offset, _ := ctx.URLParamInt("offset")     //  Default: 0 列表起始位:
+	dateType, _ := ctx.URLParamInt("dateType") // 筛选时间类型,1申请时间 2结算时间
+	startAt := ctx.URLParam("startAt")         // 申请时间
+	endAt := ctx.URLParam("endAt")             // 结算时间
+	keys := ctx.URLParam("keys")               // 运营商名称、帐号名称
+	accountType, _ := ctx.URLParamInt("type")  // 结算支付类型 1:支付宝 2:微信
+	status, _ := ctx.URLParamInt("status")     // 账单状态 1:结算成功 2:等待结算 3:结算中 4:结算失败
 
 	billService := &service.BillService{}
 
-	if accountType == 0 {
+	if accountType <= 0 {
 		common.Render(ctx, "27080101", nil)
 		return
 	}
-	if limit == 0 {
+	if limit <= 0 {
 		limit = 10
 	}
-	total, err := billService.TotalByAccountType(accountType, status, createdAt, settledAt, keys)
+	total, err := billService.TotalByAccountTypeAndTimeType(accountType, status, dateType,startAt, endAt, keys)
 	if err != nil {
+		common.Logger.Debugln("err-------------->",err)
 		common.Render(ctx, "27080102", err)
 		return
 	}
-	billList, err := billService.ListByAccountType(accountType, status, offset, limit, createdAt, settledAt, keys)
+	billList, err := billService.ListByAccountTypeAndTimeType(accountType, status, dateType,offset, limit, startAt, endAt, keys)
 	if err != nil {
 		common.Logger.Debugln("billService.ListByAccountType err----------", err)
 		common.Render(ctx, "27080103", err)
