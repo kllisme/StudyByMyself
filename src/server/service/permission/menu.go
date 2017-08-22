@@ -13,7 +13,7 @@ type MenuService struct {
 
 func (self *MenuService)GetListByIDs(ids ...interface{}) (*[]*permission.Menu, error) {
 	menuList := make([]*permission.Menu, 0)
-	err := common.SodaMngDB_R.Where("id in (?)", ids...).Order("id desc").Find(&menuList).Error
+	err := common.SodaMngDB_R.Where("id in (?)", ids...).Order("position").Find(&menuList).Error
 	if err != nil {
 		return nil, err
 	}
