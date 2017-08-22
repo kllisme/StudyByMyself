@@ -1,17 +1,18 @@
 package api
 
 import (
+	"strings"
+
+	"github.com/bitly/go-simplejson"
+	"github.com/spf13/viper"
 	"gopkg.in/kataras/iris.v5"
 	"maizuo.com/soda/erp/api/src/server/common"
-	"maizuo.com/soda/erp/api/src/server/service"
-	"github.com/spf13/viper"
-	"maizuo.com/soda/erp/api/src/server/payload"
-	permissionModel "maizuo.com/soda/erp/api/src/server/model/permission"
-	"github.com/bitly/go-simplejson"
-	"maizuo.com/soda/erp/api/src/server/model"
-	"strings"
-	"maizuo.com/soda/erp/api/src/server/service/permission"
 	"maizuo.com/soda/erp/api/src/server/kit/functions"
+	"maizuo.com/soda/erp/api/src/server/model"
+	permissionModel "maizuo.com/soda/erp/api/src/server/model/permission"
+	"maizuo.com/soda/erp/api/src/server/payload"
+	"maizuo.com/soda/erp/api/src/server/service"
+	"maizuo.com/soda/erp/api/src/server/service/permission"
 )
 
 type UserController struct{}
@@ -20,7 +21,7 @@ func (self *UserController) AuthorizationUser(ctx *iris.Context) {
 
 }
 
-func (self *UserController)Paging(ctx *iris.Context) {
+func (self *UserController) Paging(ctx *iris.Context) {
 	userService := service.UserService{}
 	id, _ := ctx.URLParamInt("id")
 	account := strings.TrimSpace(ctx.URLParam("account"))
@@ -37,7 +38,7 @@ func (self *UserController)Paging(ctx *iris.Context) {
 	return
 }
 
-func (self *UserController)Create(ctx *iris.Context) {
+func (self *UserController) Create(ctx *iris.Context) {
 	userService := service.UserService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
@@ -94,14 +95,14 @@ func (self *UserController)Create(ctx *iris.Context) {
 	}
 
 	user := model.User{
-		Account:account,
-		Name:name,
-		Mobile:mobile,
-		Contact:contact,
-		ParentID:parentID,
-		Telephone:telephone,
-		Address:address,
-		Password:password,
+		Account:   account,
+		Name:      name,
+		Mobile:    mobile,
+		Contact:   contact,
+		ParentID:  parentID,
+		Telephone: telephone,
+		Address:   address,
+		Password:  password,
 	}
 
 	if _, err := userService.GetByAccount(account); err == nil {
@@ -116,7 +117,7 @@ func (self *UserController)Create(ctx *iris.Context) {
 	common.Render(ctx, "27010100", entity)
 }
 
-func (self *UserController)Update(ctx *iris.Context) {
+func (self *UserController) Update(ctx *iris.Context) {
 	userService := service.UserService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
@@ -164,7 +165,7 @@ func (self *UserController)Update(ctx *iris.Context) {
 	common.Render(ctx, "27020400", entity)
 }
 
-func (self *UserController)Delete(ctx *iris.Context) {
+func (self *UserController) Delete(ctx *iris.Context) {
 	userService := service.UserService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
@@ -178,7 +179,7 @@ func (self *UserController)Delete(ctx *iris.Context) {
 	common.Render(ctx, "27020500", nil)
 }
 
-func (self *UserController)AssignRoles(ctx *iris.Context) {
+func (self *UserController) AssignRoles(ctx *iris.Context) {
 	userService := service.UserService{}
 	userRoleRelService := permission.UserRoleRelService{}
 	id, err := ctx.ParamInt("id")
@@ -204,7 +205,7 @@ func (self *UserController)AssignRoles(ctx *iris.Context) {
 	common.Render(ctx, "27020900", result)
 }
 
-func (self *UserController)GetRoles(ctx *iris.Context) {
+func (self *UserController) GetRoles(ctx *iris.Context) {
 	userService := service.UserService{}
 	userRoleRelService := permission.UserRoleRelService{}
 	id, err := ctx.ParamInt("id")
@@ -242,26 +243,26 @@ func (self *UserController) GetByID(ctx *iris.Context) {
 }
 
 //GetSessionInfo	use for pull info which shown on pages after login
-func (self *UserController)GetProfile(ctx *iris.Context) {
+func (self *UserController) GetProfile(ctx *iris.Context) {
 	var (
-		userService = service.UserService{}
-		menuService = permission.MenuService{}
-		userRoleRelService = permission.UserRoleRelService{}
-		roleMenuRelService = permission.PermissionMenuRelService{}
-		rolePermissionRelService = permission.RolePermissionRelService{}
+		userService                 = service.UserService{}
+		menuService                 = permission.MenuService{}
+		userRoleRelService          = permission.UserRoleRelService{}
+		roleMenuRelService          = permission.PermissionMenuRelService{}
+		rolePermissionRelService    = permission.RolePermissionRelService{}
 		permissionElementRelService = permission.PermissionElementRelService{}
-		elementService = permission.ElementService{}
+		elementService              = permission.ElementService{}
 	)
 
 	id, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	if err != nil {
-		common.Render(ctx, "000001", nil)
+		common.Render(ctx, "000001", err)
 		return
 	}
 
 	userEntity, err := userService.GetById(id)
 	if err != nil {
-		common.Render(ctx, "000001", nil)
+		common.Render(ctx, "000001", err)
 		return
 	}
 
@@ -273,37 +274,37 @@ func (self *UserController)GetProfile(ctx *iris.Context) {
 	//获取权限
 	roleIDs, err := userRoleRelService.GetRoleIDsByUserID(userEntity.ID)
 	if err != nil {
-		common.Render(ctx, "27020112", nil)
+		common.Render(ctx, "27020112", err)
 		return
 	}
 	permissionIDs, err := rolePermissionRelService.GetPermissionIDsByRoleIDs(roleIDs)
 	if err != nil {
-		common.Render(ctx, "27020117", nil)
+		common.Render(ctx, "27020117", err)
 		return
 	}
 	if len(permissionIDs) != 0 {
 		menuIDs, err := roleMenuRelService.GetMenuIDsByPermissionIDs(permissionIDs)
 		if err != nil {
-			common.Render(ctx, "27020113", nil)
+			common.Render(ctx, "27020113", err)
 			return
 		}
 		if len(menuIDs) != 0 {
 			menuList, err := menuService.GetListByIDs(menuIDs)
 			if err != nil {
-				common.Render(ctx, "27020114", nil)
+				common.Render(ctx, "27020114", err)
 				return
 			}
 			sessionInfo.MenuList = menuList
 		}
 		elementIDs, err := permissionElementRelService.GetElementIDsByPermissionIDs(permissionIDs)
 		if err != nil {
-			common.Render(ctx, "27020119", nil)
+			common.Render(ctx, "27020119", err)
 			return
 		}
 		if len(elementIDs) != 0 {
 			elementList, err := elementService.GetListByIDs(elementIDs)
 			if err != nil {
-				common.Render(ctx, "27020118", nil)
+				common.Render(ctx, "27020118", err)
 				return
 			}
 			sessionInfo.ElementList = elementList
@@ -312,8 +313,9 @@ func (self *UserController)GetProfile(ctx *iris.Context) {
 	//userEntity, _ := userService.GetById(user.ID)
 	common.Render(ctx, "27020100", sessionInfo)
 }
+
 //ResetPassword 将指定用户的密码重置为服务器默认初始密码
-func (self *UserController)ResetPassword(ctx *iris.Context) {
+func (self *UserController) ResetPassword(ctx *iris.Context) {
 	userService := service.UserService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
@@ -328,8 +330,9 @@ func (self *UserController)ResetPassword(ctx *iris.Context) {
 	}
 	common.Render(ctx, "27020800", user)
 }
+
 //ChangePassword 更改当前登录用户的密码
-func (self *UserController)ChangePassword(ctx *iris.Context) {
+func (self *UserController) ChangePassword(ctx *iris.Context) {
 	userService := service.UserService{}
 	currentUserID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	if err != nil {
