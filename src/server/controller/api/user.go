@@ -30,7 +30,7 @@ func (self *UserController)Paging(ctx *iris.Context) {
 	perPage, _ := ctx.URLParamInt("per_page")
 	result, err := userService.Paging(name, account, id, roleID, page, perPage)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "000002", err)
 		return
 	}
 	common.Render(ctx, "27020300", result)
@@ -41,7 +41,7 @@ func (self *UserController)Create(ctx *iris.Context) {
 	userService := service.UserService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27020201", nil)
+		common.Render(ctx, "27020201", err)
 		return
 	}
 	account := strings.TrimSpace(params.Get("account").MustString())
@@ -89,7 +89,7 @@ func (self *UserController)Create(ctx *iris.Context) {
 	}
 	parentID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	if err != nil {
-		common.Render(ctx, "000001", nil)
+		common.Render(ctx, "000001", err)
 		return
 	}
 
@@ -120,19 +120,19 @@ func (self *UserController)Update(ctx *iris.Context) {
 	userService := service.UserService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "000003", err)
 		return
 	}
 
 	_, err = userService.GetById(id)
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "000003", err)
 		return
 	}
 
 	user := model.User{}
 	if err := ctx.ReadJSON(&user); err != nil {
-		common.Render(ctx, "27020401", nil)
+		common.Render(ctx, "27020401", err)
 		return
 	}
 
@@ -158,7 +158,7 @@ func (self *UserController)Update(ctx *iris.Context) {
 	user.ID = id
 	entity, err := userService.Update(&user)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "000002", err)
 		return
 	}
 	common.Render(ctx, "27020400", entity)
@@ -168,11 +168,11 @@ func (self *UserController)Delete(ctx *iris.Context) {
 	userService := service.UserService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "000003", err)
 		return
 	}
 	if err := userService.DeleteById(id); err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "000002", err)
 		return
 	}
 	common.Render(ctx, "27020500", nil)
@@ -183,22 +183,22 @@ func (self *UserController)AssignRoles(ctx *iris.Context) {
 	userRoleRelService := permission.UserRoleRelService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "000003", err)
 		return
 	}
 	_, err = userService.GetById(id)
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "000003", err)
 		return
 	}
 	roleIDs := make([]int, 0)
 	if err := ctx.ReadJSON(&roleIDs); err != nil {
-		common.Render(ctx, "27020901", nil)
+		common.Render(ctx, "27020901", err)
 		return
 	}
 	result, err := userRoleRelService.AssignRoles(id, roleIDs)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "000002", err)
 		return
 	}
 	common.Render(ctx, "27020900", result)
@@ -209,18 +209,18 @@ func (self *UserController)GetRoles(ctx *iris.Context) {
 	userRoleRelService := permission.UserRoleRelService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "000003", err)
 		return
 	}
 	_, err = userService.GetById(id)
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "000003", err)
 		return
 	}
 
 	result, err := userRoleRelService.GetRoleIDsByUserID(id)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "000002", err)
 		return
 	}
 	common.Render(ctx, "27021000", result)
@@ -230,12 +230,12 @@ func (self *UserController) GetByID(ctx *iris.Context) {
 	userService := service.UserService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "000003", err)
 		return
 	}
 	userEntity, err := userService.GetById(id)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "000002", err)
 		return
 	}
 	common.Render(ctx, "27020600", userEntity)
@@ -255,13 +255,13 @@ func (self *UserController)GetProfile(ctx *iris.Context) {
 
 	id, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	if err != nil {
-		common.Render(ctx, "000001", nil)
+		common.Render(ctx, "000001", err)
 		return
 	}
 
 	userEntity, err := userService.GetById(id)
 	if err != nil {
-		common.Render(ctx, "000001", nil)
+		common.Render(ctx, "000001", err)
 		return
 	}
 
@@ -273,37 +273,37 @@ func (self *UserController)GetProfile(ctx *iris.Context) {
 	//获取权限
 	roleIDs, err := userRoleRelService.GetRoleIDsByUserID(userEntity.ID)
 	if err != nil {
-		common.Render(ctx, "27020112", nil)
+		common.Render(ctx, "27020112", err)
 		return
 	}
 	permissionIDs, err := rolePermissionRelService.GetPermissionIDsByRoleIDs(roleIDs)
 	if err != nil {
-		common.Render(ctx, "27020117", nil)
+		common.Render(ctx, "27020117", err)
 		return
 	}
 	if len(permissionIDs) != 0 {
 		menuIDs, err := roleMenuRelService.GetMenuIDsByPermissionIDs(permissionIDs)
 		if err != nil {
-			common.Render(ctx, "27020113", nil)
+			common.Render(ctx, "27020113", err)
 			return
 		}
 		if len(menuIDs) != 0 {
 			menuList, err := menuService.GetListByIDs(menuIDs)
 			if err != nil {
-				common.Render(ctx, "27020114", nil)
+				common.Render(ctx, "27020114", err)
 				return
 			}
 			sessionInfo.MenuList = menuList
 		}
 		elementIDs, err := permissionElementRelService.GetElementIDsByPermissionIDs(permissionIDs)
 		if err != nil {
-			common.Render(ctx, "27020119", nil)
+			common.Render(ctx, "27020119", err)
 			return
 		}
 		if len(elementIDs) != 0 {
 			elementList, err := elementService.GetListByIDs(elementIDs)
 			if err != nil {
-				common.Render(ctx, "27020118", nil)
+				common.Render(ctx, "27020118", err)
 				return
 			}
 			sessionInfo.ElementList = elementList
@@ -317,13 +317,13 @@ func (self *UserController)ResetPassword(ctx *iris.Context) {
 	userService := service.UserService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "000003", err)
 		return
 	}
 	defaultPassword := viper.GetString("defaultPassword")
 	user, err := userService.ChangePassword(id, defaultPassword)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "000002", err)
 		return
 	}
 	common.Render(ctx, "27020800", user)
@@ -333,12 +333,12 @@ func (self *UserController)ChangePassword(ctx *iris.Context) {
 	userService := service.UserService{}
 	currentUserID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	if err != nil {
-		common.Render(ctx, "000001", nil)
+		common.Render(ctx, "000001", err)
 		return
 	}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "", nil)
+		common.Render(ctx, "", err)
 		return
 	}
 
@@ -351,7 +351,7 @@ func (self *UserController)ChangePassword(ctx *iris.Context) {
 	user.ID = currentUserID
 	user.Password = oldPassword
 	if _, err := userService.CheckInfo(&user); err != nil {
-		common.Render(ctx, "27020701", nil)
+		common.Render(ctx, "27020701", err)
 		return
 	}
 
@@ -362,7 +362,7 @@ func (self *UserController)ChangePassword(ctx *iris.Context) {
 	}
 	entity, err := userService.ChangePassword(currentUserID, newPassword)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "000002", err)
 		return
 	}
 	common.Render(ctx, "27020700", entity)

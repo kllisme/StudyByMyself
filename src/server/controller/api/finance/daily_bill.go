@@ -82,7 +82,7 @@ func (self *DailyBillController) DetailsById(ctx *iris.Context) {
 	}
 	tickets, err := ticketService.DetailsByDailyBill(dailyBill, limit, offset)
 	if err != nil {
-		common.Render(ctx, "27100104", nil)
+		common.Render(ctx, "27100104", err)
 	}
 	objects := make([]interface{}, 0)
 	for _, ticket := range tickets {

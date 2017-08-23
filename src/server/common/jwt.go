@@ -37,7 +37,7 @@ var (
 	Authorization = func(ctx *iris.Context) {
 		err := JWT.CheckJWT(ctx)
 		if err != nil {
-			Render(ctx, "000001", nil)
+			Render(ctx, "000001", err)
 		}else {
 			ctx.Next()
 		}
