@@ -22,6 +22,8 @@ import (
 	"maizuo.com/soda/erp/api/src/server/kit/wechat/pay"
 	"maizuo.com/soda/erp/api/src/server/model"
 	"maizuo.com/soda/erp/api/src/server/service"
+	"github.com/jinzhu/gorm"
+	"github.com/hoisie/mustache"
 )
 
 type BillController struct {
@@ -169,9 +171,9 @@ func BatchAlipay(billList []*model.Bill) (map[string]string, string, error) {
 	aliPayDetailDataStr := ""
 
 	for _, bill := range billList {
-		//_remark := bill.CreatedAt.Format("01月02日") + "洗衣结算款"
-
-		_remark := "8月8日至8月17日未结洗衣款"
+		_remark := mustache.Render(viper.GetString("pay.remark"), map[string]interface{}{
+			"date":     bill.CreatedAt.Format("01月02日"),
+		})
 
 		aliPayDetailDataStr += bill.BillId + "^" + bill.Account + "^" + bill.RealName +
 			"^" + functions.Float64ToString(float64(bill.Amount)/100.00, 2) + "^" + _remark + "|" //组装支付宝支付data_detail
@@ -459,7 +461,13 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 	billBatchNoService := &service.BillBatchNoService{}
 	common.Logger.Warnln("---------------------微信企业支付开始--------------")
 	bill, err := billService.GetFirstWechatBill()
+	if err == gorm.ErrRecordNotFound {
+		// 没找到记录
+		common.Render(ctx, "27080413", err)
+		return
+	}
 	if err != nil {
+		common.Logger.Warnln("err--------------->",err)
 		common.Render(ctx, "27080401", err)
 		return
 	}
@@ -476,7 +484,9 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 		CheckName:      viper.GetString("pay.wechat.checkName"),
 		ReUserName:     bill.RealName,
 		Amount:         bill.Amount,
-		Desc:           "苏打生活" + bill.CreatedAt.Local().Format("01月02日") + "申请结算款",
+		Desc:           mustache.Render(viper.GetString("pay.remark"), map[string]interface{}{
+			"date":     bill.CreatedAt.Format("01月02日"),
+		}),
 		SPBillCreateIP: "116.24.64.139",
 	}
 	billRel := &model.BillRel{BillId: bill.BillId, BatchNo: bill.BillId, BillType: 1, Type: 2} // type=2代表微信,billType=1代表记录来源于bill

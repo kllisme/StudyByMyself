@@ -9,6 +9,11 @@ func (self *Ticket) Mapping(device *model.Device, dailyBill *model.DailyBill) ma
 	} else {
 		settledAt = dailyBill.SettledAt.Format("2006-01-02T15:04:05+00:00")
 	}
+	if self.Status == 4 || self.PaymentId == 4 {
+		self.Settle = false
+	} else {
+		self.Settle = true
+	}
 	return map[string]interface{}{
 		"createdAt": self.CreatedAt,
 		"settledAt": settledAt,

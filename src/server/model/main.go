@@ -2,9 +2,9 @@ package model
 
 func (self *Bill) Mapping(user *User, userCashAccount *UserCashAccount) map[string]interface{} {
 	user = user.Mapping()
-	isMode := false
+	isAuto := false
 	if self.Mode == 0 { // 0代表自动提现
-		isMode = true
+		isAuto = true
 	}
 	return map[string]interface{}{
 		"createdAt": self.CreatedAt,
@@ -30,7 +30,7 @@ func (self *Bill) Mapping(user *User, userCashAccount *UserCashAccount) map[stri
 		"status":      self.Status,
 		"count":       self.Count,
 		"id":          self.BillId,
-		"isMode":      isMode,
+		"isAuto":      isAuto,
 	}
 }
 

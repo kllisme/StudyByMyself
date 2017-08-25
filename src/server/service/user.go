@@ -1,10 +1,10 @@
 package service
 
 import (
-	"maizuo.com/soda/erp/api/src/server/model"
-	"maizuo.com/soda/erp/api/src/server/common"
 	"github.com/jinzhu/gorm"
+	"maizuo.com/soda/erp/api/src/server/common"
 	"maizuo.com/soda/erp/api/src/server/entity"
+	"maizuo.com/soda/erp/api/src/server/model"
 	"maizuo.com/soda/erp/api/src/server/model/permission"
 )
 
@@ -21,19 +21,19 @@ func (self *UserService) CheckInfo(user *model.User) (*model.User, error) {
 	return &result, nil
 }
 
-func (self *UserService)Paging(name string, account string, id int, roleID int, page int, perPage int) (*entity.PaginationData, error) {
+func (self *UserService) Paging(name string, account string, id int, roleID int, page int, perPage int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 	userList := make([]*model.User, 0)
 	db := common.SodaMngDB_R
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
 	if name != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("name like (?)", "%" + name + "%")
+			return db.Where("name like (?)", "%"+name+"%")
 		})
 	}
 	if account != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("account like (?)", "%" + account + "%")
+			return db.Where("account like (?)", "%"+account+"%")
 		})
 	}
 	if id != 0 {
@@ -71,7 +71,7 @@ func (self *UserService) GetById(id int) (*model.User, error) {
 func (self *UserService) GetByAccount(account string) (*model.User, error) {
 	db := common.SodaMngDB_R
 	result := model.User{}
-	if err := db.Where(&model.User{Account:account}).First(&result).Error; err != nil {
+	if err := db.Where(&model.User{Account: account}).First(&result).Error; err != nil {
 		return nil, err
 	}
 	return &result, nil
@@ -99,7 +99,7 @@ func (self *UserService) Update(user *model.User) (*model.User, error) {
 		"address":   user.Address,
 		"email":     user.Email,
 	}
-	if err := common.SodaMngDB_R.Model(&model.User{}).Where("id = ?", user.ID).Updates(_user).Scan(user).Error; err != nil {
+	if err := common.SodaMngDB_WR.Model(&model.User{}).Where("id = ?", user.ID).Updates(_user).Scan(user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
@@ -124,7 +124,7 @@ func (self *UserService) DeleteById(id int) error {
 
 func (self *UserService) ChangePassword(id int, password string) (*model.User, error) {
 	user := model.User{}
-	err := common.SodaMngDB_WR.Model(&model.User{}).Where(id).Updates(&model.User{Password:password}).Scan(&user).Error
+	err := common.SodaMngDB_WR.Model(&model.User{}).Where(id).Updates(&model.User{Password: password}).Scan(&user).Error
 	if err != nil {
 		return nil, err
 	}

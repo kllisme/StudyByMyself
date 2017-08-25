@@ -61,6 +61,7 @@ module.exports = Object.assign({}, {
     "maxResetRequest": 3
   },
   "pay": {
+    "remark":"苏打生活{{date}}结算款",
     "aliPay": {
       "service": {
         "batchTransNotify": "batch_trans_notify"

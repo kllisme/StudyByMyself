@@ -14,7 +14,7 @@
   "27080201":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "解析json异常", "isError": true },
   "27080202":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取选取的账单结算类型失败", "isError": true },
   "27080203":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取bills异常", "isError": true },
-  "27080204":{"status": "NOT_FOUND_ENTITY", "msg": "未选择任何账单", "description": "未选择任何账单", "isError": true },
+  "27080204":{"status": "UNPROCESSABLE_ENTITY", "msg": "未选择任何账单", "description": "未选择任何账单", "isError": true },
   "27080205":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取账单列表失败", "isError": true },
   "27080206":{"status": "UNPROCESSABLE_ENTITY", "msg": "所选账单中包含不是发起提现和结算失败的订单", "description": "所选账单中包含不是发起提现和结算失败的订单", "isError": false },
   "27080207":{"status": "UNPROCESSABLE_ENTITY", "msg": "所选账单中包含已结账账单，请重新选择", "description": "所选账单中包含已结账账单，请重新选择", "isError": false },
@@ -51,8 +51,8 @@
   "27080409":{"status": "UNPROCESSABLE_ENTITY", "msg": "商户订单号不一致", "description": "商户订单号不一致", "isError": false },
   "27080410":{"status": "UNPROCESSABLE_ENTITY", "msg": "随机串校验不通过", "description": "随机串校验不通过", "isError": false },
   "27080411":{"status": "UNPROCESSABLE_ENTITY", "msg": "微信返回的包有问题", "description": "微信返回的包有问题", "isError": false },
-  "27080412":{"status": "INTERNAL_SERVER_ERROR", "msg": "软删除微信批次号失败", "description": "软删除微信批次号失败", "isError": false }
-
+  "27080412":{"status": "INTERNAL_SERVER_ERROR", "msg": "软删除微信批次号失败", "description": "软删除微信批次号失败", "isError": false },
+  "27080413":{"status": "NOT_FOUND_ENTITY", "msg": "不存在可结算的账单", "description": "不存在可结算的账单", "isError": false }
 
 
 }
