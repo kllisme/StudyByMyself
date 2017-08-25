@@ -30,7 +30,7 @@ func (self *TopicService)GetByID(id int) (*community.Topic, error) {
 //
 //}
 
-func (self *TopicService)Paging(keywords string, schoolName string, channelID int, status int, page int, perPage int, userIDs []int) (*entity.PaginationData, error) {
+func (self *TopicService)Paging(cityID int,keywords string, schoolName string, channelID int, status int, page int, perPage int, userIDs []int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 	topicList := make([]*community.Topic, 0)
 	db := common.SodaDB_R
@@ -45,9 +45,14 @@ func (self *TopicService)Paging(keywords string, schoolName string, channelID in
 			return db.Where("school_name like (?)", "%" + schoolName + "%")
 		})
 	}
-	if status != 0 {
+	if status != -1 {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
 			return db.Where("status = ?", status)
+		})
+	}
+	if cityID != 0 {
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+			return db.Where("city_id = ?", cityID)
 		})
 	}
 	if channelID != 0 {
@@ -150,7 +155,7 @@ func (self *TopicService)UpdateChannel(entity *community.Topic) (*community.Topi
 		"channel_id":entity.ChannelID,
 		"channel_title":entity.ChannelTitle,
 	}
-	if err := common.SodaMngDB_WR.Model(&community.Topic{}).Where(entity.ID).Updates(_topic).Scan(entity).Error; err != nil {
+	if err := common.SodaDB_WR.Model(&community.Topic{}).Where(entity.ID).Updates(_topic).Scan(entity).Error; err != nil {
 		return nil, err
 	}
 	return entity, nil
@@ -160,7 +165,7 @@ func (self *TopicService)UpdateStatus(entity *community.Topic) (*community.Topic
 	_topic := map[string]interface{}{
 		"status":entity.Status,
 	}
-	if err := common.SodaMngDB_WR.Model(&community.Topic{}).Where(entity.ID).Updates(_topic).Scan(entity).Error; err != nil {
+	if err := common.SodaDB_WR.Model(&community.Topic{}).Where(entity.ID).Updates(_topic).Scan(entity).Error; err != nil {
 		return nil, err
 	}
 	return entity, nil

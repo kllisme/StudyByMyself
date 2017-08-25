@@ -58,9 +58,14 @@ func (self *TopicController)Paging(ctx *iris.Context) {
 	topicService := community.TopicService{}
 	keywords := strings.TrimSpace(ctx.URLParam("keywords"))
 	name := strings.TrimSpace(ctx.URLParam("name"))
-	schoolName := strings.TrimSpace(ctx.URLParam("schoolName"))
-	status, _ := ctx.URLParamInt("status")
-	channelID, _ := ctx.URLParamInt("channelID")
+	schoolName := strings.TrimSpace(ctx.URLParam("school_name"))
+	statusStr := ctx.URLParam("status")
+	status := -1
+	if statusStr != "" {
+		status, _ = ctx.URLParamInt("status")
+	}
+	cityID, _ := ctx.URLParamInt("city_id")
+	channelID, _ := ctx.URLParamInt("channel_id")
 	page, _ := ctx.URLParamInt("page")
 	perPage, _ := ctx.URLParamInt("per_page")
 	if name != "" {
@@ -71,7 +76,7 @@ func (self *TopicController)Paging(ctx *iris.Context) {
 		}
 		userIDs = result
 	}
-	result, err := topicService.Paging(keywords, schoolName, channelID, status, page, perPage, userIDs)
+	result, err := topicService.Paging(cityID, keywords, schoolName, channelID, status, page, perPage, userIDs)
 	if err != nil {
 		common.Render(ctx, "03010202", err)
 		return
@@ -144,7 +149,7 @@ func (self *TopicController)UpdateChannel(ctx *iris.Context) {
 		return
 	}
 
-	json, e := params.CheckGet("channelID")
+	json, e := params.CheckGet("channelId")
 	if !e {
 		common.Render(ctx, "03010403", nil)
 		return
@@ -185,7 +190,7 @@ func (self *TopicController)UpdateStatus(ctx *iris.Context) {
 		return
 	}
 	topic.Status = status.MustInt()
-	result, err := topicService.UpdateChannel(topic)
+	result, err := topicService.UpdateStatus(topic)
 	if err != nil {
 		common.Render(ctx, "03010505", err)
 	}
