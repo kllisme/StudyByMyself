@@ -37,7 +37,7 @@ func (self *MenuService)Paging(page int, perPage int) (*entity.PaginationData, e
 	if err := db.Model(&permission.Menu{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&menuList).Error; err != nil {
 		return nil, err
 	}
-	pagination.Pagination.From = (page - 1) * perPage
+	pagination.Pagination.From = (page - 1) * perPage + 1
 	pagination.Pagination.To = perPage * page
 	if pagination.Pagination.To > pagination.Pagination.Total {
 		pagination.Pagination.To = pagination.Pagination.Total

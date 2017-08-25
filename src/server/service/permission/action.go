@@ -38,7 +38,7 @@ func (self *ActionService)Paging(page int, perPage int, handlerName string, meth
 	if err := db.Model(&permission.Action{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&actionList).Error; err != nil {
 		return nil, err
 	}
-	pagination.Pagination.From = (page - 1) * perPage
+	pagination.Pagination.From = (page - 1) * perPage + 1
 	pagination.Pagination.To = perPage * page
 	if pagination.Pagination.To > pagination.Pagination.Total {
 		pagination.Pagination.To = pagination.Pagination.Total
