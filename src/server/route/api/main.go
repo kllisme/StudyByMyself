@@ -8,15 +8,18 @@ import (
 	"maizuo.com/soda/erp/api/src/server/middleware"
 	adminApi "maizuo.com/soda/erp/api/src/server/route/api/admin"
 	financeApi "maizuo.com/soda/erp/api/src/server/route/api/finance"
+	communityApi "maizuo.com/soda/erp/api/src/server/route/api/community"
+	publicApi "maizuo.com/soda/erp/api/src/server/route/api/public"
+
 )
 
 func Api(app *iris.Framework) {
 
 	var (
-		userCtrl    = &api.UserController{}
+		userCtrl = &api.UserController{}
 		captchaCtrl = &api.CaptchaController{}
-		loginCtrl   = &api.LoginController{}
-		billCtrl    = &finance.BillController{}
+		loginCtrl = &api.LoginController{}
+		billCtrl = &finance.BillController{}
 	)
 
 	v1 := app.Party("/v1", func(ctx *iris.Context) {
@@ -48,4 +51,8 @@ func Api(app *iris.Framework) {
 	adminApi.Setup(v1)
 
 	financeApi.Setup(v1)
+
+	communityApi.Setup(v1)
+
+	publicApi.Setup(v1)
 }
