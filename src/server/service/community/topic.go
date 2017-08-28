@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"maizuo.com/soda/erp/api/src/server/entity"
 	"maizuo.com/soda/erp/api/src/server/payload"
+	"maizuo.com/soda/erp/api/src/server/model/public"
 )
 
 type TopicService struct {
@@ -86,14 +87,26 @@ func (self *TopicService)PagingCircle(page int, perPage int, provinceID int) (*e
 	db := common.SodaDB_R
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
 	if provinceID != 0 {
-		cityIDs := make([]int,0)
-		err := common.SodaMngDB_R.Table("region").Where("parent_id = ? and level = 2", provinceID).Pluck("id",&cityIDs).Error
+		region:=public.Region{}
+		err := common.SodaMngDB_R.Where("id = ?", provinceID).Find(&region).Error
 		if err != nil {
 			return nil, err
 		}
-		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("city_id in (?)", cityIDs)
-		})
+		cityIDs := make([]int,0)
+		if region.LevelName == "市" {
+			scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+				return db.Where("city_id = ?", provinceID)
+			})
+		} else {
+			err := common.SodaMngDB_R.Table("region").Where("parent_id = ? and level = 2", provinceID).Pluck("id",&cityIDs).Error
+			if err != nil {
+				return nil, err
+			}
+			scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+				return db.Where("city_id in (?)", cityIDs)
+			})
+		}
+
 	}
 
 	if err := db.Table("2_topic").Select("city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count").Scopes(scopes...).Group("city_id").Order("topic_count desc").Offset((page - 1) * perPage).Limit(perPage).Find(&circleList).Error; err != nil {
@@ -148,11 +161,8 @@ func (self *TopicService)CountByCityIDs(cityIDs ...interface{}) (int, error) {
 }
 
 func (self *TopicService)CountCities() (int, error) {
-	count := 0
-	err := common.SodaDB_R.Table("2_topic").Select("distinct city_id").Count(&count).Error
-	if err != nil {
-		return 0, err
-	}
+	result := make([]*int,0)
+	count := int(common.SodaDB_R.Table("2_topic").Select("distinct city_id").Scan(&result).RowsAffected)
 	return count, nil
 }
 

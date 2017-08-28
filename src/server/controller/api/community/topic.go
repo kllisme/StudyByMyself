@@ -67,6 +67,7 @@ func (self *TopicController)GetSummary(ctx *iris.Context) {
 		common.Render(ctx, "03010602", err)
 		return
 	}
+	//圈子数的计算方法为所有有商品发布过的城市
 	circleCount, err := topicService.CountCities()
 	if err != nil {
 		common.Render(ctx, "03010603", err)
