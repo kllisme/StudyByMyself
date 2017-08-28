@@ -15,6 +15,8 @@ func Setup(v iris.MuxAPI) {
 
 	_api.Get("/circles",topicController.PagingCircle)
 
+	_api.Get("/circles/summary", topicController.GetSummary)
+
 	_api.Get("/topics", topicController.Paging)
 
 	_api.Get("/topics/:id", topicController.GetByID)

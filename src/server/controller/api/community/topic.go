@@ -52,6 +52,33 @@ func (self *TopicController)GetByID(ctx *iris.Context) {
 	common.Render(ctx, "03010300", topic)
 }
 
+func (self *TopicController)GetSummary(ctx *iris.Context) {
+	result := map[string]interface{}{}
+	topicService := community.TopicService{}
+	userService := community.UserService{}
+
+	topicsCount, err := topicService.CountByCityIDs()
+	if err != nil {
+		common.Render(ctx, "03010601", err)
+		return
+	}
+	usersCount, err := userService.Count(0)
+	if err != nil {
+		common.Render(ctx, "03010602", err)
+		return
+	}
+	circleCount, err := topicService.CountCities()
+	if err != nil {
+		common.Render(ctx, "03010603", err)
+		return
+	}
+	result["topicsCount"] = topicsCount
+	result["usersCount"] = usersCount
+	result["circleCount"] = circleCount
+
+	common.Render(ctx, "03010600", result)
+}
+
 func (self *TopicController)Paging(ctx *iris.Context) {
 	userIDs := make([]int, 0)
 	userService := community.UserService{}
