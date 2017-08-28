@@ -85,33 +85,34 @@ func (self *TopicService)PagingCircle(page int, perPage int, provinceID int) (*e
 
 	circleList := make([]*payload.Circle, 0)
 	db := common.SodaDB_R
-	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
 	if provinceID != 0 {
-		region:=public.Region{}
+		region := public.Region{}
 		err := common.SodaMngDB_R.Where("id = ?", provinceID).Find(&region).Error
 		if err != nil {
 			return nil, err
 		}
-		cityIDs := make([]int,0)
+		cityIDs := make([]int, 0)
 		if region.LevelName == "市" {
-			scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-				return db.Where("city_id = ?", provinceID)
-			})
+			if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `2_topic` where city_id = ? GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", provinceID, perPage, (page - 1) * perPage).Scan(&circleList).Error; err != nil {
+				return nil, err
+			}
 		} else {
-			err := common.SodaMngDB_R.Table("region").Where("parent_id = ? and level = 2", provinceID).Pluck("id",&cityIDs).Error
+			err := common.SodaMngDB_R.Table("region").Where("parent_id = ? and level = 2", provinceID).Pluck("id", &cityIDs).Error
 			if err != nil {
 				return nil, err
 			}
-			scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-				return db.Where("city_id in (?)", cityIDs)
-			})
+			if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `2_topic` where city_id in (?) GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", cityIDs, perPage, (page - 1) * perPage).Scan(&circleList).Error; err != nil {
+				return nil, err
+			}
+
 		}
 
+	} else {
+		if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `2_topic` GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", perPage, (page - 1) * perPage).Scan(&circleList).Error; err != nil {
+			return nil, err
+		}
 	}
 
-	if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `2_topic` GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?",perPage,(page - 1) * perPage).Scan(&circleList).Error; err != nil {
-		return nil, err
-	}
 	pagination.Pagination.From = (page - 1) * perPage + 1
 	pagination.Pagination.To = perPage * page
 	if pagination.Pagination.To > pagination.Pagination.Total {
@@ -148,7 +149,7 @@ func (self *TopicService)CountByCityIDs(cityIDs ...interface{}) (int, error) {
 	count := 0
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
 
-	if  len(cityIDs) != 0 {
+	if len(cityIDs) != 0 {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
 			return db.Where("city_id in (?)", cityIDs...)
 		})
@@ -161,7 +162,7 @@ func (self *TopicService)CountByCityIDs(cityIDs ...interface{}) (int, error) {
 }
 
 func (self *TopicService)CountCities() (int, error) {
-	result := make([]*int,0)
+	result := make([]*int, 0)
 	count := int(common.SodaDB_R.Table("2_topic").Select("distinct city_id").Scan(&result).RowsAffected)
 	return count, nil
 }
