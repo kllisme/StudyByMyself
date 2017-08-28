@@ -30,7 +30,7 @@ func (self *TopicService)GetByID(id int) (*community.Topic, error) {
 //
 //}
 
-func (self *TopicService)Paging(cityID int,keywords string, schoolName string, channelID int, status int, page int, perPage int, userIDs []int) (*entity.PaginationData, error) {
+func (self *TopicService)Paging(cityID int, keywords string, schoolName string, channelID int, status int, page int, perPage int, userIDs []int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 	topicList := make([]*community.Topic, 0)
 	db := common.SodaDB_R
@@ -57,10 +57,10 @@ func (self *TopicService)Paging(cityID int,keywords string, schoolName string, c
 	}
 	if channelID != 0 {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("channelID = ?", channelID)
+			return db.Where("channel_id = ?", channelID)
 		})
 	}
-	common.Logger.Debugf("%#v",userIDs)
+	common.Logger.Debugf("%#v", userIDs)
 	if len(userIDs) != 0 {
 		common.Logger.Debugf("------------------------------")
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
@@ -86,13 +86,13 @@ func (self *TopicService)PagingCircle(page int, perPage int, provinceID int) (*e
 	db := common.SodaDB_R
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
 	if provinceID != 0 {
-		cityIDs := []interface{}{}
-		err := common.SodaDB_R.Where("parent_id = ? and level = 2", provinceID).Find(&cityIDs).Error
+		cityIDs := make([]int,0)
+		err := common.SodaMngDB_R.Table("region").Where("parent_id = ? and level = 2", provinceID).Pluck("id",&cityIDs).Error
 		if err != nil {
 			return nil, err
 		}
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("city_id in (?)", cityIDs...)
+			return db.Where("city_id in (?)", cityIDs)
 		})
 	}
 
@@ -133,7 +133,23 @@ func (self *TopicService)PagingCircle(page int, perPage int, provinceID int) (*e
 
 func (self *TopicService)CountByCityIDs(cityIDs ...interface{}) (int, error) {
 	count := 0
-	err := common.SodaDB_R.Where("id in (?)", cityIDs...).Count(&count).Error
+	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
+
+	if  len(cityIDs) != 0 {
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+			return db.Where("city_id in (?)", cityIDs...)
+		})
+	}
+	err := common.SodaDB_R.Table("2_topic").Scopes(scopes...).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (self *TopicService)CountCities() (int, error) {
+	count := 0
+	err := common.SodaDB_R.Table("2_topic").Select("distinct city_id").Count(&count).Error
 	if err != nil {
 		return 0, err
 	}
