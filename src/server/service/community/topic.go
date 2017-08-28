@@ -109,7 +109,7 @@ func (self *TopicService)PagingCircle(page int, perPage int, provinceID int) (*e
 
 	}
 
-	if err := db.Table("2_topic").Select("city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count").Scopes(scopes...).Group("city_id").Order("topic_count desc").Offset((page - 1) * perPage).Limit(perPage).Find(&circleList).Error; err != nil {
+	if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `2_topic` GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?",perPage,(page - 1) * perPage).Scan(&circleList).Error; err != nil {
 		return nil, err
 	}
 	pagination.Pagination.From = (page - 1) * perPage + 1
