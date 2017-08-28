@@ -43,6 +43,8 @@ func Api(app *iris.Framework) {
 
 	v1.Get("/profile", userCtrl.GetProfile)
 
+	publicApi.Setup(v1)
+
 	//控制访问权限的接口
 	v1.UseFunc(middleware.AccessControlMiddleware)
 
@@ -54,5 +56,4 @@ func Api(app *iris.Framework) {
 
 	communityApi.Setup(v1)
 
-	publicApi.Setup(v1)
 }
