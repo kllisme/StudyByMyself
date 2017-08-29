@@ -1,6 +1,6 @@
 package model
 
-func (self *Bill) Mapping(user *User, userCashAccount *UserCashAccount) map[string]interface{} {
+func (self *Bill) Mapping(user *User) map[string]interface{} {
 	user = user.Mapping()
 	isAuto := false
 	if self.Mode == 0 { // 0代表自动提现
