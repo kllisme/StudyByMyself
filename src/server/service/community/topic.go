@@ -34,6 +34,7 @@ func (self *TopicService)GetByID(id int) (*community.Topic, error) {
 func (self *TopicService)Paging(cityID int, keywords string, schoolName string, channelID int, status int, page int, perPage int, userIDs []int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 	topicList := make([]*community.Topic, 0)
+	channelList := make([]*community.Channel, 0)
 	db := common.Soda2DB_R
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
 	if keywords != "" {
@@ -70,6 +71,16 @@ func (self *TopicService)Paging(cityID int, keywords string, schoolName string, 
 	}
 	if err := db.Model(&community.Topic{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&topicList).Error; err != nil {
 		return nil, err
+	}
+	if err := db.Model(&community.Channel{}).Find(&channelList).Error; err != nil {
+		return nil, err
+	}
+	for _,topic := range topicList {
+		for _,channel := range channelList {
+			if topic.ChannelID == channel.ID {
+				topic.ChannelTitle = channel.Title
+			}
+		}
 	}
 	pagination.Pagination.From = (page - 1) * perPage + 1
 	pagination.Pagination.To = perPage * page
