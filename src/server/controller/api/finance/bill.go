@@ -24,6 +24,7 @@ import (
 	"maizuo.com/soda/erp/api/src/server/service"
 	"github.com/jinzhu/gorm"
 	"github.com/hoisie/mustache"
+	"maizuo.com/soda/erp/api/src/server/kit/excel"
 )
 
 type BillController struct {
@@ -32,7 +33,6 @@ type BillController struct {
 // 根据微信支付或者支付宝来获取结算单列表
 func (self *BillController) ListByAccountType(ctx *iris.Context) {
 	userService := &service.UserService{}
-	userCashService := &service.UserCashAccountService{}
 	limit, _ := ctx.URLParamInt("limit")       // Default: 10
 	offset, _ := ctx.URLParamInt("offset")     //  Default: 0 列表起始位:
 	dateType, _ := ctx.URLParamInt("dateType") // 筛选时间类型,1申请时间 2结算时间
@@ -71,13 +71,7 @@ func (self *BillController) ListByAccountType(ctx *iris.Context) {
 			common.Render(ctx, "27080106", err)
 			return
 		}
-		userCashAccount, err := userCashService.BasicByUserId(bill.UserId)
-		if err != nil {
-			common.Logger.Debugln("获取账单用户信息失败err----------", err)
-			common.Render(ctx, "27080106", err)
-			return
-		}
-		objects = append(objects, bill.Mapping(user, userCashAccount))
+		objects = append(objects, bill.Mapping(user))
 	}
 
 	common.Render(ctx, "27080100", &entity.PaginationData{
@@ -634,4 +628,64 @@ func BatchWechatPay(batchPayRequest *pay.BatchPayRequest) (map[string]string, er
 	}
 	common.Logger.Warningln("微信企业支付响应：", respMap)
 	return respMap, nil
+}
+
+
+func (self *BillController)Export(ctx *iris.Context){
+	userService := &service.UserService{}
+	//limit, _ := ctx.URLParamInt("limit")       // Default: 10
+	//offset, _ := ctx.URLParamInt("offset")     //  Default: 0 列表起始位:
+	dateType, _ := ctx.URLParamInt("dateType") // 筛选时间类型,1申请时间 2结算时间
+	startAt := ctx.URLParam("startAt")         // 申请时间
+	endAt := ctx.URLParam("endAt")             // 结算时间
+	keys := ctx.URLParam("keys")               // 运营商名称、帐号名称
+	accountType, _ := ctx.URLParamInt("type")  // 结算支付类型 1:支付宝 2:微信
+	status, _ := ctx.URLParamInt("status")     // 账单状态 1:结算成功 2:等待结算 3:结算中 4:结算失败
+	limit := 999999
+	offset := 0
+
+	billService := &service.BillService{}
+
+	if accountType <= 0 {
+		common.Render(ctx, "27080501", nil)
+		return
+	}
+	billList, err := billService.ListByAccountTypeAndTimeType(accountType, status, dateType,offset, limit, startAt, endAt, keys)
+	if err != nil {
+		common.Render(ctx, "27080502", err)
+		return
+	}
+	// 开始excel文件操作
+	tableHead := []interface{}{"申请时间","申请人","收款账号","结算单号","账单天数","结算金额","手续费","入账金额","状态","结算时间","是否自动结算"}
+	tableName := "结算管理列表"
+	sheet,file,fileUrl,fileName,err := excel.GetExcelHeader(tableHead,tableName)
+	if err != nil {
+		common.Logger.Warningln("操作excel文件失败, err ------------>",err)
+		common.Render(ctx, "27080503", err)
+		return
+	}
+	//将查询的数据装填
+	for _, bill := range billList {
+		user, err := userService.GetById(bill.UserId)
+		if err != nil {
+			common.Logger.Debugln("获取账单用户信息失败,err----------", err)
+			common.Render(ctx, "27080504", err)
+			return
+		}
+
+		if excel.ExportBillDataAsCol(sheet,bill,user) == 0 {
+			common.Logger.Warningln("excel文件插入记录失败,err ------------>",err)
+			common.Render(ctx, "27080505", err)
+			return
+		}
+	}
+	err = file.Save(fileUrl)
+	if err != nil {
+		common.Logger.Warningln("excel文件保存失败,err ------------>",err)
+		common.Render(ctx, "27080503", err)
+		return
+	}
+	sendFile := "//" + viper.GetString("server.href") + viper.GetString("export.loadsPath") + "/" + fileName
+	common.Render(ctx, "27080500", sendFile)
+	return
 }
