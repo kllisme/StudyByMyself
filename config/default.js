@@ -53,6 +53,9 @@ module.exports = Object.assign({}, {
       "maxAge": 3600
     }
   },
+  "export": {
+    "loadsPath": "/temp"
+  },
   "captcha": {
     "prefix": "soda:erp:api:captcha:",
     "server": "http://captcha.sodalife.xyz",
