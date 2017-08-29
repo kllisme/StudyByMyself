@@ -11,7 +11,7 @@ type ChannelService struct {
 
 func (self *ChannelService)GetByID(id int) (*community.Channel, error) {
 	channel := community.Channel{}
-	err := common.SodaDB_R.Where(id).Find(&channel).Error
+	err := common.Soda2DB_R.Where(id).Find(&channel).Error
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func (self *ChannelService)GetByID(id int) (*community.Channel, error) {
 
 func (self *ChannelService)GetAll() (*[]*community.Channel, error) {
 	channelList := make([]*community.Channel, 0)
-	if err := common.SodaDB_R.Order("id desc").Find(&channelList).Error; err != nil {
+	if err := common.Soda2DB_R.Order("id desc").Find(&channelList).Error; err != nil {
 		return nil, err
 	}
 	return &channelList, nil

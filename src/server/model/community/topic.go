@@ -24,11 +24,12 @@ type Topic struct {
 	HasOnline        int        `json:"hasOnline"`
 	UniqueVisitor    int        `json:"uniqueVisitor"`
 	Likes            int        `json:"likes"`
+	Consultation	int	`json:"consultation";gorm:"-"` //商品询问人数
 	Comments         int        `json:"comments"`
 	Status           int        `json:"status"`
 	CreatedTimestamp int        `json:"createdTimestamp"`
 }
 
 func (Topic) TableName() string {
-	return "2_topic"
+	return "topic"
 }

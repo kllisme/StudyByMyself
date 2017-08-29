@@ -33,7 +33,7 @@ func (self *TopicController)PagingCircle(ctx *iris.Context) {
 func (self *TopicController)GetByID(ctx *iris.Context) {
 	topicService := community.TopicService{}
 	userService := community.UserService{}
-
+	inboxService:=community.InboxService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "03010301", err)
@@ -49,6 +49,12 @@ func (self *TopicController)GetByID(ctx *iris.Context) {
 		topic.UserName = "神秘用户"
 	}
 	topic.UserName = user.Name
+	consultation, err := inboxService.CountConsultation(id,topic.UserID)
+	if err != nil {
+		common.Render(ctx, "03010303", err)
+		return
+	}
+	topic.Consultation = consultation
 	common.Render(ctx, "03010300", topic)
 }
 

@@ -12,7 +12,7 @@ type UserService struct {
 
 func (self *UserService)GetByID(id int) (*community.User, error) {
 	user := community.User{}
-	err := common.SodaDB_R.Where(id).Find(&user).Error
+	err := common.Soda2DB_R.Where(id).Find(&user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func (self *UserService)Count(cityID int) (int, error) {
 			return db.Where("city_id = ?", cityID)
 		})
 	}
-	err := common.SodaDB_R.Table("2_user").Scopes(scopes...).Count(&count).Error
+	err := common.Soda2DB_R.Table("user").Scopes(scopes...).Count(&count).Error
 	if err != nil {
 		return 0, err
 	}
@@ -44,7 +44,7 @@ func (self *UserService)FilterUserIDs(name string) ([]int, error) {
 			return db.Where("name like (?)", "%" + name + "%")
 		})
 	}
-	err := common.SodaDB_R.Table("2_user").Scopes(scopes...).Pluck("id",&userIDs).Error
+	err := common.Soda2DB_R.Table("user").Scopes(scopes...).Pluck("id",&userIDs).Error
 	if err != nil {
 		return nil, err
 	}

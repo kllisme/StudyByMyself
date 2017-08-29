@@ -11,5 +11,5 @@ type Channel struct {
 }
 
 func (Channel) TableName() string {
-	return "2_channel"
+	return "channel"
 }
