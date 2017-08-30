@@ -632,9 +632,6 @@ func BatchWechatPay(batchPayRequest *pay.BatchPayRequest) (map[string]string, er
 
 
 func (self *BillController)Export(ctx *iris.Context){
-	userService := &service.UserService{}
-	//limit, _ := ctx.URLParamInt("limit")       // Default: 10
-	//offset, _ := ctx.URLParamInt("offset")     //  Default: 0 列表起始位:
 	dateType, _ := ctx.URLParamInt("dateType") // 筛选时间类型,1申请时间 2结算时间
 	startAt := ctx.URLParam("startAt")         // 申请时间
 	endAt := ctx.URLParam("endAt")             // 结算时间
@@ -645,7 +642,7 @@ func (self *BillController)Export(ctx *iris.Context){
 	offset := 0
 
 	billService := &service.BillService{}
-
+	common.Logger.Debugln("ctx.URLParams()------------------>",ctx.URLParams())
 	if accountType <= 0 {
 		common.Render(ctx, "27080501", nil)
 		return
@@ -666,14 +663,13 @@ func (self *BillController)Export(ctx *iris.Context){
 	}
 	//将查询的数据装填
 	for _, bill := range billList {
-		user, err := userService.GetById(bill.UserId)
 		if err != nil {
 			common.Logger.Debugln("获取账单用户信息失败,err----------", err)
 			common.Render(ctx, "27080504", err)
 			return
 		}
 
-		if excel.ExportBillDataAsCol(sheet,bill,user) == 0 {
+		if excel.ExportBillDataAsCol(sheet,bill) == 0 {
 			common.Logger.Warningln("excel文件插入记录失败,err ------------>",err)
 			common.Render(ctx, "27080505", err)
 			return

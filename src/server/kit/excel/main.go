@@ -21,7 +21,7 @@ func GetExcelHeader(values []interface{},tableName string)(sheet *xlsx.Sheet,fil
 	return
 }
 // 添加一行数据
-func ExportBillDataAsCol(sheet *xlsx.Sheet, bill *model.Bill,user *model.User) (int) {
+func ExportBillDataAsCol(sheet *xlsx.Sheet, bill *model.Bill) (int) {
 	row := sheet.AddRow()
 	mode := "自动结算"
 	if bill.Mode != 0 { // 0代表自动提现
@@ -43,7 +43,7 @@ func ExportBillDataAsCol(sheet *xlsx.Sheet, bill *model.Bill,user *model.User) (
 	}
 	s := []interface{}{
 		bill.CreatedAt.Local().Format("2006-01-02 15:04"),
-		user.Name+"|"+user.Account,
+		bill.UserName+"|"+bill.UserAccount,
 		bill.RealName+"|账号:"+bill.Account,
 		bill.BillId,
 		bill.Count,
