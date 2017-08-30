@@ -1,0 +1,33 @@
+{
+  "0402":"advertisement",
+  "040201":"GetByID",
+  "04020100": {"status": "OK", "msg": "", "description": "获取业务信息成功", "isError": false },
+  "04020101": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+  "04020102": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "业务详情获取失败", "isError": true },
+
+  "040202":"Paging",
+  "04020200": {"status": "OK", "msg": "", "description": "获取业务信息成功", "isError": false },
+  "04020201": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "商品详情获取失败", "isError": true },
+
+  "040203":"Create",
+  "04020300": {"status": "OK", "msg": "", "description": "新建业务信息成功", "isError": false },
+  "04020301": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+  "04020302": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "业务名不能为空", "isError": false },
+  "04020303": { "status": "BAD_REQUEST", "msg": "参数异常", "description": "业务名超长", "isError": true },
+  "04020304": { "status": "BAD_REQUEST", "msg": "参数异常", "description": "描述超长", "isError": true },
+  "04020305": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "新建业务失败", "isError": true },
+
+  "040204":"Delete",
+  "04020400": {"status": "OK", "msg": "", "description": "业务信息删除成功", "isError": false },
+  "04020401": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+  "04020402": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "业务信息删除失败", "isError": true },
+
+  "040205":"Update",
+  "04020500": {"status": "OK", "msg": "", "description": "更新业务信息成功", "isError": false },
+  "04020501": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+  "04020502": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "商品详情获取失败", "isError": true },
+  "04020503": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "业务名不能为空", "isError": false },
+  "04020504": { "status": "BAD_REQUEST", "msg": "参数异常", "description": "业务名超长", "isError": true },
+  "04020505": { "status": "BAD_REQUEST", "msg": "参数异常", "description": "描述超长", "isError": true },
+  "04020506": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "新建业务失败", "isError": true }
+}
