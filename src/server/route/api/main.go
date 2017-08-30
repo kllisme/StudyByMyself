@@ -28,7 +28,7 @@ func Api(app *iris.Framework) {
 	v1.Post("/settlement/alipay/notification", billCtrl.AlipayNotification)
 
 	v1.Get("/captcha.png", captchaCtrl.Captcha)
-	iris.StaticFS(viper.GetString("export.loadsPath"), "." + viper.GetString("export.loadsPath"), 1)
+	v1.StaticFS(viper.GetString("export.loadsPath"), "." + viper.GetString("export.loadsPath"), 2)
 	//为跨域请求设定入口
 	v1.UseFunc(common.CORS.Serve)
 	v1.Options("/*anything", common.CORS.Serve)
