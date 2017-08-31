@@ -62,7 +62,6 @@ func (self *TopicService)Paging(cityID int, keywords string, schoolName string, 
 			return db.Where("channel_id = ?", channelID)
 		})
 	}
-	common.Logger.Debugf("%#v", userIDs)
 	if len(userIDs) != 0 {
 		common.Logger.Debugf("------------------------------")
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {

@@ -108,7 +108,12 @@ func (self *TopicController)Paging(ctx *iris.Context) {
 			common.Render(ctx, "03010201", err)
 			return
 		}
-		userIDs = result
+		if len(result) == 0 {
+			userIDs = append(userIDs,0)
+		} else {
+			userIDs = result
+		}
+
 	}
 	result, err := topicService.Paging(cityID, keywords, schoolName, channelID, status, page, perPage, userIDs)
 	if err != nil {
