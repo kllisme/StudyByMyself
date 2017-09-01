@@ -31,12 +31,12 @@ func ExportBillDataAsCol(sheet *xlsx.Sheet, bill *model.Bill) (int) {
 	settledAt := "-"
 	switch bill.Status {
 	case 1:
-		status = "已申请结算"
+		status = "等待结算"
 	case 2:
 		status = "结算成功"
 		settledAt = bill.SettledAt.Local().Format("2006-01-02 15:04")
 	case 3:
-		status = "等待结算"
+		status = "结算中"
 	case 4:
 		status = "结算失败"
 		settledAt = bill.SettledAt.Local().Format("2006-01-02 15:04")
