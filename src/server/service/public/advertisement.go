@@ -62,7 +62,7 @@ func (self *AdvertisementService)Paging(title string,locationIDs []int, start st
 	}
 	if status != 0 {
 		scopes = append(scopes,func(db *gorm.DB) *gorm.DB {
-			return db.Where("app_id = ?", status)
+			return db.Where("status = ?", status)
 		})
 	}
 
@@ -108,16 +108,10 @@ func (self *AdvertisementService)Update(advertisement *public.Advertisement) (*p
 }
 
 func (self *AdvertisementService)BatchUpdateOrder(advertisementList *[]*public.Advertisement) (*[]*public.Advertisement, error) {
-	type aMap map[string]int
-	_advertisementList := make(map[int]aMap)
-	for _, advertisement := range *advertisementList {
-		_advertisementList[advertisement.ID] = map[string]int{"order":advertisement.Order}
-	}
-
 	result := []*public.Advertisement{}
-	for index, _advertisementMap := range _advertisementList {
+	for _, ad := range *advertisementList {
 		advertisement := &public.Advertisement{}
-		if err := common.SodaMngDB_WR.Model(&public.Advertisement{}).Where(index).Updates(_advertisementMap[string(index)]).Scan(advertisement).Error; err != nil {
+		if err := common.SodaMngDB_WR.Model(&public.Advertisement{}).Where(ad.ID).Update("order", ad.Order).Scan(advertisement).Error; err != nil {
 			return nil, err
 		}
 		result = append(result, advertisement)

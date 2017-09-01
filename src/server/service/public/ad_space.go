@@ -26,7 +26,7 @@ func (self *ADSpaceService)Paging(appID int, page int, perPage int) (*entity.Pag
 	db := common.SodaMngDB_R
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
 	if appID != 0 {
-		scopes = append(scopes,func(db *gorm.DB) *gorm.DB {
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
 			return db.Where("app_id = ?", appID)
 		})
 	}
@@ -79,8 +79,8 @@ func (self *ADSpaceService)Delete(id int) error {
 }
 
 func (self *ADSpaceService)GetLocationIDs(appID int) ([]int, error) {
-	locationIDs := []int{}
-	if err := common.SodaMngDB_R.Model(&public.ADSpace{}).Where("app_id = ?",appID).Scan(&locationIDs).Error; err != nil {
+	locationIDs := make([]int, 0)
+	if err := common.SodaMngDB_R.Model(&public.ADSpace{}).Where("app_id = ?", appID).Pluck("id", &locationIDs).Error; err != nil {
 		return nil, err
 	}
 

@@ -9,6 +9,9 @@ import (
 	"github.com/bitly/go-simplejson"
 	"maizuo.com/soda/erp/api/src/server/kit/functions"
 	"time"
+	"path/filepath"
+	"github.com/spf13/viper"
+	"maizuo.com/soda/erp/api/src/server/kit/util"
 )
 
 type AdvertisementController struct {
@@ -21,60 +24,66 @@ func (self *AdvertisementController)GetByID(ctx *iris.Context) {
 	applicationService := public.ApplicationService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "04020101", err)
 		return
 	}
 	advertisement, err := advertisementService.GetByID(id)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "04020102", err)
 		return
 	}
 
 	adSpace, err := adSpaceService.GetByID(advertisement.LocationID)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "04020103", err)
 		return
 	}
 	advertisement.LocationName = adSpace.Name
 
 	app, err := applicationService.GetByID(adSpace.APPID)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "04020104", err)
 		return
 	}
 	advertisement.APPName = app.Name
+	advertisement.APPID = app.ID
 
-	common.Render(ctx, "27070100", advertisement)
+	common.Render(ctx, "04020100", advertisement)
 }
 
 func (self *AdvertisementController)Paging(ctx *iris.Context) {
 	advertisementService := public.AdvertisementService{}
 	adSpaceService := public.ADSpaceService{}
 	applicationService := public.ApplicationService{}
-	locationIDs := []int{}
+	var locationIDs []int
 	page, _ := ctx.URLParamInt("page")
 	perPage, _ := ctx.URLParamInt("per_page")
 	title := strings.TrimSpace(ctx.URLParam("title"))
 	appID, _ := ctx.URLParamInt("app_id")
 	locationID, _ := ctx.URLParamInt("location_id")
 	if locationID != 0 {
-		locationIDs[0] = locationID
+		locationIDs = []int{locationID}
 	} else if appID != 0 {
 		list, err := adSpaceService.GetLocationIDs(appID)
 		if err != nil {
-			common.Render(ctx, "27070200", err)
+			common.Render(ctx, "04020203", err)
 			return
 		}
+		if len(list) == 0 {
+			locationIDs = []int{0}
+		}
 		locationIDs = list
+	} else {
+		locationIDs = []int{}
 	}
-	start := strings.TrimSpace(ctx.URLParam("start"))
-	end := strings.TrimSpace(ctx.URLParam("end"))
+	start := strings.TrimSpace(ctx.URLParam("started_at"))
+	end := strings.TrimSpace(ctx.URLParam("ended_at"))
 	display, _ := ctx.URLParamInt("display")
 	status, _ := ctx.URLParamInt("status")
 
 	result, err := advertisementService.Paging(title, locationIDs, start, end, display, status, page, perPage)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "04020201", err)
 		return
 	}
 
@@ -82,20 +91,21 @@ func (self *AdvertisementController)Paging(ctx *iris.Context) {
 	for _, ad := range adList {
 		adSpace, err := adSpaceService.GetByID(ad.LocationID)
 		if err != nil {
-			common.Render(ctx, "000002", nil)
+			common.Render(ctx, "04020204", err)
 			return
 		}
 		ad.LocationName = adSpace.Name
 
 		app, err := applicationService.GetByID(adSpace.APPID)
 		if err != nil {
-			common.Render(ctx, "000002", nil)
+			common.Render(ctx, "04020205", err)
 			return
 		}
 		ad.APPName = app.Name
+		ad.APPID = app.ID
 	}
 
-	common.Render(ctx, "27070200", result)
+	common.Render(ctx, "04020200", result)
 	return
 }
 
@@ -104,75 +114,78 @@ func (self *AdvertisementController)Create(ctx *iris.Context) {
 	adSpaceService := public.ADSpaceService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27070301", nil)
+		common.Render(ctx, "04020301", err)
 		return
 	}
 
 	locationID := params.Get("locationId").MustInt()
 	if locationID == 0 {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04020302", nil)
 		return
 	}
 	adSpace, err := adSpaceService.GetByID(locationID)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "04020303", err)
 		return
 	}
 
 	name := strings.TrimSpace(params.Get("name").MustString())
 	if name == "" {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04020304", nil)
 		return
-	} else if functions.CountRune(name) > 10 {
-		common.Render(ctx, "27070302", nil)
+	} else if functions.CountRune(name) > 20 {
+		common.Render(ctx, "04020305", nil)
 		return
 	}
 
 	title := strings.TrimSpace(params.Get("title").MustString())
 	if title == "" {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04020306", nil)
 		return
-	} else if functions.CountRune(title) > 10 {
-		common.Render(ctx, "27070302", nil)
+	} else if functions.CountRune(title) > 20 {
+		common.Render(ctx, "04020307", nil)
 		return
 	}
 
 	url := strings.TrimSpace(params.Get("url").MustString())
 	if url == "" {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04020308", nil)
 		return
 	}
 
 	image := strings.TrimSpace(params.Get("image").MustString())
 	if image == "" {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04020309", nil)
 		return
 	}
 
-	startAt, err := time.Parse(time.RFC3339, strings.TrimSpace(params.Get("startAt").MustString()))
+	startAt, err := time.Parse("2006-01-02T15:04:05", strings.TrimSpace(params.Get("startedAt").MustString()))
 	if err != nil {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04020310", err)
 		return
 	}
 
-	endAt, err := time.Parse(time.RFC3339, strings.TrimSpace(params.Get("endAt").MustString()))
+	endAt, err := time.Parse("2006-01-02T15:04:05", strings.TrimSpace(params.Get("endedAt").MustString()))
 	if err != nil {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04020311", err)
 		return
 	}
 
-	display := 0
+	display := 1
 	displayParams := ""
 
 	if adSpace.IdentifyNeeded == 1 {
 		display = params.Get("displayStrategy").MustInt()
 
-		if display == 1 {
+		if display == 2 {
 			displayParams = strings.TrimSpace(params.Get("displayParams").MustString())
+			if displayParams == "" {
+				common.Render(ctx, "04020312", err)
+				return
+			}
 		}
 	}
 	status := params.Get("status").MustInt()
-
 
 	advertisement := model.Advertisement{
 		Name:name,
@@ -188,94 +201,99 @@ func (self *AdvertisementController)Create(ctx *iris.Context) {
 	}
 	entity, err := advertisementService.Create(&advertisement)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "04020314", err)
 		return
 	}
-	common.Render(ctx, "27070300", entity)
+	common.Render(ctx, "04020300", entity)
 }
 
 func (self *AdvertisementController)Update(ctx *iris.Context) {
 	advertisementService := public.AdvertisementService{}
 	adSpaceService := public.ADSpaceService{}
 	params := simplejson.New()
-	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27070501", nil)
-		return
-	}
 
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "04020501", err)
 		return
 	}
 
 	advertisement, err := advertisementService.GetByID(id)
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "04020502", err)
+		return
+	}
+
+	if err := ctx.ReadJSON(&params); err != nil {
+		common.Render(ctx, "04020503", err)
 		return
 	}
 
 	locationID := params.Get("locationId").MustInt()
 	if locationID == 0 {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04020504", nil)
 		return
 	}
 	adSpace, err := adSpaceService.GetByID(locationID)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "04020505", err)
 		return
 	}
 
 	name := strings.TrimSpace(params.Get("name").MustString())
 	if name == "" {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04020506", nil)
 		return
-	} else if functions.CountRune(name) > 10 {
-		common.Render(ctx, "27070302", nil)
+	} else if functions.CountRune(name) > 20 {
+		common.Render(ctx, "04020507", nil)
 		return
 	}
 
 	title := strings.TrimSpace(params.Get("title").MustString())
 	if title == "" {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04020508", nil)
 		return
-	} else if functions.CountRune(title) > 10 {
-		common.Render(ctx, "27070302", nil)
+	} else if functions.CountRune(title) > 20 {
+		common.Render(ctx, "04020509", nil)
 		return
 	}
 
 	url := strings.TrimSpace(params.Get("url").MustString())
 	if url == "" {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04020510", nil)
 		return
 	}
 
 	image := strings.TrimSpace(params.Get("image").MustString())
 	if image == "" {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04020511", nil)
 		return
 	}
 
-	startAt, err := time.Parse(time.RFC3339, strings.TrimSpace(params.Get("startAt").MustString()))
+	startAt, err := time.Parse("2006-01-02T15:04:05", strings.TrimSpace(params.Get("startedAt").MustString()))
 	if err != nil {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04020512", err)
 		return
 	}
 
-	endAt, err := time.Parse(time.RFC3339, strings.TrimSpace(params.Get("endAt").MustString()))
+	endAt, err := time.Parse("2006-01-02T15:04:05", strings.TrimSpace(params.Get("endedAt").MustString()))
 	if err != nil {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04020513", err)
 		return
 	}
 
-	display := 0
+	display := 1
 	displayParams := ""
 
 	if adSpace.IdentifyNeeded == 1 {
 		display = params.Get("displayStrategy").MustInt()
 
-		if display == 1 {
+		if display == 2 {
 			displayParams = strings.TrimSpace(params.Get("displayParams").MustString())
+			if displayParams == "" {
+				common.Render(ctx, "04020514", err)
+				return
+			}
 		}
 	}
 	status := params.Get("status").MustInt()
@@ -283,98 +301,67 @@ func (self *AdvertisementController)Update(ctx *iris.Context) {
 	advertisement.URL = url
 	advertisement.Image = image
 	advertisement.DisplayStrategy = display
-	advertisement.DisplayParams =displayParams
-	advertisement.Status =status
+	advertisement.DisplayParams = displayParams
+	advertisement.Status = status
 	advertisement.StartedAt = startAt
-	advertisement.EndedAt =endAt
-	advertisement.LocationID =locationID
+	advertisement.EndedAt = endAt
+	advertisement.LocationID = locationID
 	advertisement.Title = title
 	advertisement.Name = name
 	entity, err := advertisementService.Update(advertisement)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "04020516", err)
 		return
 	}
-	common.Render(ctx, "27070500", entity)
+	common.Render(ctx, "04020500", entity)
 }
 
 func (self *AdvertisementController)Delete(ctx *iris.Context) {
 	advertisementService := public.AdvertisementService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "04020401", err)
 		return
 	}
 	if err := advertisementService.Delete(id); err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "04020402", err)
 	}
-	common.Render(ctx, "27070400", nil)
+	common.Render(ctx, "04020400", nil)
 }
 
 func (self *AdvertisementController)BatchUpdateOrder(ctx *iris.Context) {
 	advertisementService := public.AdvertisementService{}
-	params := simplejson.New()
-	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27070501", nil)
+	adList := make([]*model.Advertisement, 0)
+	//params := simplejson.New()
+	if err := ctx.ReadJSON(&adList); err != nil {
+		common.Render(ctx, "04020601", err)
 		return
 	}
 
-	id, err := ctx.ParamInt("id")
+	entity, err := advertisementService.BatchUpdateOrder(&adList)
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "04020602", err)
 		return
 	}
-
-	advertisement, err := advertisementService.GetByID(id)
-	if err != nil {
-		common.Render(ctx, "000003", nil)
-		return
-	}
-	name := strings.TrimSpace(params.Get("name").MustString())
-	if name == "" {
-		common.Render(ctx, "27070502", nil)
-		return
-	}
-
-	advertisement.Name = name
-	entity, err := advertisementService.Update(advertisement)
-	if err != nil {
-		common.Render(ctx, "000002", nil)
-		return
-	}
-	common.Render(ctx, "27070500", entity)
+	common.Render(ctx, "04020600", entity)
 }
 
 func (self *AdvertisementController)SaveImage(ctx *iris.Context) {
-	advertisementService := public.AdvertisementService{}
-	params := simplejson.New()
-	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27070501", nil)
+	ctx.Set("isUpload", true)
+	object := viper.GetString("resource.oss.object.ad")
+	formFile, err := ctx.FormFile("file")
+	fileName := formFile.Filename
+	fileExt := filepath.Ext(fileName)
+	if fileExt != ".jpg" && fileExt != ".png" {
+		common.Render(ctx, "04020701", nil)
 		return
 	}
 
-	id, err := ctx.ParamInt("id")
+	shortPath, err := util.Upload(formFile, object)
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "04020702", err)
 		return
 	}
-
-	advertisement, err := advertisementService.GetByID(id)
-	if err != nil {
-		common.Render(ctx, "000003", nil)
-		return
-	}
-	name := strings.TrimSpace(params.Get("name").MustString())
-	if name == "" {
-		common.Render(ctx, "27070502", nil)
-		return
-	}
-
-	advertisement.Name = name
-	entity, err := advertisementService.Update(advertisement)
-	if err != nil {
-		common.Render(ctx, "000002", nil)
-		return
-	}
-	common.Render(ctx, "27070500", entity)
+	// domain := viper.GetString("resource.oss.domain")
+	common.Render(ctx, "04020700", "/ad/" + shortPath)
 }

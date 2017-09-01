@@ -12,6 +12,7 @@ type Advertisement struct {
 	URL             string        `json:"url"`
 	LocationID      int        `json:"locationId"`
 	LocationName    string        `json:"locationName" gorm:"-"`
+	APPID           int        `json:"appId" gorm:"-"`
 	APPName         string        `json:"appName" gorm:"-"`
 	StartedAt       time.Time        `json:"startedAt"`
 	EndedAt         time.Time        `json:"endedAt"`
