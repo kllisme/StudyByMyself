@@ -126,6 +126,7 @@ func (self *BillService) ListByAccountTypeAndTimeType(accountType, status, dateT
 		"when bill.status=2 then 3 " +
 		"when bill.status=4 then 4 " +
 		"else 5 end asc, bill.id DESC "
+	common.Logger.Warnln("sql-------------->",sql)
 	r := common.SodaMngDB_R.Raw(sql, params...).Limit(limit).Offset(offset).Scan(&billList)
 	if r.Error != nil {
 		return nil, r.Error
