@@ -363,5 +363,5 @@ func (self *AdvertisementController)SaveImage(ctx *iris.Context) {
 		return
 	}
 	// domain := viper.GetString("resource.oss.domain")
-	common.Render(ctx, "04020700", "/ad/" + shortPath)
+	common.Render(ctx, "04020700", shortPath)
 }

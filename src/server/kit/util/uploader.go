@@ -14,7 +14,8 @@ import (
 	"github.com/juju/errors"
 )
 
-func Upload(formFile *multipart.FileHeader, object string) (string, error) {
+//
+func Upload(formFile *multipart.FileHeader, ossObject string) (string, error) {
 	fileName := formFile.Filename
 	fileExt := filepath.Ext(fileName)
 	fileName = string(time.Now().Unix()) + fileExt
@@ -59,7 +60,7 @@ func Upload(formFile *multipart.FileHeader, object string) (string, error) {
 	md5h := md5.New()
 	io.Copy(md5h, file)
 	hashName := fmt.Sprintf("%x", md5h.Sum(nil))
-	objectName := object + hashName + fileExt
+	objectName := ossObject + hashName + fileExt
 	shortPath := hashName + fileExt
 	tmpFile, err = os.Open(absPath)
 	if err != nil {
