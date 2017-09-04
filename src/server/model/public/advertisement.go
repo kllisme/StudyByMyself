@@ -31,7 +31,7 @@ func (Advertisement) TableName() string {
 
 func (a *Advertisement) AfterFind() error  {
 	if a.Image != "" {
-		fullURL := viper.GetString("resource.oss.domain")+"/"+viper.GetString("resource.oss.bucketName")+viper.GetString("resource.oss.object.ad")+a.Image
+		fullURL := viper.GetString("resource.oss.domain")+"/"+viper.GetString("resource.oss.object.ad")+a.Image
 		a.Image = fullURL
 		return nil
 	}
