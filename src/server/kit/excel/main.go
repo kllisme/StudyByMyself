@@ -3,14 +3,13 @@ package excel
 import (
 	"github.com/tealeg/xlsx"
 	"os"
-	"time"
 	"maizuo.com/soda/erp/api/src/server/model"
 )
 // 生成excel表头,并返回文件路径以及名字
-func GetExcelHeader(values []interface{},tableName string)(sheet *xlsx.Sheet,file *xlsx.File, url string, name string, err error){
+func GetExcelHeader(fileName string, values []interface{},tableName string)(sheet *xlsx.Sheet,file *xlsx.File, url string, name string, err error){
 	root, _ := os.Getwd()
 	path := root + "/temp"
-	name = time.Now().Format("20060102150405") + ".xlsx"
+	name = fileName + ".xlsx"
 	url = path + "/" + name
 	file = xlsx.NewFile()
 	sheet, err = file.AddSheet(tableName)

@@ -167,7 +167,10 @@ func BatchAlipay(billList []*model.Bill) (map[string]string, string, error) {
 	aliPayDetailDataStr := ""
 
 	for _, bill := range billList {
+		// 运营商名称运营商登录账号XX月XX日结算款
 		_remark := mustache.Render(viper.GetString("pay.remark"), map[string]interface{}{
+			"userName":bill.UserName,
+			"userAccount":bill.UserAccount,
 			"date": bill.CreatedAt.Format("01月02日"),
 		})
 
@@ -480,7 +483,10 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 		CheckName:      viper.GetString("pay.wechat.checkName"),
 		ReUserName:     bill.RealName,
 		Amount:         bill.Amount,
+		// 运营商名称运营商登录账号XX月XX日结算款
 		Desc: mustache.Render(viper.GetString("pay.remark"), map[string]interface{}{
+			"userName":bill.UserName,
+			"userAccount":bill.UserAccount,
 			"date": bill.CreatedAt.Format("01月02日"),
 		}),
 		SPBillCreateIP: "116.24.64.139",
@@ -656,7 +662,33 @@ func (self *BillController) Export(ctx *iris.Context) {
 	// 开始excel文件操作
 	tableHead := []interface{}{"申请时间", "申请人", "收款账号", "结算单号", "账单天数", "结算金额", "手续费", "入账金额", "状态", "结算时间", "是否自动结算"}
 	tableName := "结算管理列表"
-	sheet, file, fileUrl, fileName, err := excel.GetExcelHeader(tableHead, tableName)
+	timeName := ""
+	if dateType == 1 {
+		timeName = "申请时间"
+	}else if dateType == 2 {
+		timeName = "结算时间"
+	}else{
+		timeName = ""
+	}
+	payName := ""
+	if accountType == 1 {
+		payName = "支付宝"
+	}else if accountType == 2 {
+		payName = "微信"
+	}
+	// （申请时间/结算时间）XX.XX-XX.XX微信/支付宝结算账单
+	fileName := ""
+	if startAt != "" && endAt != ""{
+		if startAt[3:10] != endAt[3:10]{
+			fileName = "（"+timeName+"）"+strings.Replace(startAt[5:10], "-", ".", -1)+"-"+
+				strings.Replace(endAt[5:10], "-", ".", -1)+payName+"结算账单"
+		}else{
+			fileName = "（"+timeName+"）"+strings.Replace(endAt[5:10], "-", ".", -1)+payName+"结算账单"
+		}
+	}else{
+		fileName = payName+"结算账单"
+	}
+	sheet, file, fileUrl, fileName, err := excel.GetExcelHeader(fileName,tableHead, tableName)
 	if err != nil {
 		common.Logger.Warningln("操作excel文件失败, err ------------>", err)
 		common.Render(ctx, "27080503", err)
