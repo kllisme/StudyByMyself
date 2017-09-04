@@ -7,7 +7,7 @@ module.exports = Object.assign({}, {
   "server": {
     "host": "0.0.0.0",
     "port": 8081,
-    "href": "https://api.erp.sodalife.dev/v1",
+    "href": "http://api.erp.sodalife.dev/v1",
     "session": {
       "user": {
         "id": "USER_ID",
