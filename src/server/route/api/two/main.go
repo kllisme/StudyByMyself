@@ -1,14 +1,14 @@
-package community
+package two
 
 import (
 	iris "gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/controller/api/community"
+	"maizuo.com/soda/erp/api/src/server/controller/api/two"
 )
 
 func Setup(v iris.MuxAPI) {
 	var (
-		topicController=community.TopicController{}
-		channelController=community.ChannelController{}
+		topicController=two.TopicController{}
+		channelController=two.ChannelController{}
 
 	)
 	_api := v.Party("/2")

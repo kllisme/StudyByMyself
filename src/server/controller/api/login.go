@@ -25,7 +25,7 @@ func (self *LoginController) Login(ctx *iris.Context) {
 	params := simplejson.New()
 	err := ctx.ReadJSON(&params)
 	if err != nil {
-		common.Render(ctx, "27010102", nil)
+		common.Render(ctx, "27010102", err)
 		return
 	}
 	account := strings.TrimSpace(params.Get("account").MustString())
@@ -59,7 +59,7 @@ func (self *LoginController) Login(ctx *iris.Context) {
 
 	userEntity, err := userService.GetByAccount(account)
 	if err != nil {
-		common.Render(ctx, "27010108", nil)
+		common.Render(ctx, "27010108", err)
 		return
 	}
 	if userEntity.Password != password {

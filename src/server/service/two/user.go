@@ -1,17 +1,17 @@
-package community
+package two
 
 import (
 	"maizuo.com/soda/erp/api/src/server/common"
 	"github.com/jinzhu/gorm"
-	"maizuo.com/soda/erp/api/src/server/model/community"
+	"maizuo.com/soda/erp/api/src/server/model/two"
 )
 
 type UserService struct {
 
 }
 
-func (self *UserService)GetByID(id int) (*community.User, error) {
-	user := community.User{}
+func (self *UserService)GetByID(id int) (*two.User, error) {
+	user := two.User{}
 	err := common.Soda2DB_R.Where(id).Find(&user).Error
 	if err != nil {
 		return nil, err

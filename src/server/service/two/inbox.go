@@ -1,9 +1,9 @@
-package community
+package two
 
 
 import (
 	"maizuo.com/soda/erp/api/src/server/common"
-	"maizuo.com/soda/erp/api/src/server/model/community"
+	"maizuo.com/soda/erp/api/src/server/model/two"
 	"github.com/jinzhu/gorm"
 )
 
@@ -11,8 +11,8 @@ type InboxService struct {
 
 }
 
-func (self *InboxService)GetByID(id int) (*community.Inbox, error) {
-	inbox := community.Inbox{}
+func (self *InboxService)GetByID(id int) (*two.Inbox, error) {
+	inbox := two.Inbox{}
 	err := common.Soda2DB_R.Where(id).Find(&inbox).Error
 	if err != nil {
 		return nil, err
