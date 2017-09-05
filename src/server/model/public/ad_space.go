@@ -11,6 +11,7 @@ type ADSpace struct {
 	APPName        string       `gorm:"-" json:"appName"`
 	IdentifyNeeded int        `json:"identifyNeeded"`
 	Description    string        `json:"description"`
+	Standard       string        `json:"standard"`
 }
 
 func (ADSpace) TableName() string {

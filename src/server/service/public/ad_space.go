@@ -58,6 +58,7 @@ func (self *ADSpaceService)Update(adSpace *public.ADSpace) (*public.ADSpace, err
 		"description":adSpace.Description,
 		"identifyNeeded": adSpace.IdentifyNeeded,
 		"appId":adSpace.APPID,
+		"standard":adSpace.Standard,
 	}
 	if err := common.SodaMngDB_WR.Model(&public.ADSpace{}).Where(adSpace.ID).Updates(_adSpace).Scan(adSpace).Error; err != nil {
 		return nil, err
