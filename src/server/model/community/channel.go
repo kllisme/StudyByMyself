@@ -5,9 +5,9 @@ type Channel struct {
 	Title            string `json:"title"` //名称
 	URL              string        `json:"url"`
 	Order            int    `json:"order"`
-	IsOfficial       int        `json:"is_official"`
+	IsOfficial       int        `json:"isOfficial"`
 	Status           int        `json:"status"`
-	CreatedTimestamp int        `json:"created_timestamp"`
+	CreatedTimestamp int        `json:"createdTimestamp"`
 }
 
 func (Channel) TableName() string {

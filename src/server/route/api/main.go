@@ -10,7 +10,6 @@ import (
 	financeApi "maizuo.com/soda/erp/api/src/server/route/api/finance"
 	communityApi "maizuo.com/soda/erp/api/src/server/route/api/community"
 	publicApi "maizuo.com/soda/erp/api/src/server/route/api/public"
-
 )
 
 func Api(app *iris.Framework) {
@@ -43,8 +42,6 @@ func Api(app *iris.Framework) {
 
 	v1.Get("/profile", userCtrl.GetProfile)
 
-	publicApi.Setup(v1)
-
 	//控制访问权限的接口
 	v1.UseFunc(middleware.AccessControlMiddleware)
 
@@ -55,5 +52,7 @@ func Api(app *iris.Framework) {
 	financeApi.Setup(v1)
 
 	communityApi.Setup(v1)
+
+	publicApi.Setup(v1)
 
 }

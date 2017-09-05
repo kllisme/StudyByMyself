@@ -6,7 +6,7 @@ import (
 
 type Topic struct {
 	Model
-	Title            string        `json:"title"` //名称
+	Title            string        `json:"title"`              //名称
 	Description      string        `json:"description"`
 	Content          string        `json:"content"`
 	Value            int        `json:"value"`
@@ -24,7 +24,7 @@ type Topic struct {
 	HasOnline        int        `json:"hasOnline"`
 	UniqueVisitor    int        `json:"uniqueVisitor"`
 	Likes            int        `json:"likes"`
-	Consultation	int	`json:"consultation";gorm:"-"` //商品询问人数
+	Consultation     int        `json:"consultation" gorm:"-"` //商品询问人数
 	Comments         int        `json:"comments"`
 	Status           int        `json:"status"`
 	CreatedTimestamp int        `json:"createdTimestamp"`

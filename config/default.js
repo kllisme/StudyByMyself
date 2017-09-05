@@ -187,6 +187,19 @@ module.exports = Object.assign({}, {
         "prefix": "soda:erp:api:rate:",
         "max-retry": 3
       }
+    },
+    "oss": {
+      "domain": "//static.sodalife.xyz",
+      "tmpPath": "./tmp/",
+      "accessKeyId": "LTAICzH0wYDQUu40",
+      "accessKeySecret": "YBedLK2r34hRWsMmd8IInYdLmjctvG",
+      "bucketName": "maizuo",
+      "endpoint": "oss-cn-hangzhou.aliyuncs.com",
+      "ext": ".png,.jpg,.gif,.jpeg",
+      "maxSize": 2048000,
+      "object": {
+        "ad": "soda/test/erp.sodalife.xyz/ad/"
+      }
     }
   }
 }, {

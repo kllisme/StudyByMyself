@@ -7,20 +7,20 @@ type Inbox struct {
 	Title            string	`json:"title"` //名称
 	Content          string        `json:"content"`
 	Icon             string        `json:"icon"`
-	IsOfficial       int        `json:"is_official"`
+	IsOfficial       int        `json:"isOfficial"`
 	Type             int        `json:"type"`
-	OperatorID       int        `json:"operator_id"`
+	OperatorID       int        `json:"operatorId"`
 	Action           int        `json:"action"`
-	TargetType       int        `json:"target_type"`
-	TargetID         int        `json:"target_id"`
-	SenderID         int        `json:"sender_id"`
-	ReceiverID       int        `json:"receiver_id"`
-	SenderUserID     int        `json:"sender_user_id"`
-	ReceiverUserID   int        `json:"receiver_user_id"`
+	TargetType       int        `json:"targetType"`
+	TargetID         int        `json:"targetId"`
+	SenderID         int        `json:"senderId"`
+	ReceiverID       int        `json:"receiverId"`
+	SenderUserID     int        `json:"senderUserId"`
+	ReceiverUserID   int        `json:"receiverUserId"`
 	Extra            string        `json:"extra"`
 	Status           int        `json:"status"`
-	CreatedTimestamp int        `json:"created_timestamp"`
-	UpdatedTimestamp *time.Time        `json:"updated_timestamp"`
+	CreatedTimestamp int        `json:"createdTimestamp"`
+	UpdatedTimestamp *time.Time        `json:"updatedTimestamp"`
 }
 
 func (Inbox) TableName() string {
