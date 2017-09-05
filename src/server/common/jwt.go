@@ -19,14 +19,14 @@ func SetupJWT() {
 		SigningMethod: jwt.SigningMethodHS256,
 
 		//token首先从Cookie里获取，若是没有信息，再尝试从请求头里获取
-		Extractor:func(ctx *iris.Context) (string, error) {
+		// Extractor: func(ctx *iris.Context) (string, error) {
 
-			tokenString := ctx.GetCookie("Authorization")
-			if tokenString == "" {
-				return jwtmiddleware.FromAuthHeader(ctx)
-			}
-			return tokenString, nil
-		},
+		// 	tokenString := ctx.GetCookie("Authorization")
+		// 	if tokenString == "" {
+		// 		return jwtmiddleware.FromAuthHeader(ctx)
+		// 	}
+		// 	return tokenString, nil
+		// },
 	})
 	JWT = _jwt
 
@@ -37,8 +37,8 @@ var (
 	Authorization = func(ctx *iris.Context) {
 		err := JWT.CheckJWT(ctx)
 		if err != nil {
-			Render(ctx, "000001", nil)
-		}else {
+			Render(ctx, "000001", err)
+		} else {
 			ctx.Next()
 		}
 	}

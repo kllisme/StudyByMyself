@@ -6,7 +6,6 @@ import (
 )
 
 type PermissionElementRelService struct {
-
 }
 
 func (self *PermissionElementRelService) GetElementIDsByPermissionIDs(permissionIDs ...interface{}) ([]int, error) {
@@ -19,7 +18,7 @@ func (self *PermissionElementRelService) GetElementIDsByPermissionIDs(permission
 }
 
 func (self *PermissionElementRelService) AssignElements(permissionID int, elementIDs []int) (*[]int, error) {
-	tx := common.SodaMngDB_R.Begin()
+	tx := common.SodaMngDB_WR.Begin()
 	err := tx.Unscoped().Delete(permission.PermissionElementRel{}, "permission_id = ?", permissionID).Error
 	if err != nil {
 		tx.Rollback()
@@ -27,8 +26,8 @@ func (self *PermissionElementRelService) AssignElements(permissionID int, elemen
 	}
 	for _, v := range elementIDs {
 		err := tx.Create(&permission.PermissionElementRel{
-			PermissionID:permissionID,
-			ElementID:v,
+			PermissionID: permissionID,
+			ElementID:    v,
 		}).Error
 		if err != nil {
 			tx.Rollback()

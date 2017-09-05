@@ -1,6 +1,5 @@
 package common
 
-
 import (
 	"github.com/hoisie/mustache"
 	"github.com/jinzhu/gorm"
@@ -52,6 +51,9 @@ func SetupDB() {
 	SodaMngDB_WR = _SetupDB("soda-manager", false)
 	SodaMngDB_R = _SetupDB("soda-manager", true)
 
+	Soda2DB_WR = _SetupDB("soda-2", false)
+	Soda2DB_R = _SetupDB("soda-2", true)
+
 }
 
 var (
@@ -59,4 +61,6 @@ var (
 	SodaDB_R     *gorm.DB
 	SodaMngDB_WR *gorm.DB
 	SodaMngDB_R  *gorm.DB
+	Soda2DB_WR    *gorm.DB
+	Soda2DB_R     *gorm.DB
 )

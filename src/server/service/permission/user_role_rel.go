@@ -6,7 +6,6 @@ import (
 )
 
 type UserRoleRelService struct {
-
 }
 
 func (self *UserRoleRelService) GetRoleIDsByUserID(userID int) ([]int, error) {
@@ -20,7 +19,7 @@ func (self *UserRoleRelService) GetRoleIDsByUserID(userID int) ([]int, error) {
 }
 
 func (self *UserRoleRelService) AssignRoles(userID int, roleIDs []int) (*[]int, error) {
-	tx := common.SodaMngDB_R.Begin()
+	tx := common.SodaMngDB_WR.Begin()
 	err := tx.Delete(permission.UserRoleRel{}, "user_id = ?", userID).Error
 	if err != nil {
 		tx.Rollback()
@@ -28,8 +27,8 @@ func (self *UserRoleRelService) AssignRoles(userID int, roleIDs []int) (*[]int, 
 	}
 	for _, v := range roleIDs {
 		err := tx.Create(&permission.UserRoleRel{
-			UserID:userID,
-			RoleID:v,
+			UserID: userID,
+			RoleID: v,
 		}).Error
 		if err != nil {
 			tx.Rollback()

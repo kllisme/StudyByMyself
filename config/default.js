@@ -61,6 +61,7 @@ module.exports = Object.assign({}, {
     "maxResetRequest": 3
   },
   "pay": {
+    "remark":"苏打生活{{date}}结算款",
     "aliPay": {
       "service": {
         "batchTransNotify": "batch_trans_notify"
@@ -92,6 +93,28 @@ module.exports = Object.assign({}, {
   },
   "resource": {
     "database": {
+      "soda-2": {
+        "r": {
+          "dialect": "mysql",
+          "host": "192.168.1.204",
+          "port": 3306,
+          "user": "web",
+          "password": "123456",
+          "database": "soda-2",
+          "maxIdle": 20,
+          "maxOpen": 20
+        },
+        "wr": {
+          "dialect": "mysql",
+          "host": "192.168.1.204",
+          "port": 3306,
+          "user": "web",
+          "password": "123456",
+          "database": "soda-2",
+          "maxIdle": 20,
+          "maxOpen": 20
+        }
+      },
       "soda-manager": {
         "r": {
           "dialect": "mysql",
