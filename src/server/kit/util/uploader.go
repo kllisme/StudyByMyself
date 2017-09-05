@@ -22,10 +22,13 @@ func Upload(formFile *multipart.FileHeader, ossObject string) (string, error) {
 
 	extStr := viper.GetString("resource.oss.ext")
 	extList := strings.Split(extStr, ",")
+	supportExt := false
 	for _, ext := range extList {
 		if fileExt == ext {
-			break
+			supportExt = true
 		}
+	}
+	if !supportExt {
 		return "", errors.New("不支持的格式")
 	}
 	file, err := formFile.Open()
@@ -58,7 +61,7 @@ func Upload(formFile *multipart.FileHeader, ossObject string) (string, error) {
 	}
 	defer tmpFile.Close()
 	md5h := md5.New()
-	io.Copy(md5h, file)
+	io.Copy(md5h, tmpFile)
 	hashName := fmt.Sprintf("%x", md5h.Sum(nil))
 	objectName := ossObject + hashName + fileExt
 	shortPath := hashName + fileExt

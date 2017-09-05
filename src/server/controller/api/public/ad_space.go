@@ -85,11 +85,17 @@ func (self *ADSpaceController)Create(ctx *iris.Context) {
 		return
 	}
 	identifyNeeded := params.Get("identifyNeeded").MustInt()
+	standard := strings.TrimSpace(params.Get("standard").MustString())
+	if standard == "" {
+		common.Render(ctx, "04030507", nil)
+		return
+	}
 	adSpace := model.ADSpace{
 		Name:name,
 		APPID:appID,
 		Description:description,
 		IdentifyNeeded:identifyNeeded,
+		Standard:standard,
 	}
 	entity, err := adSpaceService.Create(&adSpace)
 	if err != nil {
@@ -139,11 +145,17 @@ func (self *ADSpaceController)Update(ctx *iris.Context) {
 		common.Render(ctx, "04030507", nil)
 		return
 	}
+	standard := strings.TrimSpace(params.Get("standard").MustString())
+	if standard == "" {
+		common.Render(ctx, "04030509", nil)
+		return
+	}
 	identifyNeeded := params.Get("identifyNeeded").MustInt()
 	adSpace.Name = name
 	adSpace.Description = description
 	adSpace.IdentifyNeeded = identifyNeeded
 	adSpace.APPID = appID
+	adSpace.Standard = standard
 	entity, err := adSpaceService.Update(adSpace)
 	if err != nil {
 		common.Render(ctx, "04030508", err)

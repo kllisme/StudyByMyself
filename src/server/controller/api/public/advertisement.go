@@ -71,8 +71,9 @@ func (self *AdvertisementController)Paging(ctx *iris.Context) {
 		}
 		if len(list) == 0 {
 			locationIDs = []int{0}
+		} else {
+			locationIDs = list
 		}
-		locationIDs = list
 	} else {
 		locationIDs = []int{}
 	}
@@ -80,7 +81,6 @@ func (self *AdvertisementController)Paging(ctx *iris.Context) {
 	end := strings.TrimSpace(ctx.URLParam("ended_at"))
 	display, _ := ctx.URLParamInt("display")
 	status, _ := ctx.URLParamInt("status")
-
 	result, err := advertisementService.Paging(title, locationIDs, start, end, display, status, page, perPage)
 	if err != nil {
 		common.Render(ctx, "04020201", err)

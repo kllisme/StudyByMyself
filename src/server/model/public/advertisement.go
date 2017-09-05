@@ -4,7 +4,6 @@ import (
 	"maizuo.com/soda/erp/api/src/server/model"
 	"time"
 	"github.com/spf13/viper"
-	"github.com/kataras/iris/core/errors"
 )
 
 type Advertisement struct {
@@ -29,11 +28,11 @@ func (Advertisement) TableName() string {
 	return "ad"
 }
 
-func (a *Advertisement) AfterFind() error  {
+func (a *Advertisement) AfterFind() error {
 	if a.Image != "" {
-		fullURL := viper.GetString("resource.oss.domain")+"/"+viper.GetString("resource.oss.object.ad")+a.Image
+		fullURL := viper.GetString("resource.oss.domain") + "/" + viper.GetString("resource.oss.object.ad") + a.Image
 		a.Image = fullURL
 		return nil
 	}
-	return errors.New("图片链接为空")
+	return nil
 }
