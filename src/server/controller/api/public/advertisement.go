@@ -159,13 +159,13 @@ func (self *AdvertisementController)Create(ctx *iris.Context) {
 		return
 	}
 
-	startAt, err := time.Parse("2006-01-02T15:04:05", strings.TrimSpace(params.Get("startedAt").MustString()))
+	startAt, err := time.Parse(time.RFC3339, strings.TrimSpace(params.Get("startedAt").MustString()))
 	if err != nil {
 		common.Render(ctx, "04020310", err)
 		return
 	}
 
-	endAt, err := time.Parse("2006-01-02T15:04:05", strings.TrimSpace(params.Get("endedAt").MustString()))
+	endAt, err := time.Parse(time.RFC3339, strings.TrimSpace(params.Get("endedAt").MustString()))
 	if err != nil {
 		common.Render(ctx, "04020311", err)
 		return
@@ -270,13 +270,12 @@ func (self *AdvertisementController)Update(ctx *iris.Context) {
 		return
 	}
 
-	startAt, err := time.Parse("2006-01-02T15:04:05", strings.TrimSpace(params.Get("startedAt").MustString()))
+	startAt, err := time.Parse(time.RFC3339, strings.TrimSpace(params.Get("startedAt").MustString()))
 	if err != nil {
 		common.Render(ctx, "04020512", err)
 		return
 	}
-
-	endAt, err := time.Parse("2006-01-02T15:04:05", strings.TrimSpace(params.Get("endedAt").MustString()))
+	endAt, err := time.Parse(time.RFC3339, strings.TrimSpace(params.Get("endedAt").MustString()))
 	if err != nil {
 		common.Render(ctx, "04020513", err)
 		return

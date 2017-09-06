@@ -37,7 +37,7 @@ func (self *AdvertisementService)Paging(title string,locationIDs []int, start st
 
 	if title != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("handler_name like (?)", "%" + title + "%")
+			return db.Where("title like (?)", "%" + title + "%")
 		})
 	}
 	if len(locationIDs) != 0 {
