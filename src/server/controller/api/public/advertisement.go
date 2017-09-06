@@ -171,18 +171,18 @@ func (self *AdvertisementController)Create(ctx *iris.Context) {
 		return
 	}
 
-	display := 1
+	display := params.Get("displayStrategy").MustInt()
 	displayParams := ""
-
-	if adSpace.IdentifyNeeded == 1 {
-		display = params.Get("displayStrategy").MustInt()
-
-		if display == 2 {
+	if display == 2 {
+		if adSpace.IdentifyNeeded == 1 {
 			displayParams = strings.TrimSpace(params.Get("displayParams").MustString())
 			if displayParams == "" {
 				common.Render(ctx, "04020312", err)
 				return
 			}
+		} else {
+			common.Render(ctx, "04020313", err)
+			return
 		}
 	}
 	status := params.Get("status").MustInt()
@@ -281,18 +281,18 @@ func (self *AdvertisementController)Update(ctx *iris.Context) {
 		return
 	}
 
-	display := 1
+	display := params.Get("displayStrategy").MustInt()
 	displayParams := ""
-
-	if adSpace.IdentifyNeeded == 1 {
-		display = params.Get("displayStrategy").MustInt()
-
-		if display == 2 {
+	if display == 2 {
+		if adSpace.IdentifyNeeded == 1 {
 			displayParams = strings.TrimSpace(params.Get("displayParams").MustString())
 			if displayParams == "" {
 				common.Render(ctx, "04020514", err)
 				return
 			}
+		} else {
+			common.Render(ctx, "04020515", err)
+			return
 		}
 	}
 	status := params.Get("status").MustInt()
