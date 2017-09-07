@@ -30,6 +30,8 @@
   "04020312": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "展示参数不能为空", "isError": true },
   "04020313": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "所选广告位无法适用该选项", "isError": true },
   "04020314": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "新建广告失败", "isError": true },
+  "04020315": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "广告列表获取失败", "isError": true },
+  "04020316": { "status": "BAD_REQUEST", "msg": "广告名已存在", "description": "广告名已存在", "isError": false },
 
   "040204":"Delete",
   "04020400": {"status": "OK", "msg": "", "description": "广告信息删除成功", "isError": false },
@@ -54,6 +56,8 @@
   "04020514": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "展示参数不能为空", "isError": true },
   "04020515": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "所选广告位无法适用该选项", "isError": true },
   "04020516": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "新建广告失败", "isError": true },
+  "04020517": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "广告列表获取失败", "isError": true },
+  "04020518": { "status": "BAD_REQUEST", "msg": "广告名已存在", "description": "广告名已存在", "isError": false },
 
   "040206":"BatchUpdateOrder",
   "04020600": {"status": "OK", "msg": "", "description": "广告排序成功", "isError": false },

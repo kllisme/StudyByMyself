@@ -28,10 +28,10 @@ func (self *ActionController)GetByID(ctx *iris.Context) {
 func (self *ActionController)Paging(ctx *iris.Context) {
 	actionService := permission.ActionService{}
 	method := strings.TrimSpace(ctx.URLParam("method"))
-	handlerName := strings.TrimSpace(ctx.URLParam("handler_name"))
-	page, _ := ctx.URLParamInt("page")
-	perPage, _ := ctx.URLParamInt("per_page")
-	result, err := actionService.Paging(page,perPage,handlerName,method)
+	handlerName := strings.TrimSpace(ctx.URLParam("handlerName"))
+	offset, _ := ctx.URLParamInt("offset")
+	limit, _ := ctx.URLParamInt("limit")
+	result, err := actionService.Paging(offset, limit,handlerName,method)
 	if err != nil {
 		common.Render(ctx, "000002", err)
 		return

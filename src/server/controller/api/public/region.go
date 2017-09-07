@@ -26,7 +26,7 @@ func (self *RegionController)GetByID(ctx *iris.Context) {
 
 func (self *RegionController)GetCities(ctx *iris.Context) {
 	regionService := public.RegionService{}
-	provinceID, err := ctx.ParamInt("province_id")
+	provinceID, err := ctx.ParamInt("provinceId")
 	if err != nil {
 		common.Render(ctx, "04010301", err)
 		return
@@ -45,7 +45,7 @@ func (self *RegionController)GetCities(ctx *iris.Context) {
 
 func (self *RegionController)GetRegions(ctx *iris.Context) {
 	regionService := public.RegionService{}
-	cityID, err := ctx.ParamInt("city_id")
+	cityID, err := ctx.ParamInt("cityId")
 	if err != nil {
 		common.Render(ctx, "04010401", err)
 		return

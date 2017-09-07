@@ -31,7 +31,7 @@ func (self *TopicService)GetByID(id int) (*two.Topic, error) {
 //
 //}
 
-func (self *TopicService)Paging(cityID int, keywords string, schoolName string, channelID int, status int, page int, perPage int, userIDs []int) (*entity.PaginationData, error) {
+func (self *TopicService)Paging(cityID int, keywords string, schoolName string, channelID int, status int, offset int, limit int, userIDs []int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 	topicList := make([]*two.Topic, 0)
 	channelList := make([]*two.Channel, 0)
@@ -68,7 +68,7 @@ func (self *TopicService)Paging(cityID int, keywords string, schoolName string, 
 			return db.Where("user_id in (?)", userIDs)
 		})
 	}
-	if err := db.Model(&two.Topic{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&topicList).Error; err != nil {
+	if err := db.Model(&two.Topic{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&topicList).Error; err != nil {
 		return nil, err
 	}
 	if err := db.Model(&two.Channel{}).Find(&channelList).Error; err != nil {
@@ -81,8 +81,8 @@ func (self *TopicService)Paging(cityID int, keywords string, schoolName string, 
 			}
 		}
 	}
-	pagination.Pagination.From = (page - 1) * perPage + 1
-	pagination.Pagination.To = perPage * page
+	pagination.Pagination.From = offset
+	pagination.Pagination.To = limit + offset -1
 	if pagination.Pagination.To > pagination.Pagination.Total {
 		pagination.Pagination.To = pagination.Pagination.Total
 	}
@@ -90,7 +90,7 @@ func (self *TopicService)Paging(cityID int, keywords string, schoolName string, 
 	return &pagination, nil
 }
 
-func (self *TopicService)PagingCircle(page int, perPage int, provinceID int) (*entity.PaginationData, error) {
+func (self *TopicService)PagingCircle(offset int, limit int, provinceID int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 
 	circleList := make([]*payload.Circle, 0)
@@ -103,7 +103,7 @@ func (self *TopicService)PagingCircle(page int, perPage int, provinceID int) (*e
 		}
 		cityIDs := make([]int, 0)
 		if region.LevelName == "市" {
-			if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `topic` where city_id = ? GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", provinceID, perPage, (page - 1) * perPage).Scan(&circleList).Error; err != nil {
+			if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `topic` where city_id = ? GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", provinceID, limit, offset).Scan(&circleList).Error; err != nil {
 				return nil, err
 			}
 		} else {
@@ -111,22 +111,19 @@ func (self *TopicService)PagingCircle(page int, perPage int, provinceID int) (*e
 			if err != nil {
 				return nil, err
 			}
-			if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `topic` where city_id in (?) GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", cityIDs, perPage, (page - 1) * perPage).Scan(&circleList).Error; err != nil {
+			if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `topic` where city_id in (?) GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", cityIDs, limit, offset).Scan(&circleList).Error; err != nil {
 				return nil, err
 			}
 
 		}
 
 	} else {
-		if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `topic` GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", perPage, (page - 1) * perPage).Scan(&circleList).Error; err != nil {
+		if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `topic` GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", limit, offset).Scan(&circleList).Error; err != nil {
 			return nil, err
 		}
 	}
-	pagination.Pagination.From = (page - 1) * perPage + 1
-	pagination.Pagination.To = perPage * page
-	if pagination.Pagination.To > pagination.Pagination.Total {
-		pagination.Pagination.To = pagination.Pagination.Total
-	}
+	pagination.Pagination.From = offset
+	pagination.Pagination.To = limit + offset -1
 	//TODO 完善学校所在圈子的逻辑
 	for index, circle := range circleList {
 		common.Soda2DB_R.Table("user").Where("school_id in (?)", circle.CityID).Count(&circle.UserCount)

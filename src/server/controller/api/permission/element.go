@@ -29,9 +29,9 @@ func (self *ElementController)GetByID(ctx *iris.Context) {
 
 func (self *ElementController)Paging(ctx *iris.Context) {
 	elementService := permission.ElementService{}
-	page, _ := ctx.URLParamInt("page")
-	perPage, _ := ctx.URLParamInt("per_page")
-	result, err := elementService.Paging(page, perPage)
+	offset, _ := ctx.URLParamInt("offset")
+	limit, _ := ctx.URLParamInt("limit")
+	result, err := elementService.Paging(offset, limit)
 	if err != nil {
 		common.Render(ctx, "000002", err)
 		return

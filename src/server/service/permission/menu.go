@@ -29,19 +29,16 @@ func (self *MenuService)GetByID(id int) (*permission.Menu, error) {
 	return &menu, nil
 }
 
-func (self *MenuService)Paging(page int, perPage int) (*entity.PaginationData, error) {
+func (self *MenuService)Paging(offset int, limit int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 	menuList := make([]*permission.Menu, 0)
 	db := common.SodaMngDB_R
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
-	if err := db.Model(&permission.Menu{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&menuList).Error; err != nil {
+	if err := db.Model(&permission.Menu{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&menuList).Error; err != nil {
 		return nil, err
 	}
-	pagination.Pagination.From = (page - 1) * perPage + 1
-	pagination.Pagination.To = perPage * page
-	if pagination.Pagination.To > pagination.Pagination.Total {
-		pagination.Pagination.To = pagination.Pagination.Total
-	}
+	pagination.Pagination.From = offset
+	pagination.Pagination.To = limit + offset -1
 	pagination.Objects = menuList
 	return &pagination, nil
 

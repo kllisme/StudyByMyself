@@ -29,9 +29,9 @@ func (self *MenuController)GetByID(ctx *iris.Context) {
 
 func (self *MenuController)Paging(ctx *iris.Context) {
 	menuService := permission.MenuService{}
-	page, _ := ctx.URLParamInt("page")
-	perPage, _ := ctx.URLParamInt("per_page")
-	result, err := menuService.Paging(page, perPage)
+	offset, _ := ctx.URLParamInt("offset")
+	limit, _ := ctx.URLParamInt("limit")
+	result, err := menuService.Paging(offset, limit)
 	if err != nil {
 		common.Render(ctx, "000002", err)
 		return

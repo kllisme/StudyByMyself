@@ -19,17 +19,14 @@ func (self *ApplicationService)GetByID(id int) (*public.Application, error) {
 	return &application, nil
 }
 
-func (self *ApplicationService)Paging(page int, perPage int) (*entity.PaginationData, error) {
+func (self *ApplicationService)Paging(offset int, limit int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 	applicationList := make([]*public.Application, 0)
-	if err := common.SodaMngDB_R.Model(&public.Application{}).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&applicationList).Error; err != nil {
+	if err := common.SodaMngDB_R.Model(&public.Application{}).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&applicationList).Error; err != nil {
 		return nil, err
 	}
-	pagination.Pagination.From = (page - 1) * perPage + 1
-	pagination.Pagination.To = perPage * page
-	if pagination.Pagination.To > pagination.Pagination.Total {
-		pagination.Pagination.To = pagination.Pagination.Total
-	}
+	pagination.Pagination.From = offset
+	pagination.Pagination.To = limit + offset -1
 	pagination.Objects = applicationList
 	return &pagination, nil
 

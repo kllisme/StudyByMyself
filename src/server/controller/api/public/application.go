@@ -29,9 +29,9 @@ func (self *ApplicationController)GetByID(ctx *iris.Context) {
 
 func (self *ApplicationController)Paging(ctx *iris.Context) {
 	applicationService := public.ApplicationService{}
-	page, _ := ctx.URLParamInt("page")
-	perPage, _ := ctx.URLParamInt("per_page")
-	result, err := applicationService.Paging(page, perPage)
+	offset, _ := ctx.URLParamInt("offset")
+	limit, _ := ctx.URLParamInt("limit")
+	result, err := applicationService.Paging(offset, limit)
 	if err != nil {
 		common.Render(ctx, "04020201", nil)
 		return

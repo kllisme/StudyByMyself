@@ -26,10 +26,10 @@ func (self *UserController) Paging(ctx *iris.Context) {
 	id, _ := ctx.URLParamInt("id")
 	account := strings.TrimSpace(ctx.URLParam("account"))
 	name := strings.TrimSpace(ctx.URLParam("name"))
-	roleID, _ := ctx.URLParamInt("role_id")
-	page, _ := ctx.URLParamInt("page")
-	perPage, _ := ctx.URLParamInt("per_page")
-	result, err := userService.Paging(name, account, id, roleID, page, perPage)
+	roleID, _ := ctx.URLParamInt("roleId")
+	offset, _ := ctx.URLParamInt("offset")
+	limit, _ := ctx.URLParamInt("limit")
+	result, err := userService.Paging(name, account, id, roleID, offset, limit)
 	if err != nil {
 		common.Render(ctx, "000002", err)
 		return

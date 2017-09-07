@@ -17,11 +17,11 @@ func (self *TopicController)PagingCircle(ctx *iris.Context) {
 	//CircleList := make([]*payload.Circle,0)
 	topicService := two.TopicService{}
 
-	provinceID, _ := ctx.URLParamInt("province_id")
+	provinceID, _ := ctx.URLParamInt("provinceId")
 
-	page, _ := ctx.URLParamInt("page")
-	perPage, _ := ctx.URLParamInt("per_page")
-	result, err := topicService.PagingCircle(page, perPage, provinceID)
+	offset, _ := ctx.URLParamInt("offset")
+	limit, _ := ctx.URLParamInt("limit")
+	result, err := topicService.PagingCircle(offset, limit, provinceID)
 
 	if err != nil {
 		common.Render(ctx, "03010101", err)
@@ -92,16 +92,16 @@ func (self *TopicController)Paging(ctx *iris.Context) {
 	topicService := two.TopicService{}
 	keywords := strings.TrimSpace(ctx.URLParam("keywords"))
 	name := strings.TrimSpace(ctx.URLParam("name"))
-	schoolName := strings.TrimSpace(ctx.URLParam("school_name"))
+	schoolName := strings.TrimSpace(ctx.URLParam("schoolName"))
 	statusStr := ctx.URLParam("status")
 	status := -1
 	if statusStr != "" {
 		status, _ = ctx.URLParamInt("status")
 	}
-	cityID, _ := ctx.URLParamInt("city_id")
-	channelID, _ := ctx.URLParamInt("channel_id")
-	page, _ := ctx.URLParamInt("page")
-	perPage, _ := ctx.URLParamInt("per_page")
+	cityID, _ := ctx.URLParamInt("cityId")
+	channelID, _ := ctx.URLParamInt("channelId")
+	offset, _ := ctx.URLParamInt("offset")
+	limit, _ := ctx.URLParamInt("limit")
 	if name != "" {
 		result, err := userService.FilterUserIDs(name)
 		if err != nil {
@@ -115,7 +115,7 @@ func (self *TopicController)Paging(ctx *iris.Context) {
 		}
 
 	}
-	result, err := topicService.Paging(cityID, keywords, schoolName, channelID, status, page, perPage, userIDs)
+	result, err := topicService.Paging(cityID, keywords, schoolName, channelID, status, offset, limit, userIDs)
 	if err != nil {
 		common.Render(ctx, "03010202", err)
 		return

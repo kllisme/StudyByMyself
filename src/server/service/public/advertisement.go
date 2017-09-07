@@ -29,11 +29,17 @@ func (self *AdvertisementService)GetByID(id int) (*public.Advertisement, error) 
 	return &advertisement, nil
 }
 
-func (self *AdvertisementService)Paging(title string,locationIDs []int, start string,end string,display int,status int, page int, perPage int) (*entity.PaginationData, error) {
+func (self *AdvertisementService)Paging(name string, title string,locationIDs []int, start string,end string,display int,status int, offset int, limit int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 	advertisementList := make([]*public.Advertisement, 0)
 	db := common.SodaMngDB_R
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
+
+	if name != "" {
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+			return db.Where("name = ?", name)
+		})
+	}
 
 	if title != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
@@ -41,40 +47,37 @@ func (self *AdvertisementService)Paging(title string,locationIDs []int, start st
 		})
 	}
 	if len(locationIDs) != 0 {
-		scopes = append(scopes,func(db *gorm.DB) *gorm.DB {
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
 			return db.Where("location_id in (?)", locationIDs)
 		})
 	}
 	if start != "" {
-		scopes = append(scopes,func(db *gorm.DB) *gorm.DB {
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
 			return db.Where("started_at >= ?", start)
 		})
 	}
 	if end != "" {
-		scopes = append(scopes,func(db *gorm.DB) *gorm.DB {
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
 			return db.Where("ended_at <= ?", end)
 		})
 	}
 	if display != 0 {
-		scopes = append(scopes,func(db *gorm.DB) *gorm.DB {
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
 			return db.Where("display_strategy = ?", display)
 		})
 	}
 	if status != 0 {
-		scopes = append(scopes,func(db *gorm.DB) *gorm.DB {
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
 			return db.Where("status = ?", status)
 		})
 	}
 
 
-	if err := db.Model(&public.Advertisement{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&advertisementList).Error; err != nil {
+	if err := db.Model(&public.Advertisement{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&advertisementList).Error; err != nil {
 		return nil, err
 	}
-	pagination.Pagination.From = (page - 1) * perPage + 1
-	pagination.Pagination.To = perPage * page
-	if pagination.Pagination.To > pagination.Pagination.Total {
-		pagination.Pagination.To = pagination.Pagination.Total
-	}
+	pagination.Pagination.From = offset
+	pagination.Pagination.To = limit + offset -1
 	pagination.Objects = advertisementList
 	return &pagination, nil
 

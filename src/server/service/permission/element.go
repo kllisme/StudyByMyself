@@ -29,19 +29,16 @@ func (self *ElementService)GetByID(id int) (*permission.Element, error) {
 	return &element, nil
 }
 
-func (self *ElementService)Paging(page int, perPage int) (*entity.PaginationData, error) {
+func (self *ElementService)Paging(offset int, limit int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 	elementList := make([]*permission.Element, 0)
 	db := common.SodaMngDB_R
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
-	if err := db.Model(&permission.Element{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&elementList).Error; err != nil {
+	if err := db.Model(&permission.Element{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&elementList).Error; err != nil {
 		return nil, err
 	}
-	pagination.Pagination.From = (page - 1) * perPage + 1
-	pagination.Pagination.To = perPage * page
-	if pagination.Pagination.To > pagination.Pagination.Total {
-		pagination.Pagination.To = pagination.Pagination.Total
-	}
+	pagination.Pagination.From = offset
+	pagination.Pagination.To = limit + offset -1
 	pagination.Objects = elementList
 	return &pagination, nil
 
