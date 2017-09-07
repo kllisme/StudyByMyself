@@ -60,9 +60,22 @@ func (self *ADSpaceService)Update(adSpace *public.ADSpace) (*public.ADSpace, err
 		"appId":adSpace.APPID,
 		"standard":adSpace.Standard,
 	}
-	if err := common.SodaMngDB_WR.Model(&public.ADSpace{}).Where(adSpace.ID).Updates(_adSpace).Scan(adSpace).Error; err != nil {
+	tx := common.SodaMngDB_WR.Begin()
+	if err := tx.Model(&public.ADSpace{}).Where(adSpace.ID).Updates(_adSpace).Scan(adSpace).Error; err != nil {
+		tx.Rollback()
 		return nil, err
 	}
+	if adSpace.IdentifyNeeded == 0 {
+		_ad := map[string]interface{}{
+			"display_strategy":1,
+			"display_params":"",
+		}
+		if err := tx.Model(&public.Advertisement{}).Where("location_id = ?", adSpace.ID).Updates(_ad).Error; err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
+	tx.Commit()
 	return adSpace, nil
 }
 
