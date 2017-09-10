@@ -74,8 +74,8 @@ func (self *TopicService)Paging(cityID int, keywords string, schoolName string, 
 	if err := db.Model(&two.Channel{}).Find(&channelList).Error; err != nil {
 		return nil, err
 	}
-	for _,topic := range topicList {
-		for _,channel := range channelList {
+	for _, topic := range topicList {
+		for _, channel := range channelList {
 			if topic.ChannelID == channel.ID {
 				topic.ChannelTitle = channel.Title
 			}
@@ -97,25 +97,19 @@ func (self *TopicService)PagingCircle(offset int, limit int, provinceID int) (*e
 	circleList := make([]*payload.Circle, 0)
 	db := common.Soda2DB_R
 	if provinceID != 0 {
-		region := public.Region{}
-		err := common.SodaMngDB_R.Where("id = ?", provinceID).Find(&region).Error
+		province := public.Province{}
+		err := common.SodaMngDB_R.Where("code = ?", provinceID).Find(&province).Error
 		if err != nil {
 			return nil, err
 		}
 		cityIDs := make([]int, 0)
-		if region.LevelName == "市" {
-			if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `topic` where city_id = ? GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", provinceID, limit, offset).Scan(&circleList).Error; err != nil {
-				return nil, err
-			}
-		} else {
-			err := common.SodaMngDB_R.Table("region").Where("parent_id = ? and level = 2", provinceID).Pluck("id", &cityIDs).Error
-			if err != nil {
-				return nil, err
-			}
-			if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `topic` where city_id in (?) GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", cityIDs, limit, offset).Scan(&circleList).Error; err != nil {
-				return nil, err
-			}
 
+		err = common.SodaMngDB_R.Model(&public.City{}).Where("parent_code = ?", provinceID).Pluck("code", &cityIDs).Error
+		if err != nil {
+			return nil, err
+		}
+		if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `topic` where city_id in (?) GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", cityIDs, limit, offset).Scan(&circleList).Error; err != nil {
+			return nil, err
 		}
 
 	} else {
@@ -131,7 +125,12 @@ func (self *TopicService)PagingCircle(offset int, limit int, provinceID int) (*e
 	}
 	//TODO 完善学校所在圈子的逻辑
 	for index, circle := range circleList {
-		common.Soda2DB_R.Table("user").Where("school_id in (?)", circle.CityID).Count(&circle.UserCount)
+		schoolIDs := make([]int, 0)
+		err := common.SodaMngDB_R.Model(&public.School{}).Where("city_code = ?", circle.CityID).Pluck("id", &schoolIDs).Error
+		if err != nil {
+			return nil, err
+		}
+		common.Soda2DB_R.Table("user").Where("school_id in (?)", schoolIDs).Count(&circle.UserCount)
 		circle.Order = pagination.Pagination.From + index
 	}
 
@@ -173,7 +172,7 @@ func (self *TopicService)CountByCityIDs(cityIDs ...interface{}) (int, error) {
 }
 
 func (self *TopicService)CountCities() (int, error) {
-	result := make([]*int,0)
+	result := make([]*int, 0)
 	count := int(common.Soda2DB_R.Table("topic").Select("distinct city_id").Scan(&result).RowsAffected)
 	return count, nil
 }
