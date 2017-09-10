@@ -30,8 +30,8 @@ func (self *BillService) userIdByUserCondition(sql string, value []interface{}) 
 	return ids, nil
 }
 
-func (self *BillService) TotalByAccountType(accountType, status int, createdAt, settledAt, keys string) (int, error) {
-	type Result struct {
+func (self *BillService) TotalByAccountTypeAndTimeType(accountType, status, dateType int,startAt, endAt, keys string) (int, error) {
+	type Result struct{
 		Total int
 	}
 	result := &Result{}
@@ -41,14 +41,24 @@ func (self *BillService) TotalByAccountType(accountType, status int, createdAt, 
 		sql += " and bill.status = ? "
 		params = append(params, status)
 	}
-
-	if createdAt != "" {
-		sql += " and Date(bill.created_at) = ? "
-		params = append(params, createdAt[:10])
-	}
-	if settledAt != "" {
-		sql += " and Date(bill.settled_at) = ? "
-		params = append(params, settledAt[:10])
+	if dateType == 1 {
+		if startAt != "" {
+			sql += " and Date(bill.created_at) >= ? "
+			params = append(params, startAt[:10])
+		}
+		if endAt != "" {
+			sql += " and Date(bill.created_at) <= ? "
+			params = append(params, endAt[:10])
+		}
+	}else if dateType == 2 {
+		if startAt != "" {
+			sql += " and Date(bill.settled_at) >= ? "
+			params = append(params, startAt[:10])
+		}
+		if endAt != "" {
+			sql += " and Date(bill.settled_at) <= ? "
+			params = append(params, endAt[:10])
+		}
 	}
 
 	if keys != "" {
@@ -67,9 +77,9 @@ func (self *BillService) TotalByAccountType(accountType, status int, createdAt, 
 		return -1, r.Error
 	}
 	return result.Total, nil
-}
 
-func (self *BillService) ListByAccountType(accountType, status, offset, limit int, createdAt, settledAt, keys string) ([]*model.Bill, error) {
+}
+func (self *BillService) ListByAccountTypeAndTimeType(accountType, status, dateType, offset, limit int, startAt, endAt, keys string) ([]*model.Bill, error) {
 	billList := []*model.Bill{}
 	sql := "select * from bill where bill.deleted_at IS NULL "
 	params := []interface{}{}
@@ -77,13 +87,24 @@ func (self *BillService) ListByAccountType(accountType, status, offset, limit in
 		sql += " and bill.status = ? "
 		params = append(params, status)
 	}
-	if createdAt != "" {
-		sql += " and Date(bill.created_at) = ? "
-		params = append(params, []byte(createdAt)[:10])
-	}
-	if settledAt != "" {
-		sql += " and Date(bill.settled_at) = ? "
-		params = append(params, []byte(settledAt)[:10])
+	if dateType == 1 {
+		if startAt != "" {
+			sql += " and Date(bill.created_at) >= ? "
+			params = append(params, startAt[:10])
+		}
+		if endAt != "" {
+			sql += " and Date(bill.created_at) <= ? "
+			params = append(params, endAt[:10])
+		}
+	}else if dateType == 2 {
+		if startAt != "" {
+			sql += " and Date(bill.settled_at) >= ? "
+			params = append(params, startAt[:10])
+		}
+		if endAt != "" {
+			sql += " and Date(bill.settled_at) <= ? "
+			params = append(params, endAt[:10])
+		}
 	}
 	// 运营商名称/登录账号
 	if keys != "" {
@@ -97,7 +118,6 @@ func (self *BillService) ListByAccountType(accountType, status, offset, limit in
 	}
 	sql += " and bill.account_type = ? and user_id != 1 " // user_id != 1 过滤测试的账单
 	params = append(params, accountType)
-	common.Logger.Debugln("params : ", params)
 	// 排序规则：等待结算的单排在最前面，然后到结算中→结算成功→结算失败，
 	// 	同状态的账单按申请时间先后排序，最新提交的提现申请排在最前面；
 	sql += " order by case " +

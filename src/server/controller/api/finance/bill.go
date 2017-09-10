@@ -11,19 +11,20 @@ import (
 	"github.com/bitly/go-simplejson"
 	"github.com/fatih/structs"
 	"github.com/go-errors/errors"
+	"github.com/hoisie/mustache"
+	"github.com/jinzhu/gorm"
 	"github.com/levigross/grequests"
 	"github.com/spf13/viper"
 	"gopkg.in/kataras/iris.v5"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"maizuo.com/soda/erp/api/src/server/entity"
 	"maizuo.com/soda/erp/api/src/server/kit/alipay"
+	"maizuo.com/soda/erp/api/src/server/kit/excel"
 	"maizuo.com/soda/erp/api/src/server/kit/functions"
 	"maizuo.com/soda/erp/api/src/server/kit/util"
 	"maizuo.com/soda/erp/api/src/server/kit/wechat/pay"
 	"maizuo.com/soda/erp/api/src/server/model"
 	"maizuo.com/soda/erp/api/src/server/service"
-	"github.com/jinzhu/gorm"
-	"github.com/hoisie/mustache"
 )
 
 type BillController struct {
@@ -32,30 +33,31 @@ type BillController struct {
 // 根据微信支付或者支付宝来获取结算单列表
 func (self *BillController) ListByAccountType(ctx *iris.Context) {
 	userService := &service.UserService{}
-	userCashService := &service.UserCashAccountService{}
-	limit, _ := ctx.URLParamInt("limit")      // Default: 10
-	offset, _ := ctx.URLParamInt("offset")    //  Default: 0 列表起始位:
-	createdAt := ctx.URLParam("createdAt")    // 申请时间
-	settledAt := ctx.URLParam("settledAt")    // 结算时间
-	keys := ctx.URLParam("keys")              // 运营商名称、帐号名称
-	accountType, _ := ctx.URLParamInt("type") // 结算支付类型 1:支付宝 2:微信
-	status, _ := ctx.URLParamInt("status")    // 账单状态 1:结算成功 2:等待结算 3:结算中 4:结算失败
+	limit, _ := ctx.URLParamInt("limit")       // Default: 10
+	offset, _ := ctx.URLParamInt("offset")     //  Default: 0 列表起始位:
+	dateType, _ := ctx.URLParamInt("dateType") // 筛选时间类型,1申请时间 2结算时间
+	startAt := ctx.URLParam("startAt")         // 申请时间
+	endAt := ctx.URLParam("endAt")             // 结算时间
+	keys := ctx.URLParam("keys")               // 运营商名称、帐号名称
+	accountType, _ := ctx.URLParamInt("type")  // 结算支付类型 1:支付宝 2:微信
+	status, _ := ctx.URLParamInt("status")     // 账单状态 1:结算成功 2:等待结算 3:结算中 4:结算失败
 
 	billService := &service.BillService{}
 
-	if accountType == 0 {
+	if accountType <= 0 {
 		common.Render(ctx, "27080101", nil)
 		return
 	}
-	if limit == 0 {
+	if limit <= 0 {
 		limit = 10
 	}
-	total, err := billService.TotalByAccountType(accountType, status, createdAt, settledAt, keys)
+	total, err := billService.TotalByAccountTypeAndTimeType(accountType, status, dateType, startAt, endAt, keys)
 	if err != nil {
+		common.Logger.Debugln("err-------------->", err)
 		common.Render(ctx, "27080102", err)
 		return
 	}
-	billList, err := billService.ListByAccountType(accountType, status, offset, limit, createdAt, settledAt, keys)
+	billList, err := billService.ListByAccountTypeAndTimeType(accountType, status, dateType, offset, limit, startAt, endAt, keys)
 	if err != nil {
 		common.Logger.Debugln("billService.ListByAccountType err----------", err)
 		common.Render(ctx, "27080103", err)
@@ -69,13 +71,7 @@ func (self *BillController) ListByAccountType(ctx *iris.Context) {
 			common.Render(ctx, "27080106", err)
 			return
 		}
-		userCashAccount, err := userCashService.BasicByUserId(bill.UserId)
-		if err != nil {
-			common.Logger.Debugln("获取账单用户信息失败err----------", err)
-			common.Render(ctx, "27080106", err)
-			return
-		}
-		objects = append(objects, bill.Mapping(user, userCashAccount))
+		objects = append(objects, bill.Mapping(user))
 	}
 
 	common.Render(ctx, "27080100", &entity.PaginationData{
@@ -171,8 +167,11 @@ func BatchAlipay(billList []*model.Bill) (map[string]string, string, error) {
 	aliPayDetailDataStr := ""
 
 	for _, bill := range billList {
+		// 运营商名称运营商登录账号XX月XX日结算款
 		_remark := mustache.Render(viper.GetString("pay.remark"), map[string]interface{}{
-			"date":     bill.CreatedAt.Format("01月02日"),
+			"userName":bill.UserName,
+			"userAccount":bill.UserAccount,
+			"date": bill.CreatedAt.Format("01月02日"),
 		})
 
 		aliPayDetailDataStr += bill.BillId + "^" + bill.Account + "^" + bill.RealName +
@@ -467,7 +466,7 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 		return
 	}
 	if err != nil {
-		common.Logger.Warnln("err--------------->",err)
+		common.Logger.Warnln("err--------------->", err)
 		common.Render(ctx, "27080401", err)
 		return
 	}
@@ -484,8 +483,11 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 		CheckName:      viper.GetString("pay.wechat.checkName"),
 		ReUserName:     bill.RealName,
 		Amount:         bill.Amount,
-		Desc:           mustache.Render(viper.GetString("pay.remark"), map[string]interface{}{
-			"date":     bill.CreatedAt.Format("01月02日"),
+		// 运营商名称运营商登录账号XX月XX日结算款
+		Desc: mustache.Render(viper.GetString("pay.remark"), map[string]interface{}{
+			"userName":bill.UserName,
+			"userAccount":bill.UserAccount,
+			"date": bill.CreatedAt.Format("01月02日"),
 		}),
 		SPBillCreateIP: "116.24.64.139",
 	}
@@ -632,4 +634,87 @@ func BatchWechatPay(batchPayRequest *pay.BatchPayRequest) (map[string]string, er
 	}
 	common.Logger.Warningln("微信企业支付响应：", respMap)
 	return respMap, nil
+}
+
+func (self *BillController) Export(ctx *iris.Context) {
+	billService := &service.BillService{}
+
+	params := simplejson.New()
+	ctx.ReadJSON(&params)
+	dateType := params.Get("dateType").MustInt()  // 筛选时间类型,1申请时间 2结算时间
+	startAt := params.Get("startAt").MustString() // 申请时间
+	endAt := params.Get("endAt").MustString()     // 结算时间
+	keys := params.Get("keys").MustString()       // 运营商名称、帐号名称
+	accountType := params.Get("type").MustInt()   // 结算支付类型 1:支付宝 2:微信
+	status := params.Get("status").MustInt()      // 账单状态 1:结算成功 2:等待结算 3:结算中 4:结算失败
+	limit := 999999
+	offset := 0
+	common.Logger.Warnln("params--------------------->", params)
+	if accountType <= 0 {
+		common.Render(ctx, "27080501", nil)
+		return
+	}
+	billList, err := billService.ListByAccountTypeAndTimeType(accountType, status, dateType, offset, limit, startAt, endAt, keys)
+	if err != nil {
+		common.Render(ctx, "27080502", err)
+		return
+	}
+	// 开始excel文件操作
+	tableHead := []interface{}{"申请时间", "申请人", "收款账号", "结算单号", "账单天数", "结算金额", "手续费", "入账金额", "状态", "结算时间", "是否自动结算"}
+	tableName := "结算管理列表"
+	timeName := ""
+	if dateType == 1 {
+		timeName = "申请时间"
+	}else if dateType == 2 {
+		timeName = "结算时间"
+	}else{
+		timeName = ""
+	}
+	payName := ""
+	if accountType == 1 {
+		payName = "支付宝"
+	}else if accountType == 2 {
+		payName = "微信"
+	}
+	// （申请时间/结算时间）XX.XX-XX.XX微信/支付宝结算账单
+	fileName := ""
+	if startAt != "" && endAt != ""{
+		if startAt[3:10] != endAt[3:10]{
+			fileName = "（"+timeName+"）"+strings.Replace(startAt[5:10], "-", ".", -1)+"-"+
+				strings.Replace(endAt[5:10], "-", ".", -1)+payName+"结算账单"
+		}else{
+			fileName = "（"+timeName+"）"+strings.Replace(endAt[5:10], "-", ".", -1)+payName+"结算账单"
+		}
+	}else{
+		fileName = payName+"结算账单"
+	}
+	sheet, file, fileUrl, fileName, err := excel.GetExcelHeader(fileName,tableHead, tableName)
+	if err != nil {
+		common.Logger.Warningln("操作excel文件失败, err ------------>", err)
+		common.Render(ctx, "27080503", err)
+		return
+	}
+	//将查询的数据装填
+	for _, bill := range billList {
+		if err != nil {
+			common.Logger.Debugln("获取账单用户信息失败,err----------", err)
+			common.Render(ctx, "27080504", err)
+			return
+		}
+
+		if excel.ExportBillDataAsCol(sheet, bill) == 0 {
+			common.Logger.Warningln("excel文件插入记录失败,err ------------>", err)
+			common.Render(ctx, "27080505", err)
+			return
+		}
+	}
+	err = file.Save(fileUrl)
+	if err != nil {
+		common.Logger.Warningln("excel文件保存失败,err ------------>", err)
+		common.Render(ctx, "27080503", err)
+		return
+	}
+	sendFile := viper.GetString("server.href") + viper.GetString("export.loadsPath") + "/" + fileName
+	common.Render(ctx, "27080500", map[string]string{"url": sendFile})
+	return
 }

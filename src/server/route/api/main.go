@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/spf13/viper"
 	"gopkg.in/kataras/iris.v5"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"maizuo.com/soda/erp/api/src/server/controller/api"
@@ -15,10 +16,10 @@ import (
 func Api(app *iris.Framework) {
 
 	var (
-		userCtrl = &api.UserController{}
+		userCtrl    = &api.UserController{}
 		captchaCtrl = &api.CaptchaController{}
-		loginCtrl = &api.LoginController{}
-		billCtrl = &finance.BillController{}
+		loginCtrl   = &api.LoginController{}
+		billCtrl    = &finance.BillController{}
 	)
 
 	v1 := app.Party("/v1", func(ctx *iris.Context) {
@@ -29,7 +30,7 @@ func Api(app *iris.Framework) {
 	v1.Post("/settlement/alipay/notification", billCtrl.AlipayNotification)
 
 	v1.Get("/captcha.png", captchaCtrl.Captcha)
-
+	v1.StaticFS(viper.GetString("export.loadsPath"), "."+viper.GetString("export.loadsPath"), 2)
 	//为跨域请求设定入口
 	v1.UseFunc(common.CORS.Serve)
 	v1.Options("/*anything", common.CORS.Serve)

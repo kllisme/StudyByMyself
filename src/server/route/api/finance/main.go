@@ -12,7 +12,7 @@ func Setup(v iris.MuxAPI) {
 	)
 
 	api := v.Party("/")
-
+	api.Post("/bills/actions/export",billCtrl.Export)
 	api.Get("/bills", billCtrl.ListByAccountType)
 	api.Get("/bills/:id", dailyBillCtrl.ListByBillId)
 

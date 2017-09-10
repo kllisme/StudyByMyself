@@ -7,7 +7,7 @@ module.exports = Object.assign({}, {
   "server": {
     "host": "0.0.0.0",
     "port": 8081,
-    "href": "https://m.sodalife.xyz/v1",
+    "href": "http://api.erp.sodalife.dev/v1",
     "session": {
       "user": {
         "id": "USER_ID",
@@ -53,6 +53,9 @@ module.exports = Object.assign({}, {
       "maxAge": 3600
     }
   },
+  "export": {
+    "loadsPath": "/temp"
+  },
   "captcha": {
     "prefix": "soda:erp:api:captcha:",
     "server": "http://captcha.sodalife.xyz",
@@ -61,7 +64,7 @@ module.exports = Object.assign({}, {
     "maxResetRequest": 3
   },
   "pay": {
-    "remark":"苏打生活{{date}}结算款",
+    "remark":"{{userName}}{{userAccount}}{{date}}结算款",
     "aliPay": {
       "service": {
         "batchTransNotify": "batch_trans_notify"
