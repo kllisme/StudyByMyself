@@ -5,7 +5,7 @@ import (
 	"maizuo.com/soda/erp/api/src/server/common"
 	"maizuo.com/soda/erp/api/src/server/controller/api"
 	"maizuo.com/soda/erp/api/src/server/controller/api/finance"
-	"maizuo.com/soda/erp/api/src/server/middleware"
+	//"maizuo.com/soda/erp/api/src/server/middleware"
 	adminApi "maizuo.com/soda/erp/api/src/server/route/api/admin"
 	financeApi "maizuo.com/soda/erp/api/src/server/route/api/finance"
 	twoApi "maizuo.com/soda/erp/api/src/server/route/api/two"
@@ -38,12 +38,12 @@ func Api(app *iris.Framework) {
 	v1.Post("/logout", loginCtrl.Logout)
 
 	//jwt校验
-	v1.UseFunc(common.Authorization)
+	//v1.UseFunc(common.Authorization)
 
 	v1.Get("/profile", userCtrl.GetProfile)
 
 	//控制访问权限的接口
-	v1.UseFunc(middleware.AccessControlMiddleware)
+	//v1.UseFunc(middleware.AccessControlMiddleware)
 
 	v1.Put("/profile/password", userCtrl.ChangePassword)
 

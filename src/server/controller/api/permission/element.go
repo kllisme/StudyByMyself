@@ -31,7 +31,8 @@ func (self *ElementController)Paging(ctx *iris.Context) {
 	elementService := permission.ElementService{}
 	offset, _ := ctx.URLParamInt("offset")
 	limit, _ := ctx.URLParamInt("limit")
-	result, err := elementService.Paging(offset, limit)
+	name := ctx.URLParam("name")
+	result, err := elementService.Paging(name, offset, limit)
 	if err != nil {
 		common.Render(ctx, "000002", err)
 		return
@@ -89,7 +90,7 @@ func (self *ElementController)Update(ctx *iris.Context) {
 		return
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
-	if name == ""{
+	if name == "" {
 		common.Render(ctx, "27070502", nil)
 		return
 	}

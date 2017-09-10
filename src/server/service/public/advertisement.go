@@ -76,8 +76,12 @@ func (self *AdvertisementService)Paging(name string, title string,locationIDs []
 	if err := db.Model(&public.Advertisement{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&advertisementList).Error; err != nil {
 		return nil, err
 	}
-	pagination.Pagination.From = offset
-	pagination.Pagination.To = limit + offset -1
+	pagination.Pagination.From = offset + 1
+	if limit == 0 {
+		pagination.Pagination.To = pagination.Pagination.Total
+	} else {
+		pagination.Pagination.To = limit + offset
+	}
 	pagination.Objects = advertisementList
 	return &pagination, nil
 

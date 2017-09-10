@@ -16,6 +16,8 @@ func Setup(v iris.MuxAPI) {
 
 	api := v.Party("/")
 
+	SetupAddress(api)
+
 	api.Get("/regions/provinces", regionCtrl.GetProvinces)
 	api.Get("/regions/provinces/:id/cities", regionCtrl.GetCities)
 

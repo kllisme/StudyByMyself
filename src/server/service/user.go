@@ -49,8 +49,12 @@ func (self *UserService) Paging(name string, account string, id int, roleID int,
 	if err := db.Model(&model.User{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&userList).Error; err != nil {
 		return nil, err
 	}
-	pagination.Pagination.From = offset
-	pagination.Pagination.To = limit + offset -1
+	pagination.Pagination.From = offset + 1
+	if limit == 0 {
+		pagination.Pagination.To = pagination.Pagination.Total
+	} else {
+		pagination.Pagination.To = limit + offset
+	}
 	pagination.Objects = userList
 	return &pagination, nil
 

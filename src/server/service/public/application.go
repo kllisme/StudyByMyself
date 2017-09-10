@@ -25,8 +25,12 @@ func (self *ApplicationService)Paging(offset int, limit int) (*entity.Pagination
 	if err := common.SodaMngDB_R.Model(&public.Application{}).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&applicationList).Error; err != nil {
 		return nil, err
 	}
-	pagination.Pagination.From = offset
-	pagination.Pagination.To = limit + offset -1
+	pagination.Pagination.From = offset + 1
+	if limit == 0 {
+		pagination.Pagination.To = pagination.Pagination.Total
+	} else {
+		pagination.Pagination.To = limit + offset
+	}
 	pagination.Objects = applicationList
 	return &pagination, nil
 

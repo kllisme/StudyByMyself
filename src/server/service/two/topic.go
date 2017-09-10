@@ -81,10 +81,11 @@ func (self *TopicService)Paging(cityID int, keywords string, schoolName string, 
 			}
 		}
 	}
-	pagination.Pagination.From = offset
-	pagination.Pagination.To = limit + offset -1
-	if pagination.Pagination.To > pagination.Pagination.Total {
+	pagination.Pagination.From = offset + 1
+	if limit == 0 {
 		pagination.Pagination.To = pagination.Pagination.Total
+	} else {
+		pagination.Pagination.To = limit + offset
 	}
 	pagination.Objects = topicList
 	return &pagination, nil
@@ -122,8 +123,12 @@ func (self *TopicService)PagingCircle(offset int, limit int, provinceID int) (*e
 			return nil, err
 		}
 	}
-	pagination.Pagination.From = offset
-	pagination.Pagination.To = limit + offset -1
+	pagination.Pagination.From = offset + 1
+	if limit == 0 {
+		pagination.Pagination.To = pagination.Pagination.Total
+	} else {
+		pagination.Pagination.To = limit + offset
+	}
 	//TODO 完善学校所在圈子的逻辑
 	for index, circle := range circleList {
 		common.Soda2DB_R.Table("user").Where("school_id in (?)", circle.CityID).Count(&circle.UserCount)
