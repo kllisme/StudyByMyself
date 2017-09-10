@@ -1,0 +1,38 @@
+{
+  "0301":"topic",
+  "030101":"PagingCircle",
+  "03010100": { "status": "OK", "msg": "", "description": "圈子列表获取成功", "isError": false },
+  "03010101": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "圈子列表获取失败", "isError": true },
+
+  "030102":"Paging",
+  "03010200": { "status": "OK", "msg": "", "description": "商品列表获取成功", "isError": false },
+  "03010201": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "用户列表获取失败", "isError": true },
+  "03010202": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "商品详情获取失败", "isError": true },
+
+  "030103":"GetByID",
+  "03010300": { "status": "OK", "msg": "", "description": "商品详情获取成功", "isError": false },
+  "03010301": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+  "03010302": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "商品详情获取失败", "isError": true },
+  "03010303": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "商品询问人数获取失败", "isError": true },
+
+  "030104":"UpdateChannel",
+  "03010400": { "status": "OK", "msg": "", "description": "商品频道移动成功", "isError": false },
+  "03010401": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+  "03010402": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+  "03010403": { "status": "BAD_REQUEST", "msg": "参数异常", "description": "参数异常", "isError": true },
+  "03010404": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常!", "description": "无法获取频道信息", "isError": true },
+  "03010405": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "无法更新该记录", "isError": true },
+
+  "030105":"UpdateStatus",
+  "03010500": { "status": "OK", "msg": "", "description": "商品状态修改成功", "isError": false },
+  "03010501": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+  "03010502": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+  "03010503": { "status": "BAD_REQUEST", "msg": "参数异常", "description": "参数异常", "isError": true },
+  "03010505": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "无法更新该记录", "isError": true },
+
+  "030106":"GetSummary",
+  "03010600": { "status": "OK", "msg": "", "description": "圈子总况获取成功", "isError": false },
+  "03010601": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "商品总数获取失败", "isError": true },
+  "03010602": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "用户获取失败", "isError": true },
+  "03010603": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "圈子总数获取失败", "isError": true }
+}

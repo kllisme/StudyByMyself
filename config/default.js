@@ -96,6 +96,28 @@ module.exports = Object.assign({}, {
   },
   "resource": {
     "database": {
+      "soda-2": {
+        "r": {
+          "dialect": "mysql",
+          "host": "192.168.1.204",
+          "port": 3306,
+          "user": "web",
+          "password": "123456",
+          "database": "soda-2",
+          "maxIdle": 20,
+          "maxOpen": 20
+        },
+        "wr": {
+          "dialect": "mysql",
+          "host": "192.168.1.204",
+          "port": 3306,
+          "user": "web",
+          "password": "123456",
+          "database": "soda-2",
+          "maxIdle": 20,
+          "maxOpen": 20
+        }
+      },
       "soda-manager": {
         "r": {
           "dialect": "mysql",
@@ -167,6 +189,19 @@ module.exports = Object.assign({}, {
         "database": 10,
         "prefix": "soda:erp:api:rate:",
         "max-retry": 3
+      }
+    },
+    "oss": {
+      "domain": "//static.sodalife.xyz",
+      "tmpPath": "./tmp/",
+      "accessKeyId": "LTAICzH0wYDQUu40",
+      "accessKeySecret": "YBedLK2r34hRWsMmd8IInYdLmjctvG",
+      "bucketName": "maizuo",
+      "endpoint": "oss-cn-hangzhou.aliyuncs.com",
+      "ext": ".png,.jpg,.gif,.jpeg",
+      "maxSize": 2048000,
+      "object": {
+        "ad": "soda/test/erp.sodalife.xyz/ad/"
       }
     }
   }

@@ -1,14 +1,16 @@
 package api
 
 import (
+	"github.com/spf13/viper"
 	"gopkg.in/kataras/iris.v5"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"maizuo.com/soda/erp/api/src/server/controller/api"
 	"maizuo.com/soda/erp/api/src/server/controller/api/finance"
 	"maizuo.com/soda/erp/api/src/server/middleware"
 	adminApi "maizuo.com/soda/erp/api/src/server/route/api/admin"
+	communityApi "maizuo.com/soda/erp/api/src/server/route/api/community"
 	financeApi "maizuo.com/soda/erp/api/src/server/route/api/finance"
-	"github.com/spf13/viper"
+	publicApi "maizuo.com/soda/erp/api/src/server/route/api/public"
 )
 
 func Api(app *iris.Framework) {
@@ -28,7 +30,7 @@ func Api(app *iris.Framework) {
 	v1.Post("/settlement/alipay/notification", billCtrl.AlipayNotification)
 
 	v1.Get("/captcha.png", captchaCtrl.Captcha)
-	v1.StaticFS(viper.GetString("export.loadsPath"), "." + viper.GetString("export.loadsPath"), 2)
+	v1.StaticFS(viper.GetString("export.loadsPath"), "."+viper.GetString("export.loadsPath"), 2)
 	//为跨域请求设定入口
 	v1.UseFunc(common.CORS.Serve)
 	v1.Options("/*anything", common.CORS.Serve)
@@ -49,4 +51,9 @@ func Api(app *iris.Framework) {
 	adminApi.Setup(v1)
 
 	financeApi.Setup(v1)
+
+	communityApi.Setup(v1)
+
+	publicApi.Setup(v1)
+
 }
