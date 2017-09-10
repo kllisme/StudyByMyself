@@ -20,18 +20,18 @@ func (self *SchoolController)GetByID(ctx *iris.Context) {
 	provinceService := public.ProvinceService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", err)
+		common.Render(ctx, "04010101", err)
 		return
 	}
 	school, err := schoolService.GetByID(id)
 	if err != nil {
-		common.Render(ctx, "000002", err)
+		common.Render(ctx, "04010102", err)
 		return
 	}
 	if school.AreaCode != "" {
 		area, err := areaService.GetByCode(school.AreaCode)
 		if err != nil {
-			common.Render(ctx, "000002", err)
+			common.Render(ctx, "04010103", err)
 			return
 		}
 		school.AreaName = area.Name
@@ -40,7 +40,7 @@ func (self *SchoolController)GetByID(ctx *iris.Context) {
 	if school.CityCode != "" {
 		city, err := cityService.GetByCode(school.CityCode)
 		if err != nil {
-			common.Render(ctx, "000002", err)
+			common.Render(ctx, "04010104", err)
 			return
 		}
 		school.CityName = city.Name
@@ -49,13 +49,13 @@ func (self *SchoolController)GetByID(ctx *iris.Context) {
 	if school.ProvinceCode != "" {
 		province, err := provinceService.GetByCode(school.ProvinceCode)
 		if err != nil {
-			common.Render(ctx, "000002", err)
+			common.Render(ctx, "04010105", err)
 			return
 		}
 		school.ProvinceName = province.Name
 	}
 
-	common.Render(ctx, "27070100", school)
+	common.Render(ctx, "04010100", school)
 }
 
 func (self *SchoolController)Paging(ctx *iris.Context) {
@@ -72,7 +72,7 @@ func (self *SchoolController)Paging(ctx *iris.Context) {
 
 	result, err := schoolService.Paging(name, provinceCode, cityCode, areaCode, offset, limit)
 	if err != nil {
-		common.Render(ctx, "000002", err)
+		common.Render(ctx, "04010201", err)
 		return
 	}
 
@@ -81,7 +81,7 @@ func (self *SchoolController)Paging(ctx *iris.Context) {
 		if school.AreaCode != "" {
 			area, err := areaService.GetByCode(school.AreaCode)
 			if err != nil {
-				common.Render(ctx, "000002", err)
+				common.Render(ctx, "04010202", err)
 				return
 			}
 			school.AreaName = area.Name
@@ -90,7 +90,7 @@ func (self *SchoolController)Paging(ctx *iris.Context) {
 		if school.CityCode != "" {
 			city, err := cityService.GetByCode(school.CityCode)
 			if err != nil {
-				common.Render(ctx, "000002", err)
+				common.Render(ctx, "04010203", err)
 				return
 			}
 			school.CityName = city.Name
@@ -99,14 +99,14 @@ func (self *SchoolController)Paging(ctx *iris.Context) {
 		if school.ProvinceCode != "" {
 			province, err := provinceService.GetByCode(school.ProvinceCode)
 			if err != nil {
-				common.Render(ctx, "000002", err)
+				common.Render(ctx, "04010204", err)
 				return
 			}
 			school.ProvinceName = province.Name
 		}
 	}
 
-	common.Render(ctx, "27070200", result)
+	common.Render(ctx, "04010200", result)
 	return
 }
 
@@ -117,32 +117,32 @@ func (self *SchoolController)Create(ctx *iris.Context) {
 	provinceService := public.ProvinceService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27070301", err)
+		common.Render(ctx, "04010301", err)
 		return
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
 	if name == "" {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04010302", nil)
 		return
 	}
 	provinceCode := strings.TrimSpace(params.Get("provinceCode").MustString())
 	if provinceCode != "" {
 		if _, err := provinceService.GetByCode(provinceCode); err != nil {
-			common.Render(ctx, "27070304", nil)
+			common.Render(ctx, "04010303", nil)
 			return
 		}
 	}
 	cityCode := strings.TrimSpace(params.Get("cityCode").MustString())
 	if cityCode != "" {
 		if _, err := cityService.GetByCode(cityCode); err != nil {
-			common.Render(ctx, "27070304", nil)
+			common.Render(ctx, "04010304", nil)
 			return
 		}
 	}
 	areaCode := strings.TrimSpace(params.Get("areaCode").MustString())
 	if areaCode != "" {
 		if _, err := areaService.GetByCode(areaCode); err != nil {
-			common.Render(ctx, "27070304", nil)
+			common.Render(ctx, "04010305", nil)
 			return
 		}
 	}
@@ -154,10 +154,10 @@ func (self *SchoolController)Create(ctx *iris.Context) {
 	}
 	entity, err := schoolService.Create(&school)
 	if err != nil {
-		common.Render(ctx, "27070307", err)
+		common.Render(ctx, "04010306", err)
 		return
 	}
-	common.Render(ctx, "27070300", entity)
+	common.Render(ctx, "04010300", entity)
 }
 
 func (self *SchoolController)Update(ctx *iris.Context) {
@@ -167,44 +167,44 @@ func (self *SchoolController)Update(ctx *iris.Context) {
 	provinceService := public.ProvinceService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27070501", err)
+		common.Render(ctx, "04010401", err)
 		return
 	}
 
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", err)
+		common.Render(ctx, "04010402", err)
 		return
 	}
 
 	school, err := schoolService.GetByID(id)
 	if err != nil {
-		common.Render(ctx, "000003", err)
+		common.Render(ctx, "04010403", err)
 		return
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
 	if name == "" {
-		common.Render(ctx, "27070502", nil)
+		common.Render(ctx, "04010404", nil)
 		return
 	}
 	provinceCode := strings.TrimSpace(params.Get("provinceCode").MustString())
 	if provinceCode != "" {
 		if _, err := provinceService.GetByCode(provinceCode); err != nil {
-			common.Render(ctx, "27070304", nil)
+			common.Render(ctx, "04010405", nil)
 			return
 		}
 	}
 	cityCode := strings.TrimSpace(params.Get("cityCode").MustString())
 	if cityCode != "" {
 		if _, err := cityService.GetByCode(cityCode); err != nil {
-			common.Render(ctx, "27070304", nil)
+			common.Render(ctx, "04010406", nil)
 			return
 		}
 	}
 	areaCode := strings.TrimSpace(params.Get("areaCode").MustString())
 	if areaCode != "" {
 		if _, err := areaService.GetByCode(areaCode); err != nil {
-			common.Render(ctx, "27070304", nil)
+			common.Render(ctx, "04010407", nil)
 			return
 		}
 	}
@@ -214,21 +214,21 @@ func (self *SchoolController)Update(ctx *iris.Context) {
 	school.AreaCode = areaCode
 	entity, err := schoolService.Update(school)
 	if err != nil {
-		common.Render(ctx, "000002", err)
+		common.Render(ctx, "04010408", err)
 		return
 	}
-	common.Render(ctx, "27070500", entity)
+	common.Render(ctx, "04010400", entity)
 }
 
 func (self *SchoolController)Delete(ctx *iris.Context) {
 	schoolService := public.SchoolService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", err)
+		common.Render(ctx, "04010501", err)
 		return
 	}
 	if err := schoolService.Delete(id); err != nil {
-		common.Render(ctx, "000002", err)
+		common.Render(ctx, "04010502", err)
 	}
-	common.Render(ctx, "27070400", nil)
+	common.Render(ctx, "04010500", nil)
 }
