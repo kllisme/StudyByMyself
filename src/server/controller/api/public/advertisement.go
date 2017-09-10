@@ -56,11 +56,11 @@ func (self *AdvertisementController)Paging(ctx *iris.Context) {
 	adSpaceService := public.ADSpaceService{}
 	applicationService := public.ApplicationService{}
 	var locationIDs []int
-	page, _ := ctx.URLParamInt("page")
-	perPage, _ := ctx.URLParamInt("per_page")
+	offset, _ := ctx.URLParamInt("offset")
+	limit, _ := ctx.URLParamInt("limit")
 	title := strings.TrimSpace(ctx.URLParam("title"))
-	appID, _ := ctx.URLParamInt("app_id")
-	locationID, _ := ctx.URLParamInt("location_id")
+	appID, _ := ctx.URLParamInt("appId")
+	locationID, _ := ctx.URLParamInt("locationId")
 	if locationID != 0 {
 		locationIDs = []int{locationID}
 	} else if appID != 0 {
@@ -77,11 +77,11 @@ func (self *AdvertisementController)Paging(ctx *iris.Context) {
 	} else {
 		locationIDs = []int{}
 	}
-	start := strings.TrimSpace(ctx.URLParam("started_at"))
-	end := strings.TrimSpace(ctx.URLParam("ended_at"))
+	start := strings.TrimSpace(ctx.URLParam("startedAt"))
+	end := strings.TrimSpace(ctx.URLParam("endedAt"))
 	display, _ := ctx.URLParamInt("display")
 	status, _ := ctx.URLParamInt("status")
-	result, err := advertisementService.Paging(title, locationIDs, start, end, display, status, page, perPage)
+	result, err := advertisementService.Paging("", title, locationIDs, start, end, display, status, offset, limit)
 	if err != nil {
 		common.Render(ctx, "04020201", err)
 		return
@@ -159,30 +159,30 @@ func (self *AdvertisementController)Create(ctx *iris.Context) {
 		return
 	}
 
-	startAt, err := time.Parse("2006-01-02T15:04:05", strings.TrimSpace(params.Get("startedAt").MustString()))
+	startAt, err := time.Parse(time.RFC3339, strings.TrimSpace(params.Get("startedAt").MustString()))
 	if err != nil {
 		common.Render(ctx, "04020310", err)
 		return
 	}
 
-	endAt, err := time.Parse("2006-01-02T15:04:05", strings.TrimSpace(params.Get("endedAt").MustString()))
+	endAt, err := time.Parse(time.RFC3339, strings.TrimSpace(params.Get("endedAt").MustString()))
 	if err != nil {
 		common.Render(ctx, "04020311", err)
 		return
 	}
 
-	display := 1
+	display := params.Get("displayStrategy").MustInt()
 	displayParams := ""
-
-	if adSpace.IdentifyNeeded == 1 {
-		display = params.Get("displayStrategy").MustInt()
-
-		if display == 2 {
+	if display == 2 {
+		if adSpace.IdentifyNeeded == 1 {
 			displayParams = strings.TrimSpace(params.Get("displayParams").MustString())
 			if displayParams == "" {
 				common.Render(ctx, "04020312", err)
 				return
 			}
+		} else {
+			common.Render(ctx, "04020313", err)
+			return
 		}
 	}
 	status := params.Get("status").MustInt()
@@ -199,6 +199,17 @@ func (self *AdvertisementController)Create(ctx *iris.Context) {
 		EndedAt:endAt,
 		DisplayStrategy:display,
 	}
+
+	if p, err := advertisementService.Paging(name, "", []int{}, "", "", 0, 0, 0, 0); err != nil {
+		common.Render(ctx, "04020315", err)
+		return
+	} else {
+		if p.Pagination.Total != 0 {
+			common.Render(ctx, "04020316", nil)
+			return
+		}
+	}
+
 	entity, err := advertisementService.Create(&advertisement)
 	if err != nil {
 		common.Render(ctx, "04020314", err)
@@ -229,12 +240,12 @@ func (self *AdvertisementController)Update(ctx *iris.Context) {
 		return
 	}
 
-	locationID := params.Get("locationId").MustInt()
-	if locationID == 0 {
-		common.Render(ctx, "04020504", nil)
-		return
-	}
-	adSpace, err := adSpaceService.GetByID(locationID)
+	//locationID := params.Get("locationId").MustInt()
+	//if locationID == 0 {
+	//	common.Render(ctx, "04020504", nil)
+	//	return
+	//}
+	adSpace, err := adSpaceService.GetByID(advertisement.LocationID)
 	if err != nil {
 		common.Render(ctx, "04020505", err)
 		return
@@ -270,33 +281,42 @@ func (self *AdvertisementController)Update(ctx *iris.Context) {
 		return
 	}
 
-	startAt, err := time.Parse("2006-01-02T15:04:05", strings.TrimSpace(params.Get("startedAt").MustString()))
+	startAt, err := time.Parse(time.RFC3339, strings.TrimSpace(params.Get("startedAt").MustString()))
 	if err != nil {
 		common.Render(ctx, "04020512", err)
 		return
 	}
-
-	endAt, err := time.Parse("2006-01-02T15:04:05", strings.TrimSpace(params.Get("endedAt").MustString()))
+	endAt, err := time.Parse(time.RFC3339, strings.TrimSpace(params.Get("endedAt").MustString()))
 	if err != nil {
 		common.Render(ctx, "04020513", err)
 		return
 	}
 
-	display := 1
+	display := params.Get("displayStrategy").MustInt()
 	displayParams := ""
-
-	if adSpace.IdentifyNeeded == 1 {
-		display = params.Get("displayStrategy").MustInt()
-
-		if display == 2 {
+	if display == 2 {
+		if adSpace.IdentifyNeeded == 1 {
 			displayParams = strings.TrimSpace(params.Get("displayParams").MustString())
 			if displayParams == "" {
 				common.Render(ctx, "04020514", err)
 				return
 			}
+		} else {
+			common.Render(ctx, "04020515", err)
+			return
 		}
 	}
 	status := params.Get("status").MustInt()
+
+	if p, err := advertisementService.Paging(name, "", []int{}, "", "", 0, 0, 0, 0); err != nil {
+		common.Render(ctx, "04020517", err)
+		return
+	} else {
+		if p.Pagination.Total != 0 && name != advertisement.Name {
+			common.Render(ctx, "04020518", nil)
+			return
+		}
+	}
 
 	advertisement.URL = url
 	advertisement.Image = image
@@ -305,7 +325,7 @@ func (self *AdvertisementController)Update(ctx *iris.Context) {
 	advertisement.Status = status
 	advertisement.StartedAt = startAt
 	advertisement.EndedAt = endAt
-	advertisement.LocationID = locationID
+	//advertisement.LocationID = locationID
 	advertisement.Title = title
 	advertisement.Name = name
 	entity, err := advertisementService.Update(advertisement)

@@ -8,8 +8,8 @@ import (
 	"maizuo.com/soda/erp/api/src/server/controller/api/finance"
 	"maizuo.com/soda/erp/api/src/server/middleware"
 	adminApi "maizuo.com/soda/erp/api/src/server/route/api/admin"
-	communityApi "maizuo.com/soda/erp/api/src/server/route/api/community"
 	financeApi "maizuo.com/soda/erp/api/src/server/route/api/finance"
+	twoApi "maizuo.com/soda/erp/api/src/server/route/api/two"
 	publicApi "maizuo.com/soda/erp/api/src/server/route/api/public"
 )
 
@@ -52,7 +52,7 @@ func Api(app *iris.Framework) {
 
 	financeApi.Setup(v1)
 
-	communityApi.Setup(v1)
+	twoApi.Setup(v1)
 
 	publicApi.Setup(v1)
 

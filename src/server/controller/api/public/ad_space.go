@@ -38,10 +38,10 @@ func (self *ADSpaceController)Paging(ctx *iris.Context) {
 	adSpaceService := public.ADSpaceService{}
 	applicationService := public.ApplicationService{}
 
-	appID, _ := ctx.URLParamInt("app_id")
-	page, _ := ctx.URLParamInt("page")
-	perPage, _ := ctx.URLParamInt("per_page")
-	result, err := adSpaceService.Paging(appID, page, perPage)
+	appID, _ := ctx.URLParamInt("appId")
+	offset, _ := ctx.URLParamInt("offset")
+	limit, _ := ctx.URLParamInt("limit")
+	result, err := adSpaceService.Paging("", appID, offset, limit)
 	if err != nil {
 		common.Render(ctx, "04030201", err)
 		return
@@ -87,7 +87,7 @@ func (self *ADSpaceController)Create(ctx *iris.Context) {
 	identifyNeeded := params.Get("identifyNeeded").MustInt()
 	standard := strings.TrimSpace(params.Get("standard").MustString())
 	if standard == "" {
-		common.Render(ctx, "04030507", nil)
+		common.Render(ctx, "04030307", nil)
 		return
 	}
 	adSpace := model.ADSpace{
@@ -97,6 +97,17 @@ func (self *ADSpaceController)Create(ctx *iris.Context) {
 		IdentifyNeeded:identifyNeeded,
 		Standard:standard,
 	}
+
+	if p, err := adSpaceService.Paging(name, appID, 0, 0); err != nil {
+		common.Render(ctx, "04030308", err)
+		return
+	} else {
+		if p.Pagination.Total != 0 {
+			common.Render(ctx, "04030309", nil)
+			return
+		}
+	}
+
 	entity, err := adSpaceService.Create(&adSpace)
 	if err != nil {
 		common.Render(ctx, "04030306", err)
@@ -134,29 +145,39 @@ func (self *ADSpaceController)Update(ctx *iris.Context) {
 		common.Render(ctx, "04030505", nil)
 		return
 	}
-
 	description := strings.TrimSpace(params.Get("description").MustString())
 	if functions.CountRune(description) > 50 {
 		common.Render(ctx, "04030506", nil)
 		return
 	}
-	appID := params.Get("appId").MustInt()
-	if appID == 0 {
-		common.Render(ctx, "04030507", nil)
-		return
-	}
+	//appID := params.Get("appId").MustInt()
+	//if appID == 0 {
+	//	common.Render(ctx, "04030507", nil)
+	//	return
+	//}
 	standard := strings.TrimSpace(params.Get("standard").MustString())
 	if standard == "" {
 		common.Render(ctx, "04030509", nil)
 		return
 	}
 	identifyNeeded := params.Get("identifyNeeded").MustInt()
+
+	if p, err := adSpaceService.Paging(name, adSpace.APPID, 0, 0); err != nil {
+		common.Render(ctx, "04030510", err)
+		return
+	} else {
+		if p.Pagination.Total != 0 && name != adSpace.Name {
+			common.Render(ctx, "04030511", nil)
+			return
+		}
+	}
+
 	adSpace.Name = name
 	adSpace.Description = description
 	adSpace.IdentifyNeeded = identifyNeeded
-	adSpace.APPID = appID
+	//adSpace.APPID = appID
 	adSpace.Standard = standard
-	entity, err := adSpaceService.Update(adSpace)
+		entity, err := adSpaceService.Update(adSpace)
 	if err != nil {
 		common.Render(ctx, "04030508", err)
 		return

@@ -1,7 +1,7 @@
-package community
+package two
 
 import (
-	"maizuo.com/soda/erp/api/src/server/model/community"
+	"maizuo.com/soda/erp/api/src/server/model/two"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"github.com/jinzhu/gorm"
 	"maizuo.com/soda/erp/api/src/server/entity"
@@ -13,8 +13,8 @@ type TopicService struct {
 
 }
 
-func (self *TopicService)GetByID(id int) (*community.Topic, error) {
-	topic := community.Topic{}
+func (self *TopicService)GetByID(id int) (*two.Topic, error) {
+	topic := two.Topic{}
 	err := common.Soda2DB_R.Where(id).Find(&topic).Error
 	if err != nil {
 		return nil, err
@@ -22,8 +22,8 @@ func (self *TopicService)GetByID(id int) (*community.Topic, error) {
 	return &topic, nil
 }
 //
-//func (self *TopicService)GetAll() (*[]*community.Topic, error) {
-//	topicList := make([]*community.Topic, 0)
+//func (self *TopicService)GetAll() (*[]*two.Topic, error) {
+//	topicList := make([]*two.Topic, 0)
 //	if err := common.SodaDB_R.Order("id desc").Find(&topicList).Error; err != nil {
 //		return nil, err
 //	}
@@ -31,9 +31,10 @@ func (self *TopicService)GetByID(id int) (*community.Topic, error) {
 //
 //}
 
-func (self *TopicService)Paging(cityID int, keywords string, schoolName string, channelID int, status int, page int, perPage int, userIDs []int) (*entity.PaginationData, error) {
+func (self *TopicService)Paging(cityID int, keywords string, schoolName string, channelID int, status int, offset int, limit int, userIDs []int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
-	topicList := make([]*community.Topic, 0)
+	topicList := make([]*two.Topic, 0)
+	channelList := make([]*two.Channel, 0)
 	db := common.Soda2DB_R
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
 	if keywords != "" {
@@ -61,65 +62,75 @@ func (self *TopicService)Paging(cityID int, keywords string, schoolName string, 
 			return db.Where("channel_id = ?", channelID)
 		})
 	}
-	common.Logger.Debugf("%#v", userIDs)
 	if len(userIDs) != 0 {
 		common.Logger.Debugf("------------------------------")
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
 			return db.Where("user_id in (?)", userIDs)
 		})
 	}
-	if err := db.Model(&community.Topic{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&topicList).Error; err != nil {
+	if err := db.Model(&two.Topic{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&topicList).Error; err != nil {
 		return nil, err
 	}
-	pagination.Pagination.From = (page - 1) * perPage + 1
-	pagination.Pagination.To = perPage * page
-	if pagination.Pagination.To > pagination.Pagination.Total {
+	if err := db.Model(&two.Channel{}).Find(&channelList).Error; err != nil {
+		return nil, err
+	}
+	for _, topic := range topicList {
+		for _, channel := range channelList {
+			if topic.ChannelID == channel.ID {
+				topic.ChannelTitle = channel.Title
+			}
+		}
+	}
+	pagination.Pagination.From = offset + 1
+	if limit == 0 {
 		pagination.Pagination.To = pagination.Pagination.Total
+	} else {
+		pagination.Pagination.To = limit + offset
 	}
 	pagination.Objects = topicList
 	return &pagination, nil
 }
 
-func (self *TopicService)PagingCircle(page int, perPage int, provinceID int) (*entity.PaginationData, error) {
+func (self *TopicService)PagingCircle(offset int, limit int, provinceID int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 
 	circleList := make([]*payload.Circle, 0)
 	db := common.Soda2DB_R
 	if provinceID != 0 {
-		region := public.Region{}
-		err := common.SodaMngDB_R.Where("id = ?", provinceID).Find(&region).Error
+		province := public.Province{}
+		err := common.SodaMngDB_R.Where("code = ?", provinceID).Find(&province).Error
 		if err != nil {
 			return nil, err
 		}
 		cityIDs := make([]int, 0)
-		if region.LevelName == "市" {
-			if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `topic` where city_id = ? GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", provinceID, perPage, (page - 1) * perPage).Scan(&circleList).Error; err != nil {
-				return nil, err
-			}
-		} else {
-			err := common.SodaMngDB_R.Table("region").Where("parent_id = ? and level = 2", provinceID).Pluck("id", &cityIDs).Error
-			if err != nil {
-				return nil, err
-			}
-			if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `topic` where city_id in (?) GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", cityIDs, perPage, (page - 1) * perPage).Scan(&circleList).Error; err != nil {
-				return nil, err
-			}
 
+		err = common.SodaMngDB_R.Model(&public.City{}).Where("parent_code = ?", provinceID).Pluck("code", &cityIDs).Error
+		if err != nil {
+			return nil, err
+		}
+		if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `topic` where city_id in (?) GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", cityIDs, limit, offset).Scan(&circleList).Error; err != nil {
+			return nil, err
 		}
 
 	} else {
-		if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `topic` GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", perPage, (page - 1) * perPage).Scan(&circleList).Error; err != nil {
+		if err := db.Raw("SELECT city_id,city_name,count(distinct school_name) as school_count,count(*) as topic_count FROM `topic` GROUP BY city_id ORDER BY topic_count desc LIMIT ? OFFSET ?", limit, offset).Scan(&circleList).Error; err != nil {
 			return nil, err
 		}
 	}
-	pagination.Pagination.From = (page - 1) * perPage + 1
-	pagination.Pagination.To = perPage * page
-	if pagination.Pagination.To > pagination.Pagination.Total {
+	pagination.Pagination.From = offset + 1
+	if limit == 0 {
 		pagination.Pagination.To = pagination.Pagination.Total
+	} else {
+		pagination.Pagination.To = limit + offset
 	}
 	//TODO 完善学校所在圈子的逻辑
 	for index, circle := range circleList {
-		common.Soda2DB_R.Table("user").Where("school_id in (?)", circle.CityID).Count(&circle.UserCount)
+		schoolIDs := make([]int, 0)
+		err := common.SodaMngDB_R.Model(&public.School{}).Where("city_code = ?", circle.CityID).Pluck("id", &schoolIDs).Error
+		if err != nil {
+			return nil, err
+		}
+		common.Soda2DB_R.Table("user").Where("school_id in (?)", schoolIDs).Count(&circle.UserCount)
 		circle.Order = pagination.Pagination.From + index
 	}
 
@@ -127,8 +138,8 @@ func (self *TopicService)PagingCircle(page int, perPage int, provinceID int) (*e
 	return &pagination, nil
 }
 
-//func (self *TopicService)GetListByIDs(ids ...interface{}) (*[]*community.Topic, error) {
-//	topicList := make([]*community.Topic, 0)
+//func (self *TopicService)GetListByIDs(ids ...interface{}) (*[]*two.Topic, error) {
+//	topicList := make([]*two.Topic, 0)
 //	err := common.SodaDB_R.Where("id in (?)", ids...).Order("id desc").Find(&topicList).Error
 //	if err != nil {
 //		return nil, err
@@ -136,7 +147,7 @@ func (self *TopicService)PagingCircle(page int, perPage int, provinceID int) (*e
 //	return &topicList, nil
 //}
 
-//func (self *TopicService)Create(topic *community.Topic) (*community.Topic, error) {
+//func (self *TopicService)Create(topic *two.Topic) (*two.Topic, error) {
 //	err := common.SodaMngDB_WR.Create(&topic).Error
 //	if err != nil {
 //		return nil, err
@@ -161,14 +172,14 @@ func (self *TopicService)CountByCityIDs(cityIDs ...interface{}) (int, error) {
 }
 
 func (self *TopicService)CountCities() (int, error) {
-	result := make([]*int,0)
+	result := make([]*int, 0)
 	count := int(common.Soda2DB_R.Table("topic").Select("distinct city_id").Scan(&result).RowsAffected)
 	return count, nil
 }
 
 //func (self *TopicService)Delete(id int) error {
 //	tx := common.SodaMngDB_WR.Begin()
-//	if err := tx.Unscoped().Delete(&community.Topic{}, id).Error; err != nil {
+//	if err := tx.Unscoped().Delete(&two.Topic{}, id).Error; err != nil {
 //		tx.Rollback()
 //		return err
 //	}
@@ -176,22 +187,22 @@ func (self *TopicService)CountCities() (int, error) {
 //	return nil
 //}
 
-func (self *TopicService)UpdateChannel(entity *community.Topic) (*community.Topic, error) {
+func (self *TopicService)UpdateChannel(entity *two.Topic) (*two.Topic, error) {
 	_topic := map[string]interface{}{
 		"channel_id":entity.ChannelID,
 		"channel_title":entity.ChannelTitle,
 	}
-	if err := common.Soda2DB_WR.Model(&community.Topic{}).Where(entity.ID).Updates(_topic).Scan(entity).Error; err != nil {
+	if err := common.Soda2DB_WR.Model(&two.Topic{}).Where(entity.ID).Updates(_topic).Scan(entity).Error; err != nil {
 		return nil, err
 	}
 	return entity, nil
 }
 
-func (self *TopicService)UpdateStatus(entity *community.Topic) (*community.Topic, error) {
+func (self *TopicService)UpdateStatus(entity *two.Topic) (*two.Topic, error) {
 	_topic := map[string]interface{}{
 		"status":entity.Status,
 	}
-	if err := common.Soda2DB_WR.Model(&community.Topic{}).Where(entity.ID).Updates(_topic).Scan(entity).Error; err != nil {
+	if err := common.Soda2DB_WR.Model(&two.Topic{}).Where(entity.ID).Updates(_topic).Scan(entity).Error; err != nil {
 		return nil, err
 	}
 	return entity, nil

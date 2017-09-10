@@ -20,7 +20,7 @@ func (self *ADSpaceService)GetByID(id int) (*public.ADSpace, error) {
 	return &adSpace, nil
 }
 
-func (self *ADSpaceService)Paging(appID int, page int, perPage int) (*entity.PaginationData, error) {
+func (self *ADSpaceService)Paging(name string, appID int, offset int, limit int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 	adSpaceList := make([]*public.ADSpace, 0)
 	db := common.SodaMngDB_R
@@ -31,13 +31,20 @@ func (self *ADSpaceService)Paging(appID int, page int, perPage int) (*entity.Pag
 		})
 	}
 
-	if err := db.Model(&public.ADSpace{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&adSpaceList).Error; err != nil {
+	if name != "" {
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+			return db.Where("name = ?", name)
+		})
+	}
+
+	if err := db.Model(&public.ADSpace{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&adSpaceList).Error; err != nil {
 		return nil, err
 	}
-	pagination.Pagination.From = (page - 1) * perPage + 1
-	pagination.Pagination.To = perPage * page
-	if pagination.Pagination.To > pagination.Pagination.Total {
+	pagination.Pagination.From = offset + 1
+	if limit == 0 {
 		pagination.Pagination.To = pagination.Pagination.Total
+	} else {
+		pagination.Pagination.To = limit + offset
 	}
 	pagination.Objects = adSpaceList
 	return &pagination, nil
@@ -60,9 +67,22 @@ func (self *ADSpaceService)Update(adSpace *public.ADSpace) (*public.ADSpace, err
 		"appId":adSpace.APPID,
 		"standard":adSpace.Standard,
 	}
-	if err := common.SodaMngDB_WR.Model(&public.ADSpace{}).Where(adSpace.ID).Updates(_adSpace).Scan(adSpace).Error; err != nil {
+	tx := common.SodaMngDB_WR.Begin()
+	if err := tx.Model(&public.ADSpace{}).Where(adSpace.ID).Updates(_adSpace).Scan(adSpace).Error; err != nil {
+		tx.Rollback()
 		return nil, err
 	}
+	if adSpace.IdentifyNeeded == 0 {
+		_ad := map[string]interface{}{
+			"display_strategy":1,
+			"display_params":"",
+		}
+		if err := tx.Model(&public.Advertisement{}).Where("location_id = ?", adSpace.ID).Updates(_ad).Error; err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
+	tx.Commit()
 	return adSpace, nil
 }
 

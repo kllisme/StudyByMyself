@@ -1,12 +1,12 @@
-package community
+package two
 
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/service/community"
+	"maizuo.com/soda/erp/api/src/server/service/two"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
 	"github.com/bitly/go-simplejson"
-	model "maizuo.com/soda/erp/api/src/server/model/community"
+	model "maizuo.com/soda/erp/api/src/server/model/two"
 )
 
 type TopicController struct {
@@ -15,13 +15,13 @@ type TopicController struct {
 
 func (self *TopicController)PagingCircle(ctx *iris.Context) {
 	//CircleList := make([]*payload.Circle,0)
-	topicService := community.TopicService{}
+	topicService := two.TopicService{}
 
-	provinceID, _ := ctx.URLParamInt("province_id")
+	provinceID, _ := ctx.URLParamInt("provinceId")
 
-	page, _ := ctx.URLParamInt("page")
-	perPage, _ := ctx.URLParamInt("per_page")
-	result, err := topicService.PagingCircle(page, perPage, provinceID)
+	offset, _ := ctx.URLParamInt("offset")
+	limit, _ := ctx.URLParamInt("limit")
+	result, err := topicService.PagingCircle(offset, limit, provinceID)
 
 	if err != nil {
 		common.Render(ctx, "03010101", err)
@@ -31,9 +31,9 @@ func (self *TopicController)PagingCircle(ctx *iris.Context) {
 }
 
 func (self *TopicController)GetByID(ctx *iris.Context) {
-	topicService := community.TopicService{}
-	userService := community.UserService{}
-	inboxService:=community.InboxService{}
+	topicService := two.TopicService{}
+	userService := two.UserService{}
+	inboxService:=two.InboxService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "03010301", err)
@@ -60,8 +60,8 @@ func (self *TopicController)GetByID(ctx *iris.Context) {
 
 func (self *TopicController)GetSummary(ctx *iris.Context) {
 	result := map[string]interface{}{}
-	topicService := community.TopicService{}
-	userService := community.UserService{}
+	topicService := two.TopicService{}
+	userService := two.UserService{}
 
 	topicsCount, err := topicService.CountByCityIDs()
 	if err != nil {
@@ -88,29 +88,34 @@ func (self *TopicController)GetSummary(ctx *iris.Context) {
 
 func (self *TopicController)Paging(ctx *iris.Context) {
 	userIDs := make([]int, 0)
-	userService := community.UserService{}
-	topicService := community.TopicService{}
+	userService := two.UserService{}
+	topicService := two.TopicService{}
 	keywords := strings.TrimSpace(ctx.URLParam("keywords"))
 	name := strings.TrimSpace(ctx.URLParam("name"))
-	schoolName := strings.TrimSpace(ctx.URLParam("school_name"))
+	schoolName := strings.TrimSpace(ctx.URLParam("schoolName"))
 	statusStr := ctx.URLParam("status")
 	status := -1
 	if statusStr != "" {
 		status, _ = ctx.URLParamInt("status")
 	}
-	cityID, _ := ctx.URLParamInt("city_id")
-	channelID, _ := ctx.URLParamInt("channel_id")
-	page, _ := ctx.URLParamInt("page")
-	perPage, _ := ctx.URLParamInt("per_page")
+	cityID, _ := ctx.URLParamInt("cityId")
+	channelID, _ := ctx.URLParamInt("channelId")
+	offset, _ := ctx.URLParamInt("offset")
+	limit, _ := ctx.URLParamInt("limit")
 	if name != "" {
 		result, err := userService.FilterUserIDs(name)
 		if err != nil {
 			common.Render(ctx, "03010201", err)
 			return
 		}
-		userIDs = result
+		if len(result) == 0 {
+			userIDs = append(userIDs,0)
+		} else {
+			userIDs = result
+		}
+
 	}
-	result, err := topicService.Paging(cityID, keywords, schoolName, channelID, status, page, perPage, userIDs)
+	result, err := topicService.Paging(cityID, keywords, schoolName, channelID, status, offset, limit, userIDs)
 	if err != nil {
 		common.Render(ctx, "03010202", err)
 		return
@@ -127,7 +132,7 @@ func (self *TopicController)Paging(ctx *iris.Context) {
 }
 
 //func (self *TopicController)Delete(ctx *iris.Context) {
-//	topicService := community.TopicService{}
+//	topicService := two.TopicService{}
 //	id, err := ctx.ParamInt("id")
 //	if err != nil {
 //		common.Render(ctx, "000003", err)
@@ -139,7 +144,7 @@ func (self *TopicController)Paging(ctx *iris.Context) {
 //}
 
 //func (self *TopicController)Update(ctx *iris.Context) {
-//	topicService := community.TopicService{}
+//	topicService := two.TopicService{}
 //	topic := model.Topic{}
 //	id, err := ctx.ParamInt("id")
 //	if err != nil {
@@ -168,8 +173,8 @@ func (self *TopicController)Paging(ctx *iris.Context) {
 //}
 
 func (self *TopicController)UpdateChannel(ctx *iris.Context) {
-	topicService := community.TopicService{}
-	channelService := community.ChannelService{}
+	topicService := two.TopicService{}
+	channelService := two.ChannelService{}
 	//topic := model.Topic{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
@@ -205,7 +210,7 @@ func (self *TopicController)UpdateChannel(ctx *iris.Context) {
 }
 
 func (self *TopicController)UpdateStatus(ctx *iris.Context) {
-	topicService := community.TopicService{}
+	topicService := two.TopicService{}
 	//topic := model.Topic{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {

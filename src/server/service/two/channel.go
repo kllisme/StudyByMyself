@@ -1,16 +1,16 @@
-package community
+package two
 
 import (
 	"maizuo.com/soda/erp/api/src/server/common"
-	"maizuo.com/soda/erp/api/src/server/model/community"
+	"maizuo.com/soda/erp/api/src/server/model/two"
 )
 
 type ChannelService struct {
 
 }
 
-func (self *ChannelService)GetByID(id int) (*community.Channel, error) {
-	channel := community.Channel{}
+func (self *ChannelService)GetByID(id int) (*two.Channel, error) {
+	channel := two.Channel{}
 	err := common.Soda2DB_R.Where(id).Find(&channel).Error
 	if err != nil {
 		return nil, err
@@ -18,8 +18,8 @@ func (self *ChannelService)GetByID(id int) (*community.Channel, error) {
 	return &channel, nil
 }
 
-func (self *ChannelService)GetAll() (*[]*community.Channel, error) {
-	channelList := make([]*community.Channel, 0)
+func (self *ChannelService)GetAll() (*[]*two.Channel, error) {
+	channelList := make([]*two.Channel, 0)
 	if err := common.Soda2DB_R.Order("id desc").Find(&channelList).Error; err != nil {
 		return nil, err
 	}

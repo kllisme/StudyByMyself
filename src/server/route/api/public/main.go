@@ -7,8 +7,6 @@ import (
 
 func Setup(v iris.MuxAPI) {
 	var (
-		regionCtrl = &public.RegionController{}
-		//schoolCtrl = &public.SchoolController{}
 		applicationCtrl = &public.ApplicationController{}
 		advertisementCtrl = &public.AdvertisementController{}
 		adSpaceCtrl = &public.ADSpaceController{}
@@ -16,8 +14,7 @@ func Setup(v iris.MuxAPI) {
 
 	api := v.Party("/")
 
-	api.Get("/regions/provinces", regionCtrl.GetProvinces)
-	api.Get("/regions/provinces/:id/cities", regionCtrl.GetCities)
+	SetupAddress(api)
 
 	api.Get("/applications", applicationCtrl.Paging)
 	api.Post("/applications", applicationCtrl.Create)

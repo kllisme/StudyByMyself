@@ -1,9 +1,9 @@
-package community
+package two
 
 import (
 	"gopkg.in/kataras/iris.v5"
 	"maizuo.com/soda/erp/api/src/server/common"
-	"maizuo.com/soda/erp/api/src/server/service/community"
+	"maizuo.com/soda/erp/api/src/server/service/two"
 )
 
 type ChannelController struct {
@@ -11,7 +11,7 @@ type ChannelController struct {
 }
 
 func (self *ChannelController)GetByID(ctx *iris.Context) {
-	topicService := community.TopicService{}
+	topicService := two.TopicService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "03020102", err)
@@ -26,7 +26,7 @@ func (self *ChannelController)GetByID(ctx *iris.Context) {
 }
 
 func (self *ChannelController)GetAll(ctx *iris.Context) {
-	channelService := community.ChannelService{}
+	channelService := two.ChannelService{}
 	channelList, err := channelService.GetAll()
 	if err != nil {
 		common.Render(ctx, "03020201", nil)
