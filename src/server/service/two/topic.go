@@ -39,7 +39,7 @@ func (self *TopicService)Paging(cityID int, keywords string, schoolName string, 
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
 	if keywords != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("title like (?)", "%" + keywords + "%").Or("content like (?)", "%" + keywords + "%")
+			return db.Where("title like (?) or content like (?)", "%" + keywords + "%", "%" + keywords + "%")
 		})
 	}
 	if schoolName != "" {

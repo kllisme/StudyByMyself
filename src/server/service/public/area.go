@@ -91,6 +91,9 @@ func (self *AreaService)Delete(id int) error {
 	} else if err := tx.Model(&public.Street{}).Where("parent_code = ?", area.Code).Update("parent_code", "").Error; err != nil {
 		tx.Rollback()
 		return err
+	} else if err := tx.Model(&public.School{}).Where("area_code = ?", area.Code).Update("area_code", "").Error; err != nil {
+		tx.Rollback()
+		return err
 	}
 	tx.Commit()
 	return nil
