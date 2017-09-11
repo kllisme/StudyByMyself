@@ -118,48 +118,48 @@ func (self *CityController)Update(ctx *iris.Context) {
 	provinceService := public.ProvinceService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27070501", err)
+		common.Render(ctx, "04050401", err)
 		return
 	}
 
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", err)
+		common.Render(ctx, "04050402", err)
 		return
 	}
 
 	city, err := cityService.GetByID(id)
 	if err != nil {
-		common.Render(ctx, "000003", err)
+		common.Render(ctx, "04050403", err)
 		return
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
 	if name == "" {
-		common.Render(ctx, "27070502", nil)
+		common.Render(ctx, "04050404", nil)
 		return
 	}
 	code := strings.TrimSpace(params.Get("code").MustString())
 	if code == "" {
-		common.Render(ctx, "27070303", nil)
+		common.Render(ctx, "04050405", nil)
 		return
 	}
 
 	if _, err := cityService.GetByCode(code); err != nil {
 		if err != gorm.ErrRecordNotFound {
-			common.Render(ctx, "27070303", nil)
+			common.Render(ctx, "04050406", nil)
 			return
 		}
 
 	} else if city.Code != code {
-		common.Render(ctx, "27070303", nil)
+		common.Render(ctx, "04050407", nil)
 		return
 	}
 	provinceCode := strings.TrimSpace(params.Get("provinceCode").MustString())
 	if provinceCode == "" {
-		common.Render(ctx, "27070305", nil)
+		common.Render(ctx, "04050408", nil)
 		return
 	} else if _, err := provinceService.GetByCode(provinceCode); err != nil {
-		common.Render(ctx, "27070306", err)
+		common.Render(ctx, "04050409", err)
 		return
 	}
 	city.Name = name
@@ -167,21 +167,21 @@ func (self *CityController)Update(ctx *iris.Context) {
 	city.ParentCode = provinceCode
 	entity, err := cityService.Update(city)
 	if err != nil {
-		common.Render(ctx, "000002", err)
+		common.Render(ctx, "04050410", err)
 		return
 	}
-	common.Render(ctx, "27070500", entity)
+	common.Render(ctx, "04050400", entity)
 }
 
 func (self *CityController)Delete(ctx *iris.Context) {
 	cityService := public.CityService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", err)
+		common.Render(ctx, "04050501", err)
 		return
 	}
 	if err := cityService.Delete(id); err != nil {
-		common.Render(ctx, "000002", err)
+		common.Render(ctx, "04050502", err)
 	}
-	common.Render(ctx, "27070400", nil)
+	common.Render(ctx, "04050500", nil)
 }
