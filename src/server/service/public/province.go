@@ -80,6 +80,9 @@ func (self *ProvinceService)Delete(id int) error {
 	} else if err := tx.Model(&public.City{}).Where("parent_code = ?", province.Code).Update("parent_code", "").Error; err != nil {
 		tx.Rollback()
 		return err
+	} else if err := tx.Model(&public.School{}).Where("province_code = ?", province.Code).Update("province_code", "").Error; err != nil {
+		tx.Rollback()
+		return err
 	}
 	tx.Commit()
 	return nil
