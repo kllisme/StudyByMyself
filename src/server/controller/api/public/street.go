@@ -21,18 +21,18 @@ func (self *StreetController)GetByID(ctx *iris.Context) {
 	provinceService := public.ProvinceService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", err)
+		common.Render(ctx, "04080101", err)
 		return
 	}
 	street, err := streetService.GetByID(id)
 	if err != nil {
-		common.Render(ctx, "000002", err)
+		common.Render(ctx, "04080102", err)
 		return
 	}
 	if street.ParentCode != "" {
 		area, err := areaService.GetByCode(street.ParentCode)
 		if err != nil {
-			common.Render(ctx, "000002", err)
+			common.Render(ctx, "04080103", err)
 			return
 		}
 		street.AreaCode = street.ParentCode
@@ -40,7 +40,7 @@ func (self *StreetController)GetByID(ctx *iris.Context) {
 		if area.ParentCode != "" {
 			city, err := cityService.GetByCode(area.ParentCode)
 			if err != nil {
-				common.Render(ctx, "000002", err)
+				common.Render(ctx, "04080104", err)
 				return
 			}
 			street.CityCode = area.ParentCode
@@ -48,7 +48,7 @@ func (self *StreetController)GetByID(ctx *iris.Context) {
 			if city.ParentCode != "" {
 				province, err := provinceService.GetByCode(city.ParentCode)
 				if err != nil {
-					common.Render(ctx, "000002", err)
+					common.Render(ctx, "04080105", err)
 					return
 				}
 				street.ProvinceCode = city.ParentCode
@@ -57,7 +57,7 @@ func (self *StreetController)GetByID(ctx *iris.Context) {
 		}
 	}
 
-	common.Render(ctx, "27070100", street)
+	common.Render(ctx, "04080100", street)
 }
 
 func (self *StreetController)Paging(ctx *iris.Context) {
@@ -71,7 +71,7 @@ func (self *StreetController)Paging(ctx *iris.Context) {
 	name := strings.TrimSpace(ctx.URLParam("name"))
 	result, err := streetService.Paging(name, areaCode, offset, limit)
 	if err != nil {
-		common.Render(ctx, "000002", err)
+		common.Render(ctx, "04080201", err)
 		return
 	}
 
@@ -80,7 +80,7 @@ func (self *StreetController)Paging(ctx *iris.Context) {
 		if street.ParentCode != "" {
 			area, err := areaService.GetByCode(street.ParentCode)
 			if err != nil {
-				common.Render(ctx, "000002", err)
+				common.Render(ctx, "04080202", err)
 				return
 			}
 			street.AreaCode = street.ParentCode
@@ -88,7 +88,7 @@ func (self *StreetController)Paging(ctx *iris.Context) {
 			if area.ParentCode != "" {
 				city, err := cityService.GetByCode(area.ParentCode)
 				if err != nil {
-					common.Render(ctx, "000002", err)
+					common.Render(ctx, "04080203", err)
 					return
 				}
 				street.CityCode = area.ParentCode
@@ -96,7 +96,7 @@ func (self *StreetController)Paging(ctx *iris.Context) {
 				if city.ParentCode != "" {
 					province, err := provinceService.GetByCode(city.ParentCode)
 					if err != nil {
-						common.Render(ctx, "000002", err)
+						common.Render(ctx, "04080204", err)
 						return
 					}
 					street.ProvinceCode = city.ParentCode
@@ -106,7 +106,7 @@ func (self *StreetController)Paging(ctx *iris.Context) {
 		}
 	}
 
-	common.Render(ctx, "27070200", result)
+	common.Render(ctx, "04080200", result)
 	return
 }
 
@@ -115,29 +115,29 @@ func (self *StreetController)Create(ctx *iris.Context) {
 	areaService := public.AreaService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27070301", err)
+		common.Render(ctx, "04080301", err)
 		return
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
 	if name == "" {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04080302", nil)
 		return
 	}
 	code := strings.TrimSpace(params.Get("code").MustString())
 	if code == "" {
-		common.Render(ctx, "27070303", nil)
+		common.Render(ctx, "04080303", nil)
 		return
 	}
 	if _, err := streetService.GetByCode(code); err != gorm.ErrRecordNotFound {
-		common.Render(ctx, "27070304", nil)
+		common.Render(ctx, "04080304", nil)
 		return
 	}
 	areaCode := strings.TrimSpace(params.Get("areaCode").MustString())
 	if areaCode == "" {
-		common.Render(ctx, "27070305", nil)
+		common.Render(ctx, "04080305", nil)
 		return
 	} else if _, err := areaService.GetByCode(areaCode); err != nil {
-		common.Render(ctx, "27070306", err)
+		common.Render(ctx, "04080306", err)
 		return
 	}
 	street := model.Street{
@@ -147,10 +147,10 @@ func (self *StreetController)Create(ctx *iris.Context) {
 	}
 	entity, err := streetService.Create(&street)
 	if err != nil {
-		common.Render(ctx, "27070307", err)
+		common.Render(ctx, "04080307", err)
 		return
 	}
-	common.Render(ctx, "27070300", entity)
+	common.Render(ctx, "04080300", entity)
 }
 
 func (self *StreetController)Update(ctx *iris.Context) {
@@ -158,48 +158,48 @@ func (self *StreetController)Update(ctx *iris.Context) {
 	areaService := public.AreaService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27070501", err)
+		common.Render(ctx, "04080401", err)
 		return
 	}
 
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", err)
+		common.Render(ctx, "04080402", err)
 		return
 	}
 
 	street, err := streetService.GetByID(id)
 	if err != nil {
-		common.Render(ctx, "000003", err)
+		common.Render(ctx, "04080403", err)
 		return
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
 	if name == "" {
-		common.Render(ctx, "27070502", nil)
+		common.Render(ctx, "04080404", nil)
 		return
 	}
 	code := strings.TrimSpace(params.Get("code").MustString())
 	if code == "" {
-		common.Render(ctx, "27070303", nil)
+		common.Render(ctx, "04080405", nil)
 		return
 	}
 
 	if _, err := streetService.GetByCode(code); err != nil {
 		if err != gorm.ErrRecordNotFound {
-			common.Render(ctx, "27070303", nil)
+			common.Render(ctx, "04080406", nil)
 			return
 		}
 
 	} else if street.Code != code {
-		common.Render(ctx, "27070303", nil)
+		common.Render(ctx, "04080407", nil)
 		return
 	}
 	areaCode := strings.TrimSpace(params.Get("areaCode").MustString())
 	if areaCode == "" {
-		common.Render(ctx, "27070305", nil)
+		common.Render(ctx, "04080408", nil)
 		return
 	} else if _, err := areaService.GetByCode(areaCode); err != nil {
-		common.Render(ctx, "27070306", err)
+		common.Render(ctx, "04080409", err)
 		return
 	}
 	street.Name = name
@@ -207,21 +207,21 @@ func (self *StreetController)Update(ctx *iris.Context) {
 	street.ParentCode = areaCode
 	entity, err := streetService.Update(street)
 	if err != nil {
-		common.Render(ctx, "000002", err)
+		common.Render(ctx, "04080410", err)
 		return
 	}
-	common.Render(ctx, "27070500", entity)
+	common.Render(ctx, "04080400", entity)
 }
 
 func (self *StreetController)Delete(ctx *iris.Context) {
 	streetService := public.StreetService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", err)
+		common.Render(ctx, "04080501", err)
 		return
 	}
 	if err := streetService.Delete(id); err != nil {
-		common.Render(ctx, "000002", err)
+		common.Render(ctx, "04080502", err)
 	}
-	common.Render(ctx, "27070400", nil)
+	common.Render(ctx, "04080500", nil)
 }
