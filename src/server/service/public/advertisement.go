@@ -29,21 +29,21 @@ func (self *AdvertisementService)GetByID(id int) (*public.Advertisement, error) 
 	return &advertisement, nil
 }
 
-func (self *AdvertisementService)Paging(name string, title string,locationIDs []int, start string,end string,display int,status int, offset int, limit int) (*entity.PaginationData, error) {
+func (self *AdvertisementService)Paging(fullName string, name string, locationIDs []int, start string, end string, display int, status int, offset int, limit int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 	advertisementList := make([]*public.Advertisement, 0)
 	db := common.SodaMngDB_R
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
 
-	if name != "" {
+	if fullName != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("name = ?", name)
+			return db.Where("name = ?", fullName)
 		})
 	}
 
-	if title != "" {
+	if name != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("title like (?)", "%" + title + "%")
+			return db.Where("name like (?)", "%" + name + "%")
 		})
 	}
 	if len(locationIDs) != 0 {
@@ -71,7 +71,6 @@ func (self *AdvertisementService)Paging(name string, title string,locationIDs []
 			return db.Where("status = ?", status)
 		})
 	}
-
 
 	if err := db.Model(&public.Advertisement{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&advertisementList).Error; err != nil {
 		return nil, err
