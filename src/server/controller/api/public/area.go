@@ -20,18 +20,18 @@ func (self *AreaController)GetByID(ctx *iris.Context) {
 	provinceService:=public.ProvinceService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", err)
+		common.Render(ctx, "04070101", err)
 		return
 	}
 	area, err := areaService.GetByID(id)
 	if err != nil {
-		common.Render(ctx, "000002", err)
+		common.Render(ctx, "04070102", err)
 		return
 	}
 	if area.ParentCode != "" {
 		city, err := cityService.GetByCode(area.ParentCode)
 		if err != nil {
-			common.Render(ctx, "000002", err)
+			common.Render(ctx, "04070103", err)
 			return
 		}
 		area.CityCode = area.ParentCode
@@ -39,7 +39,7 @@ func (self *AreaController)GetByID(ctx *iris.Context) {
 		if city.ParentCode != "" {
 			province, err := provinceService.GetByCode(city.ParentCode)
 			if err != nil {
-				common.Render(ctx, "000002", err)
+				common.Render(ctx, "04070104", err)
 				return
 			}
 			area.ProvinceCode = city.ParentCode
@@ -47,7 +47,7 @@ func (self *AreaController)GetByID(ctx *iris.Context) {
 		}
 	}
 
-	common.Render(ctx, "27070100", area)
+	common.Render(ctx, "04070100", area)
 }
 
 func (self *AreaController)Paging(ctx *iris.Context) {
@@ -60,7 +60,7 @@ func (self *AreaController)Paging(ctx *iris.Context) {
 	name := strings.TrimSpace(ctx.URLParam("name"))
 	result, err := areaService.Paging(name, cityCode, offset, limit)
 	if err != nil {
-		common.Render(ctx, "000002", err)
+		common.Render(ctx, "04070201", err)
 		return
 	}
 
@@ -69,7 +69,7 @@ func (self *AreaController)Paging(ctx *iris.Context) {
 		if area.ParentCode != "" {
 			city, err := cityService.GetByCode(area.ParentCode)
 			if err != nil {
-				common.Render(ctx, "000002", err)
+				common.Render(ctx, "04070202", err)
 				return
 			}
 			area.CityCode = area.ParentCode
@@ -77,7 +77,7 @@ func (self *AreaController)Paging(ctx *iris.Context) {
 			if city.ParentCode != "" {
 				province, err := provinceService.GetByCode(city.ParentCode)
 				if err != nil {
-					common.Render(ctx, "000002", err)
+					common.Render(ctx, "04070203", err)
 					return
 				}
 				area.ProvinceCode = city.ParentCode
@@ -86,7 +86,7 @@ func (self *AreaController)Paging(ctx *iris.Context) {
 		}
 	}
 
-	common.Render(ctx, "27070200", result)
+	common.Render(ctx, "04070200", result)
 	return
 }
 
@@ -95,29 +95,29 @@ func (self *AreaController)Create(ctx *iris.Context) {
 	cityService := public.CityService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27070301", err)
+		common.Render(ctx, "04070301", err)
 		return
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
 	if name == "" {
-		common.Render(ctx, "27070302", nil)
+		common.Render(ctx, "04070302", nil)
 		return
 	}
 	code := strings.TrimSpace(params.Get("code").MustString())
 	if code == "" {
-		common.Render(ctx, "27070303", nil)
+		common.Render(ctx, "04070303", nil)
 		return
 	}
 	if _, err := areaService.GetByCode(code); err != gorm.ErrRecordNotFound {
-		common.Render(ctx, "27070304", nil)
+		common.Render(ctx, "04070304", nil)
 		return
 	}
 	cityCode := strings.TrimSpace(params.Get("cityCode").MustString())
 	if cityCode == "" {
-		common.Render(ctx, "27070305", nil)
+		common.Render(ctx, "04070305", nil)
 		return
 	} else if _, err := cityService.GetByCode(cityCode); err != nil {
-		common.Render(ctx, "27070306", err)
+		common.Render(ctx, "04070306", err)
 		return
 	}
 	area := model.Area{
@@ -127,10 +127,10 @@ func (self *AreaController)Create(ctx *iris.Context) {
 	}
 	entity, err := areaService.Create(&area)
 	if err != nil {
-		common.Render(ctx, "27070307", err)
+		common.Render(ctx, "04070307", err)
 		return
 	}
-	common.Render(ctx, "27070300", entity)
+	common.Render(ctx, "04070300", entity)
 }
 
 func (self *AreaController)Update(ctx *iris.Context) {
@@ -138,48 +138,48 @@ func (self *AreaController)Update(ctx *iris.Context) {
 	cityService := public.CityService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27070501", err)
+		common.Render(ctx, "04070401", err)
 		return
 	}
 
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", err)
+		common.Render(ctx, "04070402", err)
 		return
 	}
 
 	area, err := areaService.GetByID(id)
 	if err != nil {
-		common.Render(ctx, "000003", err)
+		common.Render(ctx, "04070403", err)
 		return
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
 	if name == "" {
-		common.Render(ctx, "27070502", nil)
+		common.Render(ctx, "04070404", nil)
 		return
 	}
 	code := strings.TrimSpace(params.Get("code").MustString())
 	if code == "" {
-		common.Render(ctx, "27070303", nil)
+		common.Render(ctx, "04070405", nil)
 		return
 	}
 
 	if _, err := areaService.GetByCode(code); err != nil {
 		if err != gorm.ErrRecordNotFound {
-			common.Render(ctx, "27070303", nil)
+			common.Render(ctx, "04070406", nil)
 			return
 		}
 
 	} else if area.Code != code {
-		common.Render(ctx, "27070303", nil)
+		common.Render(ctx, "04070407", nil)
 		return
 	}
 	cityCode := strings.TrimSpace(params.Get("cityCode").MustString())
 	if cityCode == "" {
-		common.Render(ctx, "27070305", nil)
+		common.Render(ctx, "04070408", nil)
 		return
 	} else if _, err := cityService.GetByCode(cityCode); err != nil {
-		common.Render(ctx, "27070306", err)
+		common.Render(ctx, "04070409", err)
 		return
 	}
 	area.Name = name
@@ -187,21 +187,21 @@ func (self *AreaController)Update(ctx *iris.Context) {
 	area.ParentCode = cityCode
 	entity, err := areaService.Update(area)
 	if err != nil {
-		common.Render(ctx, "000002", err)
+		common.Render(ctx, "04070410", err)
 		return
 	}
-	common.Render(ctx, "27070500", entity)
+	common.Render(ctx, "04070401", entity)
 }
 
 func (self *AreaController)Delete(ctx *iris.Context) {
 	areaService := public.AreaService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", err)
+		common.Render(ctx, "04070501", err)
 		return
 	}
 	if err := areaService.Delete(id); err != nil {
-		common.Render(ctx, "000002", err)
+		common.Render(ctx, "04070502", err)
 	}
-	common.Render(ctx, "27070400", nil)
+	common.Render(ctx, "04070500", nil)
 }

@@ -1,0 +1,43 @@
+{
+  "0407":"area",
+  "040701":"GetByID",
+  "04070100": { "status": "OK", "msg": "", "description": "获取地区信息成功", "isError": false },
+  "04070101": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+  "04070102": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取地区信息失败", "isError": true },
+  "04070103": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "城市详情获取失败", "isError": true },
+  "04070104": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "省份详情获取失败", "isError": true },
+
+  "040702":"Paging",
+  "04070200": {"status": "OK", "msg": "", "description": "获取地区列表成功", "isError": false },
+  "04070201": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "地区列表获取失败", "isError": true },
+  "04070202": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "城市详情获取失败", "isError": true },
+  "04070203": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "省份详情获取失败", "isError": true },
+
+  "040703":"Create",
+  "04070300": {"status": "OK", "msg": "", "description": "新建地区信息成功", "isError": false },
+  "04070301": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+  "04070302": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "地区名不能为空", "isError": true },
+  "04070303": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "行政区划代码不能为空", "isError": true },
+  "04070304": { "status": "BAD_REQUEST", "msg": "行政区划代码重复", "description": "行政区划代码重复", "isError": false },
+  "04070305": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "城市信息不能为空", "isError": true },
+  "04070306": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "城市数据无法查证", "isError": true },
+  "04070307": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "新建地区信息失败", "isError": true },
+
+  "040704":"Update",
+  "04070400": {"status": "OK", "msg": "", "description": "更新地区信息成功", "isError": false },
+  "04070401": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+  "04070402": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+  "04070403": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "地区详情获取失败", "isError": true },
+  "04070404": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "地区名不能为空", "isError": true },
+  "04070405": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "行政区划代码不能为空", "isError": true },
+  "04070406": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "地区信息无法查证", "isError": true },
+  "04070407": { "status": "BAD_REQUEST", "msg": "行政区划代码重复", "description": "行政区划代码重复", "isError": false },
+  "04070408": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "城市信息不能为空", "isError": true },
+  "04070409": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "城市数据无法查证", "isError": true },
+  "04070410": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "更新地区信息失败", "isError": true },
+
+  "040705":"Delete",
+  "04070500": {"status": "OK", "msg": "", "description": "地区信息删除成功", "isError": false },
+  "04070501": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+  "04070502": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "地区信息删除失败", "isError": true }
+}
