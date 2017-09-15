@@ -86,7 +86,7 @@ func (self *DailyBillController) DetailsById(ctx *iris.Context) {
 	}
 	objects := make([]interface{}, 0)
 	for _, ticket := range tickets {
-		device, err := deviceService.BasicBySerialNumber(ticket.DeviceSerial)
+		device, err := deviceService.GetBySerialNumber(ticket.DeviceSerial)
 		if err != nil {
 			common.Render(ctx, "27100105", err)
 			return

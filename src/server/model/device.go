@@ -2,19 +2,20 @@ package model
 
 type Device struct {
 	Model
-	UserId            int    `json:"userId"`
+	UserID            int    `json:"userId"`
 	UserName          string `json:"userName" gorm:"-"`
 	UserMobile        string `json:"userMobile" gorm:"-"`
-	FromUserId        int    `json:"fromUserId"`
+	FromUserID        int    `json:"fromUserId"`
 	FromUserName      string `json:"fromUserName" gorm:"-"`
 	FromUserMobile    string `json:"fromUserMobile" gorm:"-"`
 	Label             string `json:"label"`
 	SerialNumber      string `json:"serialNumber"`
-	ReferenceDeviceId int    `json:"referenceDeviceId"`
-	ProvinceId        int    `json:"provinceId"`
-	CityId            int    `json:"cityId"`
-	DistrictId        int    `json:"districtId"`
-	SchoolId          int    `json:"schoolId"`
+	ReferenceDeviceID int    `json:"referenceDeviceId"`
+	ReferenceDevice   string `json:"referenceDevice" gorm:"-"`
+	ProvinceID        int    `json:"provinceId"`
+	CityID            int    `json:"cityId"`
+	DistrictID        int    `json:"districtId"`
+	SchoolID          int    `json:"schoolId"`
 	SchoolName        string `json:"schoolName" gorm:"-"`
 	Address           string `json:"address"`
 	FirstPulsePrice   int    `json:"firstPulsePrice"`

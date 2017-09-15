@@ -16,7 +16,6 @@ type Ticket struct {
 	DeviceMode   int    `json:"deviceMode"`
 	OwnerId      int    `json:"ownerId"`
 	Status       int    `json:"status"`
-	Address      string `json:"address" gorm:"-"`
 	PaymentId    int    `json:"paymentId"`
 	Settle       bool   `json:"settle",gorm:"-"`
 }

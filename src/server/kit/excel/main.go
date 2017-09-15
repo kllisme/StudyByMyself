@@ -4,6 +4,7 @@ import (
 	"github.com/tealeg/xlsx"
 	"os"
 	"maizuo.com/soda/erp/api/src/server/model"
+	"maizuo.com/soda/erp/api/src/server/payload/crm"
 )
 // 生成excel表头,并返回文件路径以及名字
 func GetExcelHeader(fileName string, values []interface{},tableName string)(sheet *xlsx.Sheet,file *xlsx.File, url string, name string, err error){
@@ -56,3 +57,21 @@ func ExportBillDataAsCol(sheet *xlsx.Sheet, bill *model.Bill) (int) {
 	return row.WriteSlice(&s, -1)
 }
 
+func ExportConsumptionAsCol(sheet *xlsx.Sheet, consumption *crm.Consumption) (int) {
+	row := sheet.AddRow()
+	s := []interface{}{
+		consumption.TicketID,
+		consumption.ParentOperator +" ("+consumption.ParentOperatorMobile + ")",
+		consumption.Operator,
+		consumption.Telephone,
+		consumption.DeviceSerial,
+		consumption.Address,
+		consumption.CustomerMobile,
+		consumption.Password,
+		consumption.TypeName,
+		float64(consumption.Value)/100.00,
+		consumption.Payment,
+		consumption.CreatedAt.Local().Format("2006-01-02 15:04"),
+	}
+	return row.WriteSlice(&s, -1)
+}

@@ -344,3 +344,11 @@ func (self *BillService) BasicByBillId(billId string) (*model.Bill, error) {
 	}
 	return bill, r.Error
 }
+
+func (self *BillService) Create(bill *model.Bill) (*model.Bill, error) {
+	err := common.SodaMngDB_WR.Create(&bill).Error
+	if err != nil {
+		return nil, err
+	}
+	return bill, nil
+}
