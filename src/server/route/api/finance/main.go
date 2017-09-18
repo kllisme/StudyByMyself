@@ -21,5 +21,5 @@ func Setup(v iris.MuxAPI) {
 
 	api.Post("/settlement/actions/pay", billCtrl.BatchPay)
 	api.Get("/settlement",billReportCtrl.DetailsOfReport)
-	api.Post("/settlement/export",billReportCtrl.Export)
+	api.Post("/settlement/actions/export",billReportCtrl.Export)
 }
