@@ -27,7 +27,7 @@ func (slef *DailyBillController) ListByBillId(ctx *iris.Context) {
 		return
 	}
 	if total == 0 {
-		common.Render(ctx, "27090102", err)
+		common.Render(ctx, "27090102", nil)
 		return
 	}
 	if limit == 0 {
@@ -82,7 +82,8 @@ func (self *DailyBillController) DetailsById(ctx *iris.Context) {
 	}
 	tickets, err := ticketService.DetailsByDailyBill(dailyBill, limit, offset)
 	if err != nil {
-		common.Render(ctx, "27090204", nil)
+		common.Render(ctx, "27090204", err)
+		return
 	}
 	objects := make([]interface{}, 0)
 	for _, ticket := range tickets {
@@ -97,4 +98,5 @@ func (self *DailyBillController) DetailsById(ctx *iris.Context) {
 		Pagination: entity.Pagination{Total: total, From: offset, To: offset + limit - 1},
 		Objects:    objects,
 	})
+	return
 }
