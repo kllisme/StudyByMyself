@@ -19,7 +19,7 @@ func (self *BillReportController) DetailsOfReport(ctx *iris.Context) {
 	dailyOperateService := &service.DailyOperateService{}
 	billService := &service.BillService{}
 	type Response struct {
-		Date   string                 `json:"date"`
+		Date   time.Time                 `json:"date"`
 		Wechat map[string]interface{} `json:"wechat"`
 		Alipay map[string]interface{} `json:"alipay"`
 	}
@@ -65,7 +65,9 @@ func (self *BillReportController) DetailsOfReport(ctx *iris.Context) {
 	}
 	for _, value := range *dailyOperateList {
 		response := Response{}
-		response.Date = value.Date
+		// 2016-12-11T12:33:49+08:00
+		date,_ := time.Parse("2006-01-02",value.Date)
+		response.Date = date.Local()
 		wMap := make(map[string]interface{})
 		wMap["totalAmount"] = value.TotalWechatConsume
 		wMap["settlement"] = map[string]interface{}{

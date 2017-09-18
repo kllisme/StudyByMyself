@@ -3,7 +3,7 @@
 
   "271001":"DetailsOfReport",
   "27100100":{ "status": "OK", "msg": "", "description": "获取报表列表成功", "isError": false },
-  "27100101":{ "status": "UNPROCESSABLE_ENTITY", "msg": "错误的账号类型", "description": "错误的时间区间", "isError": false },
+  "27100101":{ "status": "UNPROCESSABLE_ENTITY", "msg": "错误的时间区间", "description": "错误的时间区间", "isError": false },
   "27100102":{ "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "查询报表数据失败", "isError": true },
 
   "271002":"Export",
