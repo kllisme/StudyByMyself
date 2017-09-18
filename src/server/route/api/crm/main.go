@@ -15,11 +15,9 @@ func Setup(v iris.MuxAPI)  {
 	api := v.Party("/")
 	api.Get("/consumptions/excel/export",consumeCtrl.Export)
 	api.Get("/consumptions", consumeCtrl.Paging)
-	api.Put("/consumptions/:ticketId", consumeCtrl.Refund)
+	api.Post("/consumptions/:ticketId/refund", consumeCtrl.Refund)
 
 	api.Get("/devices", deviceCtrl.Paging)
 	api.Put("/devices/batch/remove", deviceCtrl.Remove)
-	api.Put("/devices/:id/lock", deviceCtrl.Lock)
-	api.Put("/devices/:id/unlock", deviceCtrl.Unlock)
-	api.Put("/devices/:id/free", deviceCtrl.Free)
+	api.Post("/devices/:id/status", deviceCtrl.UpdateStatus)
 }

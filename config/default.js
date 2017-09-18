@@ -189,7 +189,28 @@ module.exports = Object.assign({}, {
         "database": 10,
         "prefix": "soda:erp:api:rate:",
         "max-retry": 3
+      },
+      "userRedis": {
+        "addr": "192.168.1.204:6379",
+        "password": "123456",
+        "database": 10,
+        "prefix": "soda-manager:",
+        "maxIdle": 20,
+        "maxActive": 50,
+        "idleTimeout": 60
       }
+    },
+    "device": {
+      "step": 13,
+      "firstTimedDuration": "-4m",
+      "secondTimedDuration": "-20m",
+      "thirdTimedDuration": "-30m",
+      "fourthTimedDuration": "-40m",
+      "rateLimiter": {
+        "prefix": "soda-manager-update-device-limiter:",
+        "maxRetry": 3
+      },
+      "unlockPrefix": "soda-api:device:"
     },
     "oss": {
       "domain": "//static.sodalife.xyz",

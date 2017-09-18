@@ -1,0 +1,33 @@
+{
+  "0501":"consumption",
+  "050101":"Paging",
+  "05010100": { "status": "OK", "msg": "", "description": "消费列表获取成功", "isError": false },
+  "05010101": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "运营商信息获取失败", "isError": true },
+  "05010102": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "运营商信息获取失败", "isError": true },
+  "05010103": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "消费列表获取失败", "isError": true },
+  "05010104": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "支付方式列表获取失败", "isError": true },
+  "05010105": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "运营商信息获取失败", "isError": true },
+  "05010106": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "父级运营商信息获取失败", "isError": true },
+  "05010107": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "设备信息获取失败", "isError": true },
+
+  "050102":"Refund",
+  "05010200": { "status": "OK", "msg": "", "description": "退款成功", "isError": false },
+  "05010201": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配" , "isError": true },
+  "05010202": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "消费信息获取失败" , "isError": true },
+  "05010203": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "订单状态错误" , "isError": true },
+  "05010204": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "退款失败" , "isError": true },
+
+  "050103":"Export",
+  "05010300": { "status": "OK", "msg": "", "description": "消费列表获取成功", "isError": false },
+  "05010301": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "运营商信息获取失败", "isError": true },
+  "05010302": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "运营商信息获取失败", "isError": true },
+  "05010303": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "消费列表获取失败", "isError": true },
+  "05010304": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "支付方式列表获取失败", "isError": true },
+  "05010305": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "运营商信息获取失败", "isError": true },
+  "05010306": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "父级运营商信息获取失败", "isError": true },
+  "05010307": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "设备信息获取失败", "isError": true },
+  "05010308": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "操作excel文件失败", "isError": true },
+  "05010309": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "设备信息获取失败", "isError": true },
+  "05010310": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "excel文件插入记录失败", "isError": true },
+  "05010311": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "excel文件保存失败", "isError": true }
+}

@@ -19,6 +19,8 @@ func main() {
 
 	common.SetupRedis()
 
+	common.SetUpUserRedis()
+
 	common.SetupSession()
 
 	common.SetupDB()

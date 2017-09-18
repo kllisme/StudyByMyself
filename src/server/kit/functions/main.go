@@ -9,6 +9,7 @@ import (
 	"time"
 	"regexp"
 	"strings"
+	"fmt"
 )
 
 //int数组去重
@@ -141,4 +142,16 @@ func ExtractHandlerName(handlerName string) string {
 func CountRune(str string) int {
 	runes := []rune(str)
 	return len(runes)
+}
+
+func GenerateIdByMobile(mobile string) string {
+	if len(mobile) != 11 {
+		return ""
+	}
+	prefix := mobile[len(mobile)-4:]
+	ymd := time.Now().Format("060102")
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+	code := fmt.Sprintf("%06v", rnd.Int31n(1000000))
+	id := ymd + prefix + code
+	return id
 }

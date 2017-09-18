@@ -10,6 +10,7 @@ import (
 	"maizuo.com/soda/erp/api/src/server/common"
 	"maizuo.com/soda/erp/api/src/server/model"
 	"maizuo.com/soda/erp/api/src/server/entity"
+	"strconv"
 )
 
 type DeviceService struct {
@@ -354,7 +355,7 @@ func (self *DeviceService) UpdatePulseName(device model.Device) bool {
 }
 
 func (self *DeviceService) UpdateStatus(device *model.Device) (*model.Device, error) {
-	if err := common.SodaMngDB_WR.Model(&model.Device{}).Where(device.ID).Update("status", device.Status).Scan(&device).Error; err != nil {
+	if err := common.SodaMngDB_WR.Model(&model.Device{}).Where(device.ID).Update("status", device.Status).Scan(device).Error; err != nil {
 		return nil, err
 	}
 	return device, nil
@@ -787,4 +788,31 @@ func (self *DeviceService) GetAllReferenceDevice() (*[]*model.ReferenceDevice,er
 		return nil, err
 	}
 	return &referenceDeviceList, nil
+}
+
+func (self *DeviceService) UnLockDevice(serial string) (bool, error) {
+	prefix := viper.GetString("device.unlockPrefix")
+	useKey := prefix + "USE:" + strings.ToUpper(serial)
+	lockKey := prefix + "LOCK:" + strings.ToUpper(serial)
+	common.Logger.Debugln("useKey===", useKey)
+	common.Logger.Debugln("lockKey===", lockKey)
+	i, err1 := common.UserRedis.Del(useKey).Result()
+	j, err2 := common.UserRedis.Del(lockKey).Result()
+	if err1 != nil {
+		//有可能是没这个key
+		common.Logger.Warningln("delete redis key:", useKey, ", failed, err:", err1.Error())
+		//return false, err
+	}
+	if err2 != nil {
+		common.Logger.Warningln("delete redis key:", lockKey, ", failed, err:", err2.Error())
+	}
+	if i <= int64(0) {
+		common.Logger.Warningln("delete redis key:", useKey, ", rowsAffected:", strconv.Itoa(int(i)))
+		//return false, nil
+	}
+	if j <= int64(0) {
+		common.Logger.Warningln("delete redis key:", lockKey, ", rowsAffected:", strconv.Itoa(int(j)))
+		//return false, nil
+	}
+	return true, nil
 }
