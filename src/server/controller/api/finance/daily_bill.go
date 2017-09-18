@@ -64,7 +64,7 @@ func (self *DailyBillController) DetailsById(ctx *iris.Context) {
 	offset, _ := ctx.URLParamInt("offset") // 列表起始位: Default: 0
 	if id == 0 {
 		common.Logger.Debugln("error id", id)
-		common.Render(ctx, "27100101", nil)
+		common.Render(ctx, "27090201", nil)
 		return
 	}
 	if limit == 0 {
@@ -72,28 +72,28 @@ func (self *DailyBillController) DetailsById(ctx *iris.Context) {
 	}
 	dailyBill, err := dailyBillService.BasicById(id)
 	if err != nil {
-		common.Render(ctx, "27100102", err)
+		common.Render(ctx, "27090202", err)
 		return
 	}
 	total, err := ticketService.TotalByDailyBill(dailyBill)
 	if err != nil {
-		common.Render(ctx, "27100103", err)
+		common.Render(ctx, "27090203", err)
 		return
 	}
 	tickets, err := ticketService.DetailsByDailyBill(dailyBill, limit, offset)
 	if err != nil {
-		common.Render(ctx, "27100104", nil)
+		common.Render(ctx, "27090204", nil)
 	}
 	objects := make([]interface{}, 0)
 	for _, ticket := range tickets {
 		device, err := deviceService.BasicBySerialNumber(ticket.DeviceSerial)
 		if err != nil {
-			common.Render(ctx, "27100105", err)
+			common.Render(ctx, "27090205", err)
 			return
 		}
 		objects = append(objects, ticket.Mapping(device, dailyBill))
 	}
-	common.Render(ctx, "27100100", &entity.PaginationData{
+	common.Render(ctx, "27090200", &entity.PaginationData{
 		Pagination: entity.Pagination{Total: total, From: offset, To: offset + limit - 1},
 		Objects:    objects,
 	})

@@ -30,8 +30,8 @@ func (self *BillService) userIdByUserCondition(sql string, value []interface{}) 
 	return ids, nil
 }
 
-func (self *BillService) TotalByAccountTypeAndTimeType(accountType, status, dateType int,startAt, endAt, keys string) (int, error) {
-	type Result struct{
+func (self *BillService) TotalByAccountTypeAndTimeType(accountType, status, dateType int, startAt, endAt, keys string) (int, error) {
+	type Result struct {
 		Total int
 	}
 	result := &Result{}
@@ -50,7 +50,7 @@ func (self *BillService) TotalByAccountTypeAndTimeType(accountType, status, date
 			sql += " and Date(bill.created_at) <= ? "
 			params = append(params, endAt[:10])
 		}
-	}else if dateType == 2 {
+	} else if dateType == 2 {
 		if startAt != "" {
 			sql += " and Date(bill.settled_at) >= ? "
 			params = append(params, startAt[:10])
@@ -96,7 +96,7 @@ func (self *BillService) ListByAccountTypeAndTimeType(accountType, status, dateT
 			sql += " and Date(bill.created_at) <= ? "
 			params = append(params, endAt[:10])
 		}
-	}else if dateType == 2 {
+	} else if dateType == 2 {
 		if startAt != "" {
 			sql += " and Date(bill.settled_at) >= ? "
 			params = append(params, startAt[:10])
@@ -343,4 +343,34 @@ func (self *BillService) BasicByBillId(billId string) (*model.Bill, error) {
 		return nil, r.Error
 	}
 	return bill, r.Error
+}
+
+/* 返回日期字符串为key的map集合*/
+func (self *BillService) ReportMapByPeriodAndAccountType(start, end time.Time, accountType int) (*map[string]map[string]interface{}, error) {
+	type Result struct {
+		Cast int
+		TotalAmount int
+		SettledAt time.Time
+	}
+
+	sql := "select sum(cast) Cast,sum(total_amount) TotalAmount,date(settled_at) SettledAt from bill where " +
+		"created_timestamp >= ? and created_timestamp < ? and account_type = ? and status = 4 "+ // 必须要获取到成功的账单
+		"group by date(SettledAt)"
+	rows,err := common.SodaMngDB_R.Raw(sql,start.Unix(),end.Unix(),accountType).Rows()
+	defer rows.Close()
+	if err != nil {
+		return nil, err
+	}
+	reportMap := make(map[string]map[string]interface{})
+	for rows.Next() {
+		result := &Result{Cast:0,TotalAmount:0}
+		if err = rows.Scan(&result.Cast,&result.TotalAmount,&result.SettledAt);err != nil {
+			return nil,err
+		}
+		resultMap := make(map[string]interface{})
+		resultMap["cast"] = result.Cast
+		resultMap["totalAmount"] = result.TotalAmount
+		reportMap[result.SettledAt.Local().Format("2006-01-02")] = resultMap
+	}
+	return &reportMap, nil
 }

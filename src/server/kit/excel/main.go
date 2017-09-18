@@ -56,3 +56,24 @@ func ExportBillDataAsCol(sheet *xlsx.Sheet, bill *model.Bill) (int) {
 	return row.WriteSlice(&s, -1)
 }
 
+func ExportBillReportDataAsCol(sheet *xlsx.Sheet, value *model.DailyOperate, alipayMap map[string]interface{}, wechatMap map[string]interface{})(int){
+	row := sheet.AddRow()
+	getValOrDefaultVal := func (m map[string]interface{},  key string) int {
+		if value,ok := m[key];ok != false {
+			return value.(int)
+		}else{
+			return 0
+		}
+	}
+	s := []interface{}{
+		value.Date,
+		float64(value.TotalAlipayConsume)/100.00,
+		float64(value.TotalWechatConsume)/100.00,
+		float64(getValOrDefaultVal(alipayMap,"totalAmount"))/100.00,
+		float64(getValOrDefaultVal(wechatMap,"totalAmount"))/100.00,
+		float64(getValOrDefaultVal(alipayMap,"cast"))/100.00,
+		float64(getValOrDefaultVal(wechatMap,"cast"))/100.00,
+		float64(getValOrDefaultVal(alipayMap,"cast") + getValOrDefaultVal(wechatMap,"cast"))/100.00,
+	}
+	return row.WriteSlice(&s, -1)
+}
