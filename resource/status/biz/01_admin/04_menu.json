@@ -1,17 +1,35 @@
 {
-  "2704":"menu",
-  "270401":"GetByID",
-  "27040100": {"status": "OK", "msg": "", "description": "获取菜单信息成功", "isError": false },
-  "270402":"Paging",
-  "27040200": {"status": "OK", "msg": "", "description": "获取菜单信息成功", "isError": false },
-  "270403":"Create",
-  "27040300": {"status": "OK", "msg": "", "description": "新建菜单信息成功", "isError": false },
-  "27040301": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
-  "270404":"Delete",
-  "27040400": {"status": "OK", "msg": "", "description": "菜单信息删除成功", "isError": false },
-  "270405":"Update",
-  "27040500": {"status": "OK", "msg": "", "description": "更新菜单信息成功", "isError": false },
-  "27040501": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
-  "27040502": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "菜单名不能为空", "isError": false },
-  "27040503": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "图标不能为空", "isError": false }
+  "0104":"menu",
+  "010401":"GetByID",
+  "01040100": {"status": "OK", "msg": "", "description": "获取菜单信息成功", "isError": false },
+  "01040101": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+  "01040102": {"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取菜单信息失败", "isError": true },
+
+  "010402":"Paging",
+  "01040200": {"status": "OK", "msg": "", "description": "获取菜单列表成功", "isError": false },
+  "01040201": {"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取菜单列表失败", "isError": true },
+
+  "010403":"Create",
+  "01040300": {"status": "OK", "msg": "", "description": "新建菜单成功", "isError": false },
+  "01040301": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+  "01040302": {"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "新建菜单失败", "isError": true },
+
+  "010404":"Delete",
+  "01040400": {"status": "OK", "msg": "", "description": "菜单信息删除成功", "isError": false },
+  "01040401": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+  "01040402": {"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "删除菜单失败", "isError": true },
+
+  "010405":"Update",
+  "01040500": {"status": "OK", "msg": "", "description": "更新菜单信息成功", "isError": false },
+  "01040501": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+  "01040502": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+  "01040503": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "无法获取菜单信息", "isError": true },
+  "01040504": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "菜单名不能为空", "isError": false },
+  "01040505": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "图标不能为空", "isError": false },
+  "01040506": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "更新菜单信息失败", "isError": true },
+
+  "010406":"RearrangePosition",
+  "01040600": {"status": "OK", "msg": "", "description": "更新菜单顺序信息成功", "isError": false },
+  "01040601": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+  "01040602": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "更新菜单顺序信息失败", "isError": true }
 }

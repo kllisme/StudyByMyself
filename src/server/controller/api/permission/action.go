@@ -22,7 +22,7 @@ func (self *ActionController)GetByID(ctx *iris.Context) {
 	if err != nil {
 		common.Render(ctx, "000002", err)
 	}
-	common.Render(ctx, "27040100", action)
+	common.Render(ctx, "01030100", action)
 }
 
 func (self *ActionController)Paging(ctx *iris.Context) {
@@ -36,19 +36,19 @@ func (self *ActionController)Paging(ctx *iris.Context) {
 		common.Render(ctx, "000002", err)
 		return
 	}
-	common.Render(ctx, "27040200", result)
+	common.Render(ctx, "01030200", result)
 }
 
 func (self *ActionController)Create(ctx *iris.Context) {
 	actionService := permission.ActionService{}
 	action := model.Action{}
 	if err := ctx.ReadJSON(&action); err != nil {
-		common.Render(ctx, "27040301", err)
+		common.Render(ctx, "01030301", err)
 	}
 	if err := actionService.Create(&action); err != nil {
 		common.Render(ctx, "000002", err)
 	}
-	common.Render(ctx, "27040300", action)
+	common.Render(ctx, "01030300", action)
 }
 
 func (self *ActionController)Delete(ctx *iris.Context) {
@@ -60,7 +60,7 @@ func (self *ActionController)Delete(ctx *iris.Context) {
 	if err := actionService.Delete(id); err != nil {
 		common.Render(ctx, "000002", err)
 	}
-	common.Render(ctx, "27040400", nil)
+	common.Render(ctx, "01030400", nil)
 }
 
 func (self *ActionController)Update(ctx *iris.Context) {
@@ -76,7 +76,7 @@ func (self *ActionController)Update(ctx *iris.Context) {
 	}
 	err = ctx.ReadJSON(&action)
 	if err != nil {
-		common.Render(ctx, "27040501", err)
+		common.Render(ctx, "01030501", err)
 		return
 	}
 
@@ -89,5 +89,5 @@ func (self *ActionController)Update(ctx *iris.Context) {
 	if err != nil {
 		common.Render(ctx, "000002", err)
 	}
-	common.Render(ctx, "27040500", result)
+	common.Render(ctx, "01030500", result)
 }

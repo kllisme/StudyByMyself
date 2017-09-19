@@ -34,7 +34,7 @@ func (self *MenuService)Paging(offset int, limit int) (*entity.PaginationData, e
 	menuList := make([]*permission.Menu, 0)
 	db := common.SodaMngDB_R
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
-	if err := db.Model(&permission.Menu{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&menuList).Error; err != nil {
+	if err := db.Model(&permission.Menu{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("position").Find(&menuList).Error; err != nil {
 		return nil, err
 	}
 	pagination.Pagination.From = offset + 1
@@ -74,4 +74,16 @@ func (self *MenuService)Delete(id int) error {
 	}
 	tx.Commit()
 	return nil
+}
+
+func (self *MenuService)RearrangePosition(menuList *[]*permission.Menu) (*[]*permission.Menu, error) {
+	result := []*permission.Menu{}
+	for _, menu := range *menuList {
+		//menu := &permission.Menu{}
+		if err := common.SodaMngDB_WR.Model(&permission.Menu{}).Where(menu.ID).Update("position", menu.Position).Scan(menu).Error; err != nil {
+			return nil, err
+		}
+		result = append(result, menu)
+	}
+	return &result, nil
 }

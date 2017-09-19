@@ -39,7 +39,7 @@ func Setup(v iris.MuxAPI) {
 	_api.Put("/menus/:id", menuCtrl.Update)
 	_api.Get("/menus/:id", menuCtrl.GetByID)
 	_api.Get("/menus", menuCtrl.Paging)
-	//_api.Post("/menus/batch/orders", menuCtrl.BatchUpdateOrder)
+	_api.Post("/menus/batch/positions", menuCtrl.RearrangePosition)
 
 	_api.Post("/permissions", permissionCtrl.Create)
 	_api.Delete("/permissions/:id", permissionCtrl.Delete)
