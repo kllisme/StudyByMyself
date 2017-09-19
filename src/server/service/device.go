@@ -740,7 +740,7 @@ func (self *DeviceService) Paging(userIDs []int, fromUserIDs []int, label string
 
 	if serialNumber != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("serial_number = ?", serialNumber)
+			return db.Where("serial_number like (?)", "%" + serialNumber + "%")
 		})
 	}
 
@@ -781,7 +781,7 @@ func (self *DeviceService) Paging(userIDs []int, fromUserIDs []int, label string
 	return &pagination, nil
 }
 
-func (self *DeviceService) GetAllReferenceDevice() (*[]*model.ReferenceDevice,error) {
+func (self *DeviceService) GetAllReferenceDevice() (*[]*model.ReferenceDevice, error) {
 	referenceDeviceList := []*model.ReferenceDevice{}
 	err := common.SodaMngDB_R.Find(&referenceDeviceList).Error
 	if err != nil {
