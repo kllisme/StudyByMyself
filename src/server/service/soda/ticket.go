@@ -114,7 +114,7 @@ func (self *TicketService) Paging(userIDs []int, mobile string, paymentID int, d
 	}
 	if end != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("created_timestamp <= UNIX_TIMESTAMP(?)", end)
+			return db.Where("created_timestamp < UNIX_TIMESTAMP(DATE_ADD(?, INTERVAL 1 day))", end)
 		})
 	}
 

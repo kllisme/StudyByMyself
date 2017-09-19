@@ -38,12 +38,15 @@ func (self *DeviceController)Paging(ctx *iris.Context) {
 			_userList := _p.Objects.([]*model.User)
 			userList = append(userList, _userList...)
 		}
-	}
-	if len(userList) != 0 {
-		for _, user := range userList {
-			userIDs = append(userIDs, user.ID)
+		if len(userList) != 0 {
+			for _, user := range userList {
+				userIDs = append(userIDs, user.ID)
+			}
+		}else {
+			userIDs = []int{-1}
 		}
 	}
+
 
 	pagination, err := deviceService.Paging(userIDs, []int{}, "", serial, 0, 0, []int{}, offset, limit)
 	if err != nil {

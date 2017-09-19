@@ -47,10 +47,12 @@ func (self *ConsumptionController) Paging(ctx *iris.Context) {
 			_userList := _p.Objects.([]*model.User)
 			userList = append(userList, _userList...)
 		}
-	}
-	if len(userList) != 0 {
-		for _, user := range userList {
-			userIDs = append(userIDs, user.ID)
+		if len(userList) != 0 {
+			for _, user := range userList {
+				userIDs = append(userIDs, user.ID)
+			}
+		} else {
+			userIDs = []int{-1}
 		}
 	}
 
@@ -66,7 +68,6 @@ func (self *ConsumptionController) Paging(ctx *iris.Context) {
 	if err != nil {
 		common.Render(ctx, "05010104", err)
 		return
-
 	}
 	for _, ticket := range ticketList {
 		user, err := userService.GetById(ticket.OwnerId)
@@ -134,7 +135,7 @@ func (self *ConsumptionController) Refund(ctx *iris.Context) {
 	}
 	ticket, err := ticketService.GetByTicketID(ticketId)
 	if err != nil {
-		common.Render(ctx, "05010202", nil)
+		common.Render(ctx, "05010202", err)
 		return
 	}
 	if ticket.Status != 7 {
@@ -143,7 +144,7 @@ func (self *ConsumptionController) Refund(ctx *iris.Context) {
 	}
 	ticket, err = ticketService.Refund(ticketId)
 	if err != nil {
-		common.Render(ctx, "05010204", nil)
+		common.Render(ctx, "05010204", err)
 		return
 	}
 	common.Render(ctx, "05010200", ticket)
@@ -179,10 +180,12 @@ func (self *ConsumptionController) Export(ctx *iris.Context) {
 			_userList := _p.Objects.([]*model.User)
 			userList = append(userList, _userList...)
 		}
-	}
-	if len(userList) != 0 {
-		for _, user := range userList {
-			userIDs = append(userIDs, user.ID)
+		if len(userList) != 0 {
+			for _, user := range userList {
+				userIDs = append(userIDs, user.ID)
+			}
+		} else {
+			userIDs = []int{-1}
 		}
 	}
 
@@ -257,7 +260,7 @@ func (self *ConsumptionController) Export(ctx *iris.Context) {
 
 	// 开始excel文件操作
 	tableHead := []interface{}{"订单号", "上级运营商", "运营商名称", "服务电话", "模块编号", "楼道信息", "消费手机号", "消费密码", "类型", "消费金额", "支付方式", "下单时间"}
-	tableName := "结算管理列表"
+	tableName := "消费查询列表"
 
 	fileName := "消费订单详情" + strconv.FormatInt(time.Now().Local().Unix(), 10)
 
