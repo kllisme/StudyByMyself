@@ -56,7 +56,7 @@ func (self *Result) New(code string, data interface{}) *Result {
 
 func Error(code string, data interface{}) *Result {
 	if code == "" {
-		code = "000001"
+		code = "000007"
 	}
 	prefix := "status.service."
 	msg := viper.GetString(prefix + code + "." + "msg")

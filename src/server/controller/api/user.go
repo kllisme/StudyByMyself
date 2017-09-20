@@ -90,7 +90,7 @@ func (self *UserController) Create(ctx *iris.Context) {
 	}
 	parentID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	if err != nil {
-		common.Render(ctx, "000001", err)
+		common.Render(ctx, "000008", err)
 		return
 	}
 
@@ -256,13 +256,13 @@ func (self *UserController) GetProfile(ctx *iris.Context) {
 
 	id, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	if err != nil {
-		common.Render(ctx, "000001", err)
+		common.Render(ctx, "000008", err)
 		return
 	}
 
 	userEntity, err := userService.GetById(id)
 	if err != nil {
-		common.Render(ctx, "000001", err)
+		common.Render(ctx, "000008", err)
 		return
 	}
 
@@ -336,7 +336,7 @@ func (self *UserController) ChangePassword(ctx *iris.Context) {
 	userService := service.UserService{}
 	currentUserID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	if err != nil {
-		common.Render(ctx, "000001", err)
+		common.Render(ctx, "000008", err)
 		return
 	}
 	params := simplejson.New()
