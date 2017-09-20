@@ -68,3 +68,12 @@ func (self *DeviceOperateService) BatchCreateBussiness(operatorId int, operatorT
 	}
 	return self.BatchCreate(deviceOperates)
 }
+
+func (self *DeviceOperateService) GetBySerialNumber(serial string) (*[]*model.DeviceOperate, error) {
+	deviceOperateList := make([]*model.DeviceOperate,0)
+	if err := common.SodaMngDB_R.Where("serial_number = ?", serial).Order("id desc").Find(&deviceOperateList).Error; err != nil {
+
+		return nil, err
+	}
+	return &deviceOperateList, nil
+}

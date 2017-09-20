@@ -8,7 +8,8 @@
   "05020103": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "设备列表获取失败", "isError": true },
   "05020104": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "关联设备列表获取失败", "isError": true },
   "05020105": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "运营商信息获取失败", "isError": true },
-  "05020106": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "运营商信息获取失败", "isError": true },
+  "05020106": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "设备操作信息获取失败", "isError": true },
+  "05020107": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "分配人信息获取失败", "isError": true },
 
   "050202":"UpdateStatus",
   "05020200": { "status": "OK", "msg": "", "description": "设备状态更新成功", "isError": false },

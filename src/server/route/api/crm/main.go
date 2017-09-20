@@ -18,6 +18,6 @@ func Setup(v iris.MuxAPI)  {
 	api.Post("/consumptions/:ticketId/refund", consumeCtrl.Refund)
 
 	api.Get("/devices", deviceCtrl.Paging)
-	api.Put("/devices/batch/remove", deviceCtrl.Remove)
+	api.Put("/devices/batch/reset", deviceCtrl.Reset)
 	api.Post("/devices/:id/status", deviceCtrl.UpdateStatus)
 }

@@ -32,6 +32,9 @@ type Device struct {
 	AssignedAt        string `json:"assignedAt"`
 	HasRetrofited     int    `json:"hasRetrofited"`
 	Status            int    `json:"status"`
+	Assigner          string        `json:"assigner" gorm:"-"`
+	AssignerID        int        `json:"assignerId" gorm:"-"`
+	AssignerMobile    string        `json:"assignerMobile" gorm:"-"`
 }
 
 func (Device) TableName() string {

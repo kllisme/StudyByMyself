@@ -15,7 +15,7 @@ type DeviceController struct {
 func (self *DeviceController)Paging(ctx *iris.Context) {
 	deviceService := service.DeviceService{}
 	userService := service.UserService{}
-
+	deviceOperateService := &service.DeviceOperateService{}
 	offset, _ := ctx.URLParamInt("offset")
 	limit, _ := ctx.URLParamInt("limit")
 	keywords := ctx.URLParam("keywords")               // 运营商名称、帐号名称
@@ -42,11 +42,10 @@ func (self *DeviceController)Paging(ctx *iris.Context) {
 			for _, user := range userList {
 				userIDs = append(userIDs, user.ID)
 			}
-		}else {
+		} else {
 			userIDs = []int{-1}
 		}
 	}
-
 
 	pagination, err := deviceService.Paging(userIDs, []int{}, "", serial, 0, 0, []int{}, offset, limit)
 	if err != nil {
@@ -65,13 +64,26 @@ func (self *DeviceController)Paging(ctx *iris.Context) {
 			common.Render(ctx, "05020105", err)
 			return
 		}
-		fromUser, err := userService.GetById(device.FromUserID)
+		operationList, err := deviceOperateService.GetBySerialNumber(device.SerialNumber)
 		if err != nil {
 			common.Render(ctx, "05020106", err)
 			return
 		}
-		device.FromUserName = fromUser.Name
-		device.FromUserMobile = fromUser.Mobile
+		for _,operation := range *operationList {
+			if operation.OperatorType == 1 || operation.OperatorType == 4 {
+				device.AssignerID = operation.OperatorID
+				break
+			}
+		}
+		if device.AssignerID != 0 {
+			assigner, err := userService.GetById(device.AssignerID)
+			if err != nil {
+				common.Render(ctx, "05020107", err)
+				return
+			}
+			device.Assigner = assigner.Name
+			device.AssignerMobile = assigner.Mobile
+		}
 		device.UserName = user.Name
 		device.UserMobile = user.Mobile
 		for _, refer := range *referDeviceList {
@@ -120,7 +132,7 @@ func (self *DeviceController)UpdateStatus(ctx *iris.Context) {
 	common.Render(ctx, "05020200", _device)
 }
 
-func (self *DeviceController)Remove(ctx *iris.Context) {
+func (self *DeviceController)Reset(ctx *iris.Context) {
 	deviceService := service.DeviceService{}
 	userService := service.UserService{}
 	deviceOperateService := &service.DeviceOperateService{}

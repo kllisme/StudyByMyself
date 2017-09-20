@@ -5,14 +5,14 @@
   "04040101": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
   "04040102": {"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取广告信息失败", "isError": true },
   "04040103": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "广告位详情获取失败", "isError": true },
-  "04040104": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "业务详情获取失败", "isError": true },
+  "04040104": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "应用详情获取失败", "isError": true },
 
   "040402":"Paging",
   "04040200": {"status": "OK", "msg": "", "description": "获取广告列表成功", "isError": false },
   "04040201": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "广告列表获取失败", "isError": true },
   "04040203": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "广告位列表获取失败", "isError": true },
   "04040204": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "广告位详情获取失败", "isError": true },
-  "04040205": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "业务详情获取失败", "isError": true },
+  "04040205": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "应用详情获取失败", "isError": true },
 
   "040403":"Create",
   "04040300": {"status": "OK", "msg": "", "description": "新建广告信息成功", "isError": false },
