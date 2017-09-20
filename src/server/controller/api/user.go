@@ -262,7 +262,7 @@ func (self *UserController) GetProfile(ctx *iris.Context) {
 
 	userEntity, err := userService.GetById(id)
 	if err != nil {
-		common.Render(ctx, "000008", err)
+		common.Render(ctx, "27020120", err)
 		return
 	}
 
