@@ -20,7 +20,7 @@ func AccessControlMiddleware(ctx *iris.Context) {
 	)
 	currentUserID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	if err != nil {
-		common.Render(ctx, "000001", err)
+		common.Render(ctx, "000008", err)
 		return
 	}
 	roleIDs, err := userRoleRelService.GetRoleIDsByUserID(currentUserID)
