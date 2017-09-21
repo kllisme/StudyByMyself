@@ -16,6 +16,11 @@
 			"Rev": "2453499434e8166b684339d91e2cdef70600f347"
 		},
 		{
+			"ImportPath": "github.com/aliyun/aliyun-oss-go-sdk/oss",
+			"Comment": "1.4.0-7-g238969d",
+			"Rev": "238969d88b7eabd7102466f4097dd776cb8bba34"
+		},
+		{
 			"ImportPath": "github.com/ant0ine/go-json-rest/rest",
 			"Comment": "v3.3.1-8-g3a807d6",
 			"Rev": "3a807d6d8d36e0f9175d6c292030fce09bcbb2db"
@@ -216,6 +221,10 @@
 			"Rev": "1c35d901db3da928c72a72d8458480cc9ade058f"
 		},
 		{
+			"ImportPath": "github.com/juju/errors",
+			"Rev": "c7d06af17c68cd34c835053720b21f6549d9b0ee"
+		},
+		{
 			"ImportPath": "github.com/kataras/go-errors",
 			"Rev": "6fb46ef666f60ce19b5cc73906d531645d5bf8bc"
 		},
@@ -368,6 +377,10 @@
 		{
 			"ImportPath": "github.com/square/go-jose/json",
 			"Rev": "50df5ca198e569d06795909c091ac0cea62e925a"
+		},
+		{
+			"ImportPath": "github.com/tealeg/xlsx",
+			"Rev": "a8490cf686defe538b45b05af838d9eeb7d8fe64"
 		},
 		{
 			"ImportPath": "github.com/ulule/limiter",

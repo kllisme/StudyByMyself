@@ -20,7 +20,7 @@ func AccessControlMiddleware(ctx *iris.Context) {
 	)
 	currentUserID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	if err != nil {
-		common.Render(ctx, "000001", err)
+		common.Render(ctx, "000008", err)
 		return
 	}
 	roleIDs, err := userRoleRelService.GetRoleIDsByUserID(currentUserID)
@@ -34,7 +34,7 @@ func AccessControlMiddleware(ctx *iris.Context) {
 		return
 	}
 	if len(permissionIDs) == 0 {
-		common.Render(ctx, "000005", nil)
+		common.Render(ctx, "000005", err)
 		return
 	}
 	actionIDs, err := permissionActionRelService.GetActionIDsByPermissionIDs(permissionIDs)
@@ -43,7 +43,7 @@ func AccessControlMiddleware(ctx *iris.Context) {
 		return
 	}
 	if len(actionIDs) == 0 {
-		common.Render(ctx, "000005", nil)
+		common.Render(ctx, "000005", err)
 		return
 	}
 	actionList, err := actionService.GetListByIDs(actionIDs)
@@ -60,7 +60,7 @@ func AccessControlMiddleware(ctx *iris.Context) {
 		}
 	}
 	if !hasAuthorized {
-		common.Render(ctx, "000005", nil)
+		common.Render(ctx, "000005", err)
 		return
 	}
 	ctx.Next()

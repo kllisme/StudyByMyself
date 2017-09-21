@@ -1,0 +1,11 @@
+{
+  "0302":"channel",
+  "030201":"GetByID",
+  "03020100": { "status": "OK", "msg": "", "description": "频道信息获取成功", "isError": false },
+  "03020101": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "频道信息获取失败", "isError": true },
+  "03020102": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+
+  "030202":"GetAll",
+  "03020200": { "status": "OK", "msg": "", "description": "频道列表获取成功", "isError": false },
+  "03020201": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "频道列表获取失败" , "isError": true }
+}

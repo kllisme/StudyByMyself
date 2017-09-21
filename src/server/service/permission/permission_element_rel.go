@@ -10,7 +10,7 @@ type PermissionElementRelService struct {
 
 func (self *PermissionElementRelService) GetElementIDsByPermissionIDs(permissionIDs ...interface{}) ([]int, error) {
 	elementIDs := make([]int, 0)
-	err := common.SodaMngDB_R.Model(&permission.PermissionElementRel{}).Where("permission_id in (?)", permissionIDs...).Pluck("element_id", &elementIDs).Error
+	err := common.SodaMngDB_R.Model(&permission.PermissionElementRel{}).Where("permission_id in (?)", permissionIDs...).Pluck("distinct element_id", &elementIDs).Error
 	if err != nil {
 		return nil, err
 	}

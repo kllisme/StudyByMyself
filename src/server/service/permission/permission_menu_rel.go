@@ -10,7 +10,7 @@ type PermissionMenuRelService struct {
 
 func (self *PermissionMenuRelService) GetMenuIDsByPermissionIDs(permissionIDs ...interface{}) ([]int, error) {
 	menuIDs := make([]int, 0)
-	err := common.SodaMngDB_R.Model(&permission.PermissionMenuRel{}).Where("permission_id in (?)", permissionIDs...).Pluck("menu_id", &menuIDs).Error
+	err := common.SodaMngDB_R.Model(&permission.PermissionMenuRel{}).Where("permission_id in (?)", permissionIDs...).Pluck("distinct menu_id", &menuIDs).Error
 	if err != nil {
 		return nil, err
 	}

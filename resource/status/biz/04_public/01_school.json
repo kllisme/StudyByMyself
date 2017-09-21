@@ -1,0 +1,42 @@
+{
+  "0401":"school",
+  "040101":"GetByID",
+  "04010100": { "status": "OK", "msg": "", "description": "获取学校信息成功", "isError": false },
+  "04010101": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+  "04010102": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取学校信息失败", "isError": true },
+  "04010103": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "地区详情获取失败", "isError": true },
+  "04010104": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "城市详情获取失败", "isError": true },
+  "04010105": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "省份详情获取失败", "isError": true },
+
+  "040102":"Paging",
+  "04010200": {"status": "OK", "msg": "", "description": "获取学校列表成功", "isError": false },
+  "04010201": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "学校列表获取失败", "isError": true },
+  "04010202": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "地区详情获取失败", "isError": true },
+  "04010203": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "城市详情获取失败", "isError": true },
+  "04010204": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "省份详情获取失败", "isError": true },
+
+  "040103":"Create",
+  "04010300": {"status": "OK", "msg": "", "description": "新建学校信息成功", "isError": false },
+  "04010301": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+  "04010302": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "学校名不能为空", "isError": true },
+  "04010303": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "省份数据无法查证", "isError": true },
+  "04010304": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "城市数据无法查证", "isError": true },
+  "04010305": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "地区信息无法查证", "isError": true },
+  "04010306": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "新建学校信息失败", "isError": true },
+
+  "040104":"Update",
+  "04010400": {"status": "OK", "msg": "", "description": "更新学校信息成功", "isError": false },
+  "04010401": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "json解析失败", "isError": true },
+  "04010402": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+  "04010403": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "学校详情获取失败", "isError": true },
+  "04010404": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "学校名不能为空", "isError": true },
+  "04010405": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "省份数据无法查证", "isError": true },
+  "04010406": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "城市数据无法查证", "isError": true },
+  "04010407": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "地区信息无法查证", "isError": true },
+  "04010408": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "更新学校信息成功", "isError": true },
+
+  "040105":"Delete",
+  "04010500": {"status": "OK", "msg": "", "description": "学校信息删除成功", "isError": false },
+  "04010501": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },
+  "04010502": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "学校信息删除失败", "isError": true }
+}

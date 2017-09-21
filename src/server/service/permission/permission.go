@@ -29,23 +29,24 @@ func (self *PermissionService)GetAll() (*[]*permission.Permission, error) {
 
 }
 
-func (self *PermissionService)Paging(_type int, page int, perPage int) (*entity.PaginationData, error) {
+func (self *PermissionService)Paging(categoryID int, offset int, limit int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 	permissionList := make([]*permission.Permission, 0)
 	db := common.SodaMngDB_R
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
-	if _type != 0 {
+	if categoryID != 0 {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("type = ?", _type)
+			return db.Where("category_id = ?", categoryID)
 		})
 	}
-	if err := db.Model(&permission.Permission{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset((page - 1) * perPage).Limit(perPage).Order("id desc").Find(&permissionList).Error; err != nil {
+	if err := db.Model(&permission.Permission{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&permissionList).Error; err != nil {
 		return nil, err
 	}
-	pagination.Pagination.From = (page - 1) * perPage
-	pagination.Pagination.To = perPage * page
-	if pagination.Pagination.To > pagination.Pagination.Total {
+	pagination.Pagination.From = offset + 1
+	if limit == 0 {
 		pagination.Pagination.To = pagination.Pagination.Total
+	} else {
+		pagination.Pagination.To = limit + offset
 	}
 	pagination.Objects = permissionList
 	return &pagination, nil

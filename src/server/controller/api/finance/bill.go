@@ -428,7 +428,7 @@ func (self *BillController) CancelBatchAliPay(ctx *iris.Context) {
 		billBatchNos, err := billBatchNoService.Baisc(billId)
 		if err != nil {
 			common.Logger.Debugln("获取账单批次详情异常,原因:%v,账单ID:%v", err, billId)
-			common.Render(ctx, "27080309", nil)
+			common.Render(ctx, "27080309", err)
 			return
 		}
 		if len(*billBatchNos) <= 0 {

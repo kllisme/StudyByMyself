@@ -17,23 +17,23 @@ func (self *MenuController)GetByID(ctx *iris.Context) {
 	menuService := permission.MenuService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "000003", err)
 		return
 	}
 	menu, err := menuService.GetByID(id)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "000002", err)
 	}
 	common.Render(ctx, "27040100", menu)
 }
 
 func (self *MenuController)Paging(ctx *iris.Context) {
 	menuService := permission.MenuService{}
-	page, _ := ctx.URLParamInt("page")
-	perPage, _ := ctx.URLParamInt("per_page")
-	result, err := menuService.Paging(page, perPage)
+	offset, _ := ctx.URLParamInt("offset")
+	limit, _ := ctx.URLParamInt("limit")
+	result, err := menuService.Paging(offset, limit)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "000002", err)
 		return
 	}
 	common.Render(ctx, "27040200", result)
@@ -44,7 +44,7 @@ func (self *MenuController)Create(ctx *iris.Context) {
 	menuService := permission.MenuService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27040301", nil)
+		common.Render(ctx, "27040301", err)
 		return
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
@@ -63,7 +63,7 @@ func (self *MenuController)Create(ctx *iris.Context) {
 	}
 	entity, err := menuService.Create(&menu)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "000002", err)
 		return
 	}
 	common.Render(ctx, "27040300", entity)
@@ -73,19 +73,19 @@ func (self *MenuController)Update(ctx *iris.Context) {
 	menuService := permission.MenuService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "27040501", nil)
+		common.Render(ctx, "27040501", err)
 		return
 	}
 
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "000003", err)
 		return
 	}
 
 	menu, err := menuService.GetByID(id)
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "000003", err)
 		return
 	}
 	name := strings.TrimSpace(params.Get("name").MustString())
@@ -112,7 +112,7 @@ func (self *MenuController)Update(ctx *iris.Context) {
 	menu.Icon = icon
 	entity, err := menuService.Update(menu)
 	if err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "000002", err)
 		return
 	}
 	common.Render(ctx, "27040500", entity)
@@ -122,11 +122,11 @@ func (self *MenuController)Delete(ctx *iris.Context) {
 	menuService := permission.MenuService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
-		common.Render(ctx, "000003", nil)
+		common.Render(ctx, "000003", err)
 		return
 	}
 	if err := menuService.Delete(id); err != nil {
-		common.Render(ctx, "000002", nil)
+		common.Render(ctx, "000002", err)
 	}
 	common.Render(ctx, "27040400", nil)
 }
