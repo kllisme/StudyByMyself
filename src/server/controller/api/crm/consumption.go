@@ -117,6 +117,7 @@ func (self *ConsumptionController) Paging(ctx *iris.Context) {
 				break
 			}
 		}
+		consumption.PaymentID = ticket.PaymentId
 		consumption.CreatedAt = ticket.CreatedAt
 		consumptionList = append(consumptionList, &consumption)
 	}
@@ -140,6 +141,10 @@ func (self *ConsumptionController) Refund(ctx *iris.Context) {
 	}
 	if ticket.Status != 7 {
 		common.Render(ctx, "05010203", nil)
+		return
+	}
+	if ticket.PaymentId == 4 {
+		common.Render(ctx, "05010205", nil)
 		return
 	}
 	ticket, err = ticketService.Refund(ticketId)

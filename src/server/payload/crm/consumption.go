@@ -17,6 +17,7 @@ type Consumption struct {
 	TypeName             string        `json:"typeName"`
 	Value                int        `json:"value"`
 	Payment              string        `json:"payment"`
+	PaymentID            int        `json:"paymentId"`
 	CreatedAt            time.Time        `json:"createdAt"`
 	Status               int        `json:"status"`
 }
