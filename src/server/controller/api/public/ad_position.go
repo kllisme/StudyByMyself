@@ -25,10 +25,12 @@ func (self *ADPositionController)GetByID(ctx *iris.Context) {
 	adPosition, err := adPositionService.GetByID(id)
 	if err != nil {
 		common.Render(ctx, "04030102", err)
+		return
 	}
 	app, err := applicationService.GetByID(adPosition.APPID)
 	if err != nil {
 		common.Render(ctx, "04030103", err)
+		return
 	}
 	adPosition.APPName = app.Name
 	common.Render(ctx, "04030100", adPosition)
@@ -204,6 +206,7 @@ func (self *ADPositionController)Delete(ctx *iris.Context) {
 	}
 	if err := adPositionService.Delete(id); err != nil {
 		common.Render(ctx, "04030404", err)
+		return
 	}
 	common.Render(ctx, "04030400", nil)
 }

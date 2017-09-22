@@ -23,6 +23,7 @@ func (self *MenuController)GetByID(ctx *iris.Context) {
 	menu, err := menuService.GetByID(id)
 	if err != nil {
 		common.Render(ctx, "01040102", err)
+		return
 	}
 	common.Render(ctx, "01040100", menu)
 }
@@ -127,6 +128,7 @@ func (self *MenuController)Delete(ctx *iris.Context) {
 	}
 	if err := menuService.Delete(id); err != nil {
 		common.Render(ctx, "01040402", err)
+		return
 	}
 	common.Render(ctx, "01040400", nil)
 }

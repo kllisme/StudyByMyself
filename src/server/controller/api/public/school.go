@@ -228,6 +228,7 @@ func (self *SchoolController)Delete(ctx *iris.Context) {
 	}
 	if err := schoolService.Delete(id); err != nil {
 		common.Render(ctx, "04010502", err)
+		return
 	}
 	common.Render(ctx, "04010500", nil)
 }

@@ -202,6 +202,7 @@ func (self *AreaController)Delete(ctx *iris.Context) {
 	}
 	if err := areaService.Delete(id); err != nil {
 		common.Render(ctx, "04070502", err)
+		return
 	}
 	common.Render(ctx, "04070500", nil)
 }

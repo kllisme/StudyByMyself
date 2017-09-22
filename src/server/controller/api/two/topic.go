@@ -179,6 +179,7 @@ func (self *TopicController)UpdateChannel(ctx *iris.Context) {
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "03010401", err)
+		return
 	}
 	topic, err := topicService.GetByID(id)
 
@@ -205,6 +206,7 @@ func (self *TopicController)UpdateChannel(ctx *iris.Context) {
 	result, err := topicService.UpdateChannel(topic)
 	if err != nil {
 		common.Render(ctx, "03010405", err)
+		return
 	}
 	common.Render(ctx, "03010400", result)
 }
@@ -215,6 +217,7 @@ func (self *TopicController)UpdateStatus(ctx *iris.Context) {
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "03010501", err)
+		return
 	}
 	topic, err := topicService.GetByID(id)
 
@@ -232,6 +235,7 @@ func (self *TopicController)UpdateStatus(ctx *iris.Context) {
 	result, err := topicService.UpdateStatus(topic)
 	if err != nil {
 		common.Render(ctx, "03010505", err)
+		return
 	}
 	common.Render(ctx, "03010500", result)
 }

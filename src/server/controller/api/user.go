@@ -339,7 +339,7 @@ func (self *UserController) ChangePassword(ctx *iris.Context) {
 	}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
-		common.Render(ctx, "", err)
+		common.Render(ctx, "27020702", err)
 		return
 	}
 

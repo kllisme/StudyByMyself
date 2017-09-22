@@ -134,6 +134,7 @@ func (self *ProvinceController)Delete(ctx *iris.Context) {
 	}
 	if err := provinceService.Delete(id); err != nil {
 		common.Render(ctx, "04060502", err)
+		return
 	}
 	common.Render(ctx, "04060500", nil)
 }

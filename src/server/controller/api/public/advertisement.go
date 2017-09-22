@@ -341,6 +341,7 @@ func (self *AdvertisementController)Delete(ctx *iris.Context) {
 	}
 	if err := advertisementService.Delete(id); err != nil {
 		common.Render(ctx, "04040402", err)
+		return
 	}
 	common.Render(ctx, "04040400", nil)
 }

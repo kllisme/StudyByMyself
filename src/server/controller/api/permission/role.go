@@ -62,6 +62,7 @@ func (self *RoleController)Delete(ctx *iris.Context) {
 	}
 	if err := roleService.Delete(id); err != nil {
 		common.Render(ctx, "000002", err)
+		return
 	}
 	common.Render(ctx, "27050400", nil)
 }

@@ -17,10 +17,12 @@ func (self *ActionController)GetByID(ctx *iris.Context) {
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
+		return
 	}
 	action, err := actionService.GetByID(id)
 	if err != nil {
 		common.Render(ctx, "000002", err)
+		return
 	}
 	common.Render(ctx, "01030100", action)
 }
@@ -44,9 +46,11 @@ func (self *ActionController)Create(ctx *iris.Context) {
 	action := mngModel.Action{}
 	if err := ctx.ReadJSON(&action); err != nil {
 		common.Render(ctx, "01030301", err)
+		return
 	}
 	if err := actionService.Create(&action); err != nil {
 		common.Render(ctx, "000002", err)
+		return
 	}
 	common.Render(ctx, "01030300", action)
 }
@@ -56,9 +60,11 @@ func (self *ActionController)Delete(ctx *iris.Context) {
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
+		return
 	}
 	if err := actionService.Delete(id); err != nil {
 		common.Render(ctx, "000002", err)
+		return
 	}
 	common.Render(ctx, "01030400", nil)
 }
@@ -69,10 +75,12 @@ func (self *ActionController)Update(ctx *iris.Context) {
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
+		return
 	}
 	_, err = actionService.GetByID(id)
 	if err != nil {
 		common.Render(ctx, "000003", err)
+		return
 	}
 	err = ctx.ReadJSON(&action)
 	if err != nil {
@@ -88,6 +96,7 @@ func (self *ActionController)Update(ctx *iris.Context) {
 	result, err := actionService.Update(&action)
 	if err != nil {
 		common.Render(ctx, "000002", err)
+		return
 	}
 	common.Render(ctx, "01030500", result)
 }

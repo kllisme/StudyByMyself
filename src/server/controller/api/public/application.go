@@ -23,6 +23,7 @@ func (self *ApplicationController)GetByID(ctx *iris.Context) {
 	application, err := applicationService.GetByID(id)
 	if err != nil {
 		common.Render(ctx, "04020102", err)
+		return
 	}
 	common.Render(ctx, "04020100", application)
 }
@@ -135,6 +136,7 @@ func (self *ApplicationController)Delete(ctx *iris.Context) {
 
 	if err := applicationService.Delete(id); err != nil {
 		common.Render(ctx, "04020404", nil)
+		return
 	}
 	common.Render(ctx, "04020400", nil)
 }

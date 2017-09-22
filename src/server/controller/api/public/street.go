@@ -222,6 +222,7 @@ func (self *StreetController)Delete(ctx *iris.Context) {
 	}
 	if err := streetService.Delete(id); err != nil {
 		common.Render(ctx, "04080502", err)
+		return
 	}
 	common.Render(ctx, "04080500", nil)
 }

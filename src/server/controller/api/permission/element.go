@@ -23,6 +23,7 @@ func (self *ElementController)GetByID(ctx *iris.Context) {
 	element, err := elementService.GetByID(id)
 	if err != nil {
 		common.Render(ctx, "000002", err)
+		return
 	}
 	common.Render(ctx, "27070100", element)
 }
@@ -118,6 +119,7 @@ func (self *ElementController)Delete(ctx *iris.Context) {
 	}
 	if err := elementService.Delete(id); err != nil {
 		common.Render(ctx, "000002", err)
+		return
 	}
 	common.Render(ctx, "27070400", nil)
 }

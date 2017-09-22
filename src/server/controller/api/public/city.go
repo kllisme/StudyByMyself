@@ -181,6 +181,7 @@ func (self *CityController)Delete(ctx *iris.Context) {
 	}
 	if err := cityService.Delete(id); err != nil {
 		common.Render(ctx, "04050502", err)
+		return
 	}
 	common.Render(ctx, "04050500", nil)
 }

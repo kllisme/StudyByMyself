@@ -24,6 +24,7 @@ func (self *PermissionController)GetByID(ctx *iris.Context) {
 	_permission, err := permissionService.GetByID(id)
 	if err != nil {
 		common.Render(ctx, "000002", err)
+		return
 	}
 	common.Render(ctx, "27060100", _permission)
 }
@@ -119,6 +120,7 @@ func (self *PermissionController)Delete(ctx *iris.Context) {
 	}
 	if err := permissionService.Delete(id); err != nil {
 		common.Render(ctx, "000002", err)
+		return
 	}
 	common.Render(ctx, "27060400", nil)
 }
