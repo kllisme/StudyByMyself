@@ -116,14 +116,14 @@ func (self *ApplicationController)Update(ctx *iris.Context) {
 
 func (self *ApplicationController)Delete(ctx *iris.Context) {
 	applicationService := public.ApplicationService{}
-	adSpaceService:= public.ADSpaceService{}
+	adPositionService := public.ADPositionService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04020401", nil)
 		return
 	}
 
-	adList, err := adSpaceService.GetLocationIDs(id)
+	adList, err := adPositionService.GetIDsByAPPID(id)
 	if err != nil {
 		common.Render(ctx, "04020402", err)
 		return

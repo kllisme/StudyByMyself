@@ -20,7 +20,7 @@ type AdvertisementController struct {
 
 func (self *AdvertisementController)GetByID(ctx *iris.Context) {
 	advertisementService := public.AdvertisementService{}
-	adSpaceService := public.ADSpaceService{}
+	adPositionService := public.ADPositionService{}
 	applicationService := public.ApplicationService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
@@ -33,14 +33,14 @@ func (self *AdvertisementController)GetByID(ctx *iris.Context) {
 		return
 	}
 
-	adSpace, err := adSpaceService.GetByID(advertisement.LocationID)
+	adPosition, err := adPositionService.GetByID(advertisement.AdPositionID)
 	if err != nil {
 		common.Render(ctx, "04040103", err)
 		return
 	}
-	advertisement.LocationName = adSpace.Name
+	advertisement.AdPositionName = adPosition.Name
 
-	app, err := applicationService.GetByID(adSpace.APPID)
+	app, err := applicationService.GetByID(adPosition.APPID)
 	if err != nil {
 		common.Render(ctx, "04040104", err)
 		return
@@ -53,36 +53,36 @@ func (self *AdvertisementController)GetByID(ctx *iris.Context) {
 
 func (self *AdvertisementController)Paging(ctx *iris.Context) {
 	advertisementService := public.AdvertisementService{}
-	adSpaceService := public.ADSpaceService{}
+	adPositionService := public.ADPositionService{}
 	applicationService := public.ApplicationService{}
-	var locationIDs []int
+	var adPositionIDs []int
 	offset, _ := ctx.URLParamInt("offset")
 	limit, _ := ctx.URLParamInt("limit")
 	name := strings.TrimSpace(ctx.URLParam("name"))
 	appID, _ := ctx.URLParamInt("appId")
-	locationID, _ := ctx.URLParamInt("locationId")
-	if locationID != 0 {
-		locationIDs = []int{locationID}
+	adPositionID, _ := ctx.URLParamInt("adPositionId")
+	if adPositionID != 0 {
+		adPositionIDs = []int{adPositionID}
 	} else if appID != 0 {
-		list, err := adSpaceService.GetLocationIDs(appID)
+		list, err := adPositionService.GetIDsByAPPID(appID)
 		if err != nil {
 			common.Render(ctx, "04040203", err)
 			return
 		}
 		if len(list) == 0 {
-			locationIDs = []int{0}
+			adPositionIDs = []int{0}
 		} else {
-			locationIDs = list
+			adPositionIDs = list
 		}
 	} else {
-		locationIDs = []int{}
+		adPositionIDs = []int{}
 	}
-	start := strings.TrimSpace(ctx.URLParam("startedAt"))
-	end := strings.TrimSpace(ctx.URLParam("endedAt"))
+	start := strings.TrimSpace(ctx.URLParam("startAt"))
+	end := strings.TrimSpace(ctx.URLParam("endAt"))
 	display, _ := ctx.URLParamInt("display")
 	status, _ := ctx.URLParamInt("status")
 	common.Logger.Debug(name)
-	result, err := advertisementService.Paging("", name, locationIDs, start, end, display, status, offset, limit)
+	result, err := advertisementService.Paging("", name, adPositionIDs, start, end, display, status, offset, limit)
 	if err != nil {
 		common.Render(ctx, "04040201", err)
 		return
@@ -90,14 +90,14 @@ func (self *AdvertisementController)Paging(ctx *iris.Context) {
 
 	adList := result.Objects.([]*model.Advertisement)
 	for _, ad := range adList {
-		adSpace, err := adSpaceService.GetByID(ad.LocationID)
+		adPosition, err := adPositionService.GetByID(ad.AdPositionID)
 		if err != nil {
 			common.Render(ctx, "04040204", err)
 			return
 		}
-		ad.LocationName = adSpace.Name
+		ad.AdPositionName = adPosition.Name
 
-		app, err := applicationService.GetByID(adSpace.APPID)
+		app, err := applicationService.GetByID(adPosition.APPID)
 		if err != nil {
 			common.Render(ctx, "04040205", err)
 			return
@@ -112,19 +112,19 @@ func (self *AdvertisementController)Paging(ctx *iris.Context) {
 
 func (self *AdvertisementController)Create(ctx *iris.Context) {
 	advertisementService := public.AdvertisementService{}
-	adSpaceService := public.ADSpaceService{}
+	adPositionService := public.ADPositionService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "04040301", err)
 		return
 	}
 
-	locationID := params.Get("locationId").MustInt()
-	if locationID == 0 {
+	adPositionID := params.Get("adPositionId").MustInt()
+	if adPositionID == 0 {
 		common.Render(ctx, "04040302", nil)
 		return
 	}
-	adSpace, err := adSpaceService.GetByID(locationID)
+	adPosition, err := adPositionService.GetByID(adPositionID)
 	if err != nil {
 		common.Render(ctx, "04040303", err)
 		return
@@ -175,7 +175,7 @@ func (self *AdvertisementController)Create(ctx *iris.Context) {
 	display := params.Get("displayStrategy").MustInt()
 	displayParams := ""
 	if display == 2 {
-		if adSpace.IdentifyNeeded == 1 {
+		if adPosition.IdentifyNeeded == 1 {
 			displayParams = strings.TrimSpace(params.Get("displayParams").MustString())
 			if displayParams == "" {
 				common.Render(ctx, "04040312", err)
@@ -192,7 +192,7 @@ func (self *AdvertisementController)Create(ctx *iris.Context) {
 		Name:name,
 		DisplayParams:displayParams,
 		Status:status,
-		LocationID:locationID,
+		AdPositionID:adPositionID,
 		Title:title,
 		URL:url,
 		Image:image,
@@ -221,7 +221,7 @@ func (self *AdvertisementController)Create(ctx *iris.Context) {
 
 func (self *AdvertisementController)Update(ctx *iris.Context) {
 	advertisementService := public.AdvertisementService{}
-	adSpaceService := public.ADSpaceService{}
+	adPositionService := public.ADPositionService{}
 	params := simplejson.New()
 
 	id, err := ctx.ParamInt("id")
@@ -241,12 +241,8 @@ func (self *AdvertisementController)Update(ctx *iris.Context) {
 		return
 	}
 
-	//locationID := params.Get("locationId").MustInt()
-	//if locationID == 0 {
-	//	common.Render(ctx, "04040504", nil)
-	//	return
-	//}
-	adSpace, err := adSpaceService.GetByID(advertisement.LocationID)
+
+	adPosition, err := adPositionService.GetByID(advertisement.AdPositionID)
 	if err != nil {
 		common.Render(ctx, "04040505", err)
 		return
@@ -296,7 +292,7 @@ func (self *AdvertisementController)Update(ctx *iris.Context) {
 	display := params.Get("displayStrategy").MustInt()
 	displayParams := ""
 	if display == 2 {
-		if adSpace.IdentifyNeeded == 1 {
+		if adPosition.IdentifyNeeded == 1 {
 			displayParams = strings.TrimSpace(params.Get("displayParams").MustString())
 			if displayParams == "" {
 				common.Render(ctx, "04040514", err)
@@ -326,7 +322,6 @@ func (self *AdvertisementController)Update(ctx *iris.Context) {
 	advertisement.Status = status
 	advertisement.StartedAt = startAt
 	advertisement.EndedAt = endAt
-	//advertisement.LocationID = locationID
 	advertisement.Title = title
 	advertisement.Name = name
 	entity, err := advertisementService.Update(advertisement)

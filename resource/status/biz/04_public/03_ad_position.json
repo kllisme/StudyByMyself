@@ -1,5 +1,5 @@
 {
-  "0403":"adSpace",
+  "0403":"adPosition",
   "040301":"GetByID",
   "04030100": {"status": "OK", "msg": "", "description": "获取广告位信息成功", "isError": false },
   "04030101": { "status": "NOT_FOUND_ENTITY", "msg": "你所请求的资源不存在,请检查后再试!", "description": "URL无法匹配", "isError": true },

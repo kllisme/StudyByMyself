@@ -11,9 +11,9 @@ type AdvertisementService struct {
 
 }
 
-func (self *AdvertisementService)GetListByLocationID(id int) (*[]*public.Advertisement, error) {
+func (self *AdvertisementService)GetListByADPositionID(id int) (*[]*public.Advertisement, error) {
 	advertisementList := make([]*public.Advertisement, 0)
-	err := common.SodaMngDB_R.Where("location_id = ?", id).Order("id desc").Find(&advertisementList).Error
+	err := common.SodaMngDB_R.Where("ad_position_id = ?", id).Order("id desc").Find(&advertisementList).Error
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (self *AdvertisementService)GetByID(id int) (*public.Advertisement, error) 
 	return &advertisement, nil
 }
 
-func (self *AdvertisementService)Paging(fullName string, name string, locationIDs []int, start string, end string, display int, status int, offset int, limit int) (*entity.PaginationData, error) {
+func (self *AdvertisementService)Paging(fullName string, name string, adPositionIDs []int, start string, end string, display int, status int, offset int, limit int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 	advertisementList := make([]*public.Advertisement, 0)
 	db := common.SodaMngDB_R
@@ -46,9 +46,9 @@ func (self *AdvertisementService)Paging(fullName string, name string, locationID
 			return db.Where("name like (?)", "%" + name + "%")
 		})
 	}
-	if len(locationIDs) != 0 {
+	if len(adPositionIDs) != 0 {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("location_id in (?)", locationIDs)
+			return db.Where("ad_position_id in (?)", adPositionIDs)
 		})
 	}
 	if start != "" {
@@ -97,7 +97,7 @@ func (self *AdvertisementService)Create(advertisement *public.Advertisement) (*p
 func (self *AdvertisementService)Update(advertisement *public.Advertisement) (*public.Advertisement, error) {
 	_advertisement := map[string]interface{}{
 		"name":advertisement.Name,
-		"locationId":advertisement.LocationID,
+		"adPositionId":advertisement.AdPositionID,
 		"title":advertisement.Title,
 		"image":advertisement.Image,
 		"url":advertisement.URL,

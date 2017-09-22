@@ -10,44 +10,44 @@ import (
 	"maizuo.com/soda/erp/api/src/server/kit/functions"
 )
 
-type ADSpaceController struct {
+type ADPositionController struct {
 
 }
 
-func (self *ADSpaceController)GetByID(ctx *iris.Context) {
-	adSpaceService := public.ADSpaceService{}
+func (self *ADPositionController)GetByID(ctx *iris.Context) {
+	adPositionService := public.ADPositionService{}
 	applicationService := public.ApplicationService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04030101", err)
 		return
 	}
-	adSpace, err := adSpaceService.GetByID(id)
+	adPosition, err := adPositionService.GetByID(id)
 	if err != nil {
 		common.Render(ctx, "04030102", err)
 	}
-	app, err := applicationService.GetByID(adSpace.APPID)
+	app, err := applicationService.GetByID(adPosition.APPID)
 	if err != nil {
 		common.Render(ctx, "04030103", err)
 	}
-	adSpace.APPName = app.Name
-	common.Render(ctx, "04030100", adSpace)
+	adPosition.APPName = app.Name
+	common.Render(ctx, "04030100", adPosition)
 }
 
-func (self *ADSpaceController)Paging(ctx *iris.Context) {
-	adSpaceService := public.ADSpaceService{}
+func (self *ADPositionController)Paging(ctx *iris.Context) {
+	adPositionService := public.ADPositionService{}
 	applicationService := public.ApplicationService{}
 
 	appID, _ := ctx.URLParamInt("appId")
 	offset, _ := ctx.URLParamInt("offset")
 	limit, _ := ctx.URLParamInt("limit")
-	result, err := adSpaceService.Paging("", appID, offset, limit)
+	result, err := adPositionService.Paging("", appID, offset, limit)
 	if err != nil {
 		common.Render(ctx, "04030201", err)
 		return
 	}
-	adSpaceList := result.Objects.([]*model.ADSpace)
-	for _, value := range adSpaceList {
+	adPositionList := result.Objects.([]*model.ADPosition)
+	for _, value := range adPositionList {
 		app, err := applicationService.GetByID(value.APPID)
 		if err != nil {
 			common.Render(ctx, "04030202", err)
@@ -58,8 +58,8 @@ func (self *ADSpaceController)Paging(ctx *iris.Context) {
 	common.Render(ctx, "04030200", result)
 }
 
-func (self *ADSpaceController)Create(ctx *iris.Context) {
-	adSpaceService := public.ADSpaceService{}
+func (self *ADPositionController)Create(ctx *iris.Context) {
+	adPositionService := public.ADPositionService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "04030301", err)
@@ -90,7 +90,7 @@ func (self *ADSpaceController)Create(ctx *iris.Context) {
 		common.Render(ctx, "04030307", nil)
 		return
 	}
-	adSpace := model.ADSpace{
+	adPosition := model.ADPosition{
 		Name:name,
 		APPID:appID,
 		Description:description,
@@ -98,7 +98,7 @@ func (self *ADSpaceController)Create(ctx *iris.Context) {
 		Standard:standard,
 	}
 
-	if p, err := adSpaceService.Paging(name, appID, 0, 0); err != nil {
+	if p, err := adPositionService.Paging(name, appID, 0, 0); err != nil {
 		common.Render(ctx, "04030308", err)
 		return
 	} else {
@@ -108,7 +108,7 @@ func (self *ADSpaceController)Create(ctx *iris.Context) {
 		}
 	}
 
-	entity, err := adSpaceService.Create(&adSpace)
+	entity, err := adPositionService.Create(&adPosition)
 	if err != nil {
 		common.Render(ctx, "04030306", err)
 		return
@@ -116,8 +116,8 @@ func (self *ADSpaceController)Create(ctx *iris.Context) {
 	common.Render(ctx, "04030300", entity)
 }
 
-func (self *ADSpaceController)Update(ctx *iris.Context) {
-	adSpaceService := public.ADSpaceService{}
+func (self *ADPositionController)Update(ctx *iris.Context) {
+	adPositionService := public.ADPositionService{}
 
 	id, err := ctx.ParamInt("id")
 	if err != nil {
@@ -125,7 +125,7 @@ func (self *ADSpaceController)Update(ctx *iris.Context) {
 		return
 	}
 
-	adSpace, err := adSpaceService.GetByID(id)
+	adPosition, err := adPositionService.GetByID(id)
 	if err != nil {
 		common.Render(ctx, "04030502", err)
 		return
@@ -162,22 +162,22 @@ func (self *ADSpaceController)Update(ctx *iris.Context) {
 	}
 	identifyNeeded := params.Get("identifyNeeded").MustInt()
 
-	if p, err := adSpaceService.Paging(name, adSpace.APPID, 0, 0); err != nil {
+	if p, err := adPositionService.Paging(name, adPosition.APPID, 0, 0); err != nil {
 		common.Render(ctx, "04030510", err)
 		return
 	} else {
-		if p.Pagination.Total != 0 && name != adSpace.Name {
+		if p.Pagination.Total != 0 && name != adPosition.Name {
 			common.Render(ctx, "04030511", nil)
 			return
 		}
 	}
 
-	adSpace.Name = name
-	adSpace.Description = description
-	adSpace.IdentifyNeeded = identifyNeeded
-	//adSpace.APPID = appID
-	adSpace.Standard = standard
-		entity, err := adSpaceService.Update(adSpace)
+	adPosition.Name = name
+	adPosition.Description = description
+	adPosition.IdentifyNeeded = identifyNeeded
+	//adPosition.APPID = appID
+	adPosition.Standard = standard
+		entity, err := adPositionService.Update(adPosition)
 	if err != nil {
 		common.Render(ctx, "04030508", err)
 		return
@@ -185,15 +185,15 @@ func (self *ADSpaceController)Update(ctx *iris.Context) {
 	common.Render(ctx, "04030500", entity)
 }
 
-func (self *ADSpaceController)Delete(ctx *iris.Context) {
-	adSpaceService := public.ADSpaceService{}
+func (self *ADPositionController)Delete(ctx *iris.Context) {
+	adPositionService := public.ADPositionService{}
 	AdvertisementService := public.AdvertisementService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04030401", err)
 		return
 	}
-	adList, err := AdvertisementService.GetListByLocationID(id)
+	adList, err := AdvertisementService.GetListByADPositionID(id)
 	if err != nil {
 		common.Render(ctx, "04030402", err)
 		return
@@ -202,7 +202,7 @@ func (self *ADSpaceController)Delete(ctx *iris.Context) {
 		common.Render(ctx, "04030403", nil)
 		return
 	}
-	if err := adSpaceService.Delete(id); err != nil {
+	if err := adPositionService.Delete(id); err != nil {
 		common.Render(ctx, "04030404", err)
 	}
 	common.Render(ctx, "04030400", nil)

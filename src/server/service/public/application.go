@@ -60,7 +60,7 @@ func (self *ApplicationService)Delete(id int) error {
 	if err := tx.Delete(&public.Application{}, id).Error; err != nil {
 		tx.Rollback()
 		return err
-	} else if err := tx.Where("app_id = ?", id).Delete(&public.ADSpace{}).Error; err != nil {
+	} else if err := tx.Where("app_id = ?", id).Delete(&public.ADPosition{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

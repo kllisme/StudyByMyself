@@ -9,7 +9,7 @@ func Setup(v iris.MuxAPI) {
 	var (
 		applicationCtrl = &public.ApplicationController{}
 		advertisementCtrl = &public.AdvertisementController{}
-		adSpaceCtrl = &public.ADSpaceController{}
+		adPositionCtrl = &public.ADPositionController{}
 	)
 
 	api := v.Party("/")
@@ -30,9 +30,9 @@ func Setup(v iris.MuxAPI) {
 	api.Post("/advertisements/images", advertisementCtrl.SaveImage)
 	api.Post("/advertisements/batch/orders", advertisementCtrl.BatchUpdateOrder)
 
-	api.Get("/ad-spaces", adSpaceCtrl.Paging)
-	api.Post("/ad-spaces", adSpaceCtrl.Create)
-	api.Delete("/ad-spaces/:id", adSpaceCtrl.Delete)
-	api.Put("/ad-spaces/:id", adSpaceCtrl.Update)
-	api.Get("/ad-spaces/:id", adSpaceCtrl.GetByID)
+	api.Get("/ad-positions", adPositionCtrl.Paging)
+	api.Post("/ad-positions", adPositionCtrl.Create)
+	api.Delete("/ad-positions/:id", adPositionCtrl.Delete)
+	api.Put("/ad-positions/:id", adPositionCtrl.Update)
+	api.Get("/ad-positions/:id", adPositionCtrl.GetByID)
 }
