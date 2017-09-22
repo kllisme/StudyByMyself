@@ -25,10 +25,11 @@
   "05010303": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "消费列表获取失败", "isError": true },
   "05010304": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "支付方式列表获取失败", "isError": true },
   "05010305": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "运营商信息获取失败", "isError": true },
-  "05010306": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "父级运营商信息获取失败", "isError": true },
-  "05010307": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "设备信息获取失败", "isError": true },
-  "05010308": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "操作excel文件失败", "isError": true },
-  "05010309": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "设备信息获取失败", "isError": true },
-  "05010310": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "excel文件插入记录失败", "isError": true },
-  "05010311": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "excel文件保存失败", "isError": true }
+  "05010306": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "设备信息获取失败", "isError": true },
+  "05010307": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "运营商信息无法自洽", "isError": true },
+  "05010308": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "父级运营商信息无法自洽", "isError": true },
+  "05010309": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "设备信息无法自洽", "isError": true },
+  "05010310": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "操作excel文件失败", "isError": true },
+  "05010311": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "excel文件插入记录失败", "isError": true },
+  "05010312": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "excel文件保存失败", "isError": true }
 }
