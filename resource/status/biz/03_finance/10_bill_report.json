@@ -1,0 +1,18 @@
+{
+  "2710":"bill_report",
+
+  "271001":"DetailsOfReport",
+  "27100100":{ "status": "OK", "msg": "", "description": "获取报表列表成功", "isError": false },
+  "27100101":{ "status": "UNPROCESSABLE_ENTITY", "msg": "错误的时间区间", "description": "错误的时间区间", "isError": false },
+  "27100102":{ "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "查询报表数据失败", "isError": true },
+
+  "271002":"Export",
+  "27100200":{ "status": "OK", "msg": "", "description": "导出报表列表成功", "isError": false },
+  "27100201":{ "status": "UNPROCESSABLE_ENTITY", "msg": "错误的参数类型", "description": "解析json数据出错", "isError": false },
+  "27100202":{ "status": "UNPROCESSABLE_ENTITY", "msg": "服务器内部异常", "description": "错误的时间区间", "isError": false },
+  "27100203":{ "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "查询报表数据失败", "isError": true },
+  "27100204":{ "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "操作excel文件失败", "isError": true },
+  "27100205":{ "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "excel文件插入记录失败", "isError": true },
+  "27100206":{ "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "excel文件保存失败", "isError": true }
+
+}

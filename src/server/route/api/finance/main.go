@@ -9,6 +9,7 @@ func Setup(v iris.MuxAPI) {
 	var (
 		billCtrl      = &finance.BillController{}
 		dailyBillCtrl = &finance.DailyBillController{}
+		billReportCtrl = &finance.BillReportController{}
 	)
 
 	api := v.Party("/")
@@ -19,4 +20,6 @@ func Setup(v iris.MuxAPI) {
 	api.Get("/daily-bills/:id", dailyBillCtrl.DetailsById)
 
 	api.Post("/settlement/actions/pay", billCtrl.BatchPay)
+	api.Get("/settlement",billReportCtrl.DetailsOfReport)
+	api.Post("/settlement/actions/export",billReportCtrl.Export)
 }

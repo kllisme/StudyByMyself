@@ -344,3 +344,33 @@ func (self *BillService) BasicByBillId(billId string) (*mngModel.Bill, error) {
 	}
 	return bill, r.Error
 }
+
+/* 返回日期字符串为key的map集合*/
+func (self *BillService) ReportMapByPeriodAndAccountType(start, end string, accountType int) (*map[string]map[string]interface{}, error) {
+	type Result struct {
+		Cast int
+		TotalAmount int
+		SettledAt time.Time
+	}
+
+	sql := "select sum(cast) Cast,sum(total_amount) TotalAmount,date(settled_at) SettledAt from bill where " +
+		"date(settled_at) >= ? and date(settled_at) <= ? and account_type = ? and status = 4 "+ // 必须要获取到成功的账单
+		"group by date(SettledAt) order by settled_at desc"
+	rows,err := common.SodaMngDB_R.Raw(sql,start,end,accountType).Rows()
+	defer rows.Close()
+	if err != nil {
+		return nil, err
+	}
+	reportMap := make(map[string]map[string]interface{})
+	for rows.Next() {
+		result := &Result{Cast:0,TotalAmount:0}
+		if err = rows.Scan(&result.Cast,&result.TotalAmount,&result.SettledAt);err != nil {
+			return nil,err
+		}
+		resultMap := make(map[string]interface{})
+		resultMap["cast"] = result.Cast
+		resultMap["totalAmount"] = result.TotalAmount
+		reportMap[result.SettledAt.Local().Format("2006-01-02")] = resultMap
+	}
+	return &reportMap, nil
+}

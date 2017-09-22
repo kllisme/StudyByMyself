@@ -1,5 +1,6 @@
 {
   "2708":"bill",
+
   "270801":"ListByAccountType",
   "27080100":{ "status": "OK", "msg": "", "description": "获取账单列表成功", "isError": false },
   "27080101":{ "status": "UNPROCESSABLE_ENTITY", "msg": "错误的账号类型", "description": "账号类型不能为空", "isError": false },
@@ -54,13 +55,12 @@
   "27080412":{"status": "INTERNAL_SERVER_ERROR", "msg": "软删除微信批次号失败", "description": "软删除微信批次号失败", "isError": false },
   "27080413":{"status": "NOT_FOUND_ENTITY", "msg": "不存在可结算的账单", "description": "不存在可结算的账单", "isError": false },
 
-  "270805":"ListByAccountType",
+  "270805":"Export",
   "27080500":{ "status": "OK", "msg": "", "description": "excel文件导出成功", "isError": false },
   "27080501":{ "status": "UNPROCESSABLE_ENTITY", "msg": "错误的账号类型", "description": "错误的账号类型", "isError": false },
   "27080502":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取要导出账单列表失败", "isError": true },
   "27080503":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "操作excel文件失败", "isError": true },
   "27070504":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "获取账单用户信息失败", "isError": true },
   "27080505":{"status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "excel文件插入记录失败", "isError": true }
-
 
 }
