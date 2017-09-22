@@ -346,7 +346,7 @@ func (self *BillService) BasicByBillId(billId string) (*model.Bill, error) {
 }
 
 /* 返回日期字符串为key的map集合*/
-func (self *BillService) ReportMapByPeriodAndAccountType(start, end time.Time, accountType int) (*map[string]map[string]interface{}, error) {
+func (self *BillService) ReportMapByPeriodAndAccountType(start, end string, accountType int) (*map[string]map[string]interface{}, error) {
 	type Result struct {
 		Cast int
 		TotalAmount int
@@ -354,9 +354,9 @@ func (self *BillService) ReportMapByPeriodAndAccountType(start, end time.Time, a
 	}
 
 	sql := "select sum(cast) Cast,sum(total_amount) TotalAmount,date(settled_at) SettledAt from bill where " +
-		"created_timestamp >= ? and created_timestamp < ? and account_type = ? and status = 4 "+ // 必须要获取到成功的账单
+		"date(settled_at) >= ? and date(settled_at) <= ? and account_type = ? and status = 4 "+ // 必须要获取到成功的账单
 		"group by date(SettledAt)"
-	rows,err := common.SodaMngDB_R.Raw(sql,start.Unix(),end.Unix(),accountType).Rows()
+	rows,err := common.SodaMngDB_R.Raw(sql,start,end,accountType).Rows()
 	defer rows.Close()
 	if err != nil {
 		return nil, err

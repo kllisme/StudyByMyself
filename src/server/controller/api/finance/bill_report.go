@@ -42,14 +42,14 @@ func (self *BillReportController) DetailsOfReport(ctx *iris.Context) {
 	}
 
 	alipayType, wechatType := 1, 2
-	alipayMap, err := billService.ReportMapByPeriodAndAccountType(start, end, alipayType)
+	alipayMap, err := billService.ReportMapByPeriodAndAccountType(startAt[:10], endAt[:10], alipayType)
 	if err != nil {
 		common.Logger.Warnln("BasicByAccountTypeAndDatetime ------------", err)
 		common.Render(ctx, "27100102", err)
 		return
 	}
 
-	wechatMap, err := billService.ReportMapByPeriodAndAccountType(start, end, wechatType)
+	wechatMap, err := billService.ReportMapByPeriodAndAccountType(startAt[:10], endAt[:10], wechatType)
 	if err != nil {
 		common.Logger.Warnln("BasicByAccountTypeAndDatetime ------------", err)
 		common.Render(ctx, "27100102", err)
@@ -124,14 +124,14 @@ func (self *BillReportController) Export(ctx *iris.Context) {
 	}
 
 	alipayType, wechatType := 1, 2
-	alipayMap, err := billService.ReportMapByPeriodAndAccountType(start, end, alipayType)
+	alipayMap, err := billService.ReportMapByPeriodAndAccountType(startAt[:10], endAt[:10], alipayType)
 	if err != nil {
 		common.Logger.Warnln("BasicByAccountTypeAndDatetime ------------", err)
 		common.Render(ctx, "27100203", err)
 		return
 	}
 
-	wechatMap, err := billService.ReportMapByPeriodAndAccountType(start, end, wechatType)
+	wechatMap, err := billService.ReportMapByPeriodAndAccountType(startAt[:10], endAt[:10], wechatType)
 	if err != nil {
 		common.Logger.Warnln("BasicByAccountTypeAndDatetime ------------", err)
 		common.Render(ctx, "27100203", err)
