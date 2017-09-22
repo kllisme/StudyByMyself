@@ -90,8 +90,8 @@ func ExportBillReportDataAsCol(sheet *xlsx.Sheet, value *mngModel.DailyOperate, 
 	}
 	s := []interface{}{
 		value.Date,
-		float64(value.TotalAlipayConsume) / 100.00,
-		float64(value.TotalWechatConsume) / 100.00,
+		float64(value.TotalAlipayConsume+value.TotalAlipayRecharge) / 100.00,
+		float64(value.TotalWechatConsume+value.TotalWechatRecharge) / 100.00,
 		float64(getValOrDefaultVal(alipayMap, "totalAmount")) / 100.00,
 		float64(getValOrDefaultVal(wechatMap, "totalAmount")) / 100.00,
 		float64(getValOrDefaultVal(alipayMap, "cast")) / 100.00,

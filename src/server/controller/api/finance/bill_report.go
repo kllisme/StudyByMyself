@@ -70,7 +70,7 @@ func (self *BillReportController) DetailsOfReport(ctx *iris.Context) {
 		date, _ := time.Parse("2006-01-02", value.Date)
 		response.Date = date.Local()
 		wMap := make(map[string]interface{})
-		wMap["totalAmount"] = value.TotalWechatConsume
+		wMap["totalAmount"] = value.TotalWechatConsume + value.TotalWechatRecharge
 		wMap["settlement"] = map[string]interface{}{
 			"totalAmount": getValOrDefaultVal((*wechatMap)[value.Date], "totalAmount"),
 			"cast":        getValOrDefaultVal((*wechatMap)[value.Date], "cast"),
@@ -78,7 +78,7 @@ func (self *BillReportController) DetailsOfReport(ctx *iris.Context) {
 		response.Wechat = wMap
 
 		aMap := make(map[string]interface{})
-		aMap["totalAmount"] = value.TotalAlipayConsume
+		aMap["totalAmount"] = value.TotalAlipayConsume + value.TotalAlipayRecharge
 		aMap["settlement"] = map[string]interface{}{
 			"totalAmount": getValOrDefaultVal((*alipayMap)[value.Date], "totalAmount"),
 			"cast":        getValOrDefaultVal((*alipayMap)[value.Date], "cast"),
