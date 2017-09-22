@@ -200,8 +200,6 @@ func (self *ConsumptionController) Export(ctx *iris.Context) {
 		return
 	}
 
-	ticketList := pagination.Objects.([]*sodaModel.Ticket)
-	consumptionList := make([]*payload.Consumption, 0)
 	paymentList, err := paymentService.GetAll()
 	if err != nil {
 		if err != nil {
@@ -209,20 +207,46 @@ func (self *ConsumptionController) Export(ctx *iris.Context) {
 			return
 		}
 	}
+
+	ticketList := pagination.Objects.([]*sodaModel.Ticket)
+	userMap := make(map[int]*model.User)
+	userPage, err := userService.Paging("","", 0, 0, 0, 0)
+	if err != nil {
+		common.Render(ctx, "05010305", err)
+		return
+	}
+	userList, _ = userPage.Objects.([]*model.User)
+	for _, user := range userList {
+		userMap[user.ID] = user
+	}
+
+	deviceMap := make(map[string]*model.Device)
+	devicePage, err := deviceService.Paging(userIDs,[]int{},"",serial, 0, 0,[]int{}, 0, 0)
+	if err != nil {
+		common.Render(ctx, "05010306", err)
+		return
+	}
+	deviceList, _ := devicePage.Objects.([]*model.Device)
+	for _, device := range deviceList {
+		deviceMap[device.SerialNumber] = device
+	}
+
+	consumptionList := make([]*payload.Consumption, 0)
+
 	for _, ticket := range ticketList {
-		user, err := userService.GetById(ticket.OwnerId)
-		if err != nil {
-			common.Render(ctx, "05010305", err)
-			return
-		}
-		parentUser, err := userService.GetById(user.ParentID)
-		if err != nil {
-			common.Render(ctx, "05010306", err)
-			return
-		}
-		device, err := deviceService.GetBySerialNumber(ticket.DeviceSerial)
-		if err != nil {
+		user := userMap[ticket.OwnerId]
+		if user == nil {
 			common.Render(ctx, "05010307", err)
+			return
+		}
+		parentUser := userMap[user.ParentID]
+		if parentUser == nil {
+			common.Render(ctx, "05010308", err)
+			return
+		}
+		device := deviceMap[ticket.DeviceSerial]
+		if device == nil {
+			common.Render(ctx, "05010309", err)
 			return
 		}
 		consumption := payload.Consumption{}
@@ -267,26 +291,26 @@ func (self *ConsumptionController) Export(ctx *iris.Context) {
 	tableHead := []interface{}{"订单号", "上级运营商", "运营商名称", "服务电话", "模块编号", "楼道信息", "消费手机号", "消费密码", "类型", "消费金额", "支付方式", "下单时间"}
 	tableName := "消费查询列表"
 
-	fileName := "消费订单详情" + strconv.FormatInt(time.Now().Local().Unix(), 10)
+	fileName := "消费订单详情" + time.Now().Format("20060102") + strconv.FormatInt(time.Now().Local().Unix(), 10)
 
 	sheet, file, fileUrl, fileName, err := excel.GetExcelHeader(fileName, tableHead, tableName)
 	if err != nil {
 		common.Logger.Warningln("操作excel文件失败, err ------------>", err)
-		common.Render(ctx, "05010308", err)
+		common.Render(ctx, "05010310", err)
 		return
 	}
 	//将查询的数据装填
 	for _, consumption := range consumptionList {
 		if excel.ExportConsumptionAsCol(sheet, consumption) == 0 {
 			common.Logger.Warningln("excel文件插入记录失败,err ------------>", err)
-			common.Render(ctx, "05010310", err)
+			common.Render(ctx, "05010311", err)
 			return
 		}
 	}
 	err = file.Save(fileUrl)
 	if err != nil {
 		common.Logger.Warningln("excel文件保存失败,err ------------>", err)
-		common.Render(ctx, "05010311", err)
+		common.Render(ctx, "05010312", err)
 		return
 	}
 	sendFile := viper.GetString("server.href") + viper.GetString("export.loadsPath") + "/" + fileName
