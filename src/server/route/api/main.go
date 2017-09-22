@@ -20,7 +20,6 @@ func Api(app *iris.Framework) {
 		captchaCtrl = &api.CaptchaController{}
 		loginCtrl   = &api.LoginController{}
 		billCtrl    = &finance.BillController{}
-		billReportCtrl = &finance.BillReportController{}
 	)
 
 	v1 := app.Party("/v1", func(ctx *iris.Context) {
@@ -29,8 +28,7 @@ func Api(app *iris.Framework) {
 
 	v1.Post("/settlement/actions/wechatPay", billCtrl.WechatPay)
 	v1.Post("/settlement/alipay/notification", billCtrl.AlipayNotification)
-	v1.Get("/settlement",billReportCtrl.DetailsOfReport)
-	v1.Post("/settlement/actions/export",billReportCtrl.Export)
+
 	v1.Get("/captcha.png", captchaCtrl.Captcha)
 	v1.StaticFS(viper.GetString("export.loadsPath"), "."+viper.GetString("export.loadsPath"), 2)
 	//为跨域请求设定入口

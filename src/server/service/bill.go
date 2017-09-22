@@ -355,7 +355,7 @@ func (self *BillService) ReportMapByPeriodAndAccountType(start, end string, acco
 
 	sql := "select sum(cast) Cast,sum(total_amount) TotalAmount,date(settled_at) SettledAt from bill where " +
 		"date(settled_at) >= ? and date(settled_at) <= ? and account_type = ? and status = 4 "+ // 必须要获取到成功的账单
-		"group by date(SettledAt)"
+		"group by date(SettledAt) order by settled_at desc"
 	rows,err := common.SodaMngDB_R.Raw(sql,start,end,accountType).Rows()
 	defer rows.Close()
 	if err != nil {
