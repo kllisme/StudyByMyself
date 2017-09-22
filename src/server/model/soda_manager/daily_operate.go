@@ -1,7 +1,9 @@
-package model
+package soda_manager
+
+import "maizuo.com/soda/erp/api/src/server/model"
 
 type DailyOperate struct {
-	Model
+	model.Model
 	Date                 string `json:"date"`
 	TotalRecharge        int    `json:"totalRecharge"`
 	TotalConsume         int    `json:"totalConsume"`

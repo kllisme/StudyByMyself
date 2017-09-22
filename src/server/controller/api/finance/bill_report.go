@@ -1,14 +1,15 @@
 package finance
 
 import (
+	"strings"
+	"time"
+
 	"github.com/bitly/go-simplejson"
 	"github.com/spf13/viper"
 	"gopkg.in/kataras/iris.v5"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"maizuo.com/soda/erp/api/src/server/kit/excel"
-	"maizuo.com/soda/erp/api/src/server/service"
-	"strings"
-	"time"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
 )
 
 type BillReportController struct {
@@ -16,10 +17,10 @@ type BillReportController struct {
 
 /**获取结算报表详情 */
 func (self *BillReportController) DetailsOfReport(ctx *iris.Context) {
-	dailyOperateService := &service.DailyOperateService{}
-	billService := &service.BillService{}
+	dailyOperateService := &mngService.DailyOperateService{}
+	billService := &mngService.BillService{}
 	type Response struct {
-		Date   time.Time                 `json:"date"`
+		Date   time.Time              `json:"date"`
 		Wechat map[string]interface{} `json:"wechat"`
 		Alipay map[string]interface{} `json:"alipay"`
 	}
@@ -66,7 +67,7 @@ func (self *BillReportController) DetailsOfReport(ctx *iris.Context) {
 	for _, value := range *dailyOperateList {
 		response := Response{}
 		// 2016-12-11T12:33:49+08:00
-		date,_ := time.Parse("2006-01-02",value.Date)
+		date, _ := time.Parse("2006-01-02", value.Date)
 		response.Date = date.Local()
 		wMap := make(map[string]interface{})
 		wMap["totalAmount"] = value.TotalWechatConsume
@@ -93,8 +94,8 @@ func (self *BillReportController) DetailsOfReport(ctx *iris.Context) {
 
 /** 导出结算报表详情 */
 func (self *BillReportController) Export(ctx *iris.Context) {
-	dailyOperateService := &service.DailyOperateService{}
-	billService := &service.BillService{}
+	dailyOperateService := &mngService.DailyOperateService{}
+	billService := &mngService.BillService{}
 	type Response struct {
 		Date   string                 `json:"date"`
 		Wechat map[string]interface{} `json:"wechat"`
@@ -111,8 +112,8 @@ func (self *BillReportController) Export(ctx *iris.Context) {
 		common.Render(ctx, "27100202", nil)
 		return
 	}
-	start, _ := time.Parse("2006-01-02", startAt[:10])// 只取日期,除去时间可能对时间戳造成的影响
-	start = start.Add(-8 * time.Hour) // 减去八个小时,否则转换的时间戳是北京时间早上8点的时间戳,从而出现检索不到startAt对应那天的记录
+	start, _ := time.Parse("2006-01-02", startAt[:10]) // 只取日期,除去时间可能对时间戳造成的影响
+	start = start.Add(-8 * time.Hour)                  // 减去八个小时,否则转换的时间戳是北京时间早上8点的时间戳,从而出现检索不到startAt对应那天的记录
 
 	end, _ := time.Parse("2006-01-02", endAt[:10])
 

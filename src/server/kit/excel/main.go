@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/tealeg/xlsx"
-	"maizuo.com/soda-manager/src/server/model"
 	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/payload/crm"
 )
@@ -80,7 +79,7 @@ func ExportConsumptionAsCol(sheet *xlsx.Sheet, consumption *crm.Consumption) int
 	return row.WriteSlice(&s, -1)
 }
 
-func ExportBillReportDataAsCol(sheet *xlsx.Sheet, value *model.DailyOperate, alipayMap map[string]interface{}, wechatMap map[string]interface{}) int {
+func ExportBillReportDataAsCol(sheet *xlsx.Sheet, value *mngModel.DailyOperate, alipayMap map[string]interface{}, wechatMap map[string]interface{}) int {
 	row := sheet.AddRow()
 	getValOrDefaultVal := func(m map[string]interface{}, key string) int {
 		if value, ok := m[key]; ok != false {
