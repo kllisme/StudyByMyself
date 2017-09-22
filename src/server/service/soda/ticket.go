@@ -79,7 +79,7 @@ func (self *TicketService) Paging(userIDs []int, mobile string, paymentID int, d
 
 	if deviceSerial != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("device_serial like (?)", "%" + deviceSerial + "%")
+			return db.Where("device_serial = ?", deviceSerial)
 		})
 	}
 

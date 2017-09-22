@@ -108,7 +108,7 @@ func (self *ConsumptionController) Paging(ctx *iris.Context) {
 		case 4:
 			consumption.TypeName = device.FourthPulseName
 		default:
-			consumption.TypeName = "错误的数据"
+			consumption.TypeName = "/"
 		}
 		consumption.Value = ticket.Value
 		for _, payment := range *paymentList {
@@ -116,6 +116,9 @@ func (self *ConsumptionController) Paging(ctx *iris.Context) {
 				consumption.Payment = payment.Name
 				break
 			}
+		}
+		if consumption.Payment == "" {
+			consumption.Payment = "/"
 		}
 		consumption.PaymentID = ticket.PaymentId
 		consumption.CreatedAt = ticket.CreatedAt
@@ -271,7 +274,7 @@ func (self *ConsumptionController) Export(ctx *iris.Context) {
 		case 4:
 			consumption.TypeName = device.FourthPulseName
 		default:
-			consumption.TypeName = "错误的数据"
+			consumption.TypeName = "/"
 		}
 		consumption.Value = ticket.Value
 		for _, payment := range *paymentList {
@@ -279,6 +282,9 @@ func (self *ConsumptionController) Export(ctx *iris.Context) {
 				consumption.Payment = payment.Name
 				break
 			}
+		}
+		if consumption.Payment == "" {
+			consumption.Payment = "/"
 		}
 		consumption.CreatedAt = ticket.CreatedAt
 		consumptionList = append(consumptionList, &consumption)
