@@ -2,11 +2,11 @@ package permission
 
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/service/permission"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
 	"github.com/bitly/go-simplejson"
-	model "maizuo.com/soda/erp/api/src/server/model/permission"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/kit/functions"
 )
 
@@ -15,7 +15,7 @@ type RoleController struct {
 }
 
 func (self *RoleController)GetAll(ctx *iris.Context) {
-	roleService := permission.RoleService{}
+	roleService := mngService.RoleService{}
 	roleList, err := roleService.GetAll()
 	if err != nil {
 		common.Render(ctx, "000002", err)
@@ -25,7 +25,7 @@ func (self *RoleController)GetAll(ctx *iris.Context) {
 	return
 }
 func (self *RoleController)Create(ctx *iris.Context) {
-	roleService := permission.RoleService{}
+	roleService := mngService.RoleService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "27050301", err)
@@ -41,7 +41,7 @@ func (self *RoleController)Create(ctx *iris.Context) {
 	}
 	description := strings.TrimSpace(params.Get("description").MustString())
 	status := params.Get("status").MustInt()
-	role := model.Role{
+	role := mngModel.Role{
 		Name:name,
 		Description:description,
 		Status:status,
@@ -54,7 +54,7 @@ func (self *RoleController)Create(ctx *iris.Context) {
 	common.Render(ctx, "27050300", entity)
 }
 func (self *RoleController)Delete(ctx *iris.Context) {
-	roleService := permission.RoleService{}
+	roleService := mngService.RoleService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -66,7 +66,7 @@ func (self *RoleController)Delete(ctx *iris.Context) {
 	common.Render(ctx, "27050400", nil)
 }
 func (self *RoleController)GetByID(ctx *iris.Context) {
-	roleService := permission.RoleService{}
+	roleService := mngService.RoleService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", nil)
@@ -79,7 +79,7 @@ func (self *RoleController)GetByID(ctx *iris.Context) {
 	common.Render(ctx, "27050100", role)
 }
 func (self *RoleController)Update(ctx *iris.Context) {
-	roleService := permission.RoleService{}
+	roleService := mngService.RoleService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "27050501", err)
@@ -122,8 +122,8 @@ func (self *RoleController)Update(ctx *iris.Context) {
 }
 
 func (self *RoleController)AssignPermissions(ctx *iris.Context) {
-	roleService := permission.RoleService{}
-	rolePermissionRelService := permission.RolePermissionRelService{}
+	roleService := mngService.RoleService{}
+	rolePermissionRelService := mngService.RolePermissionRelService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -148,8 +148,8 @@ func (self *RoleController)AssignPermissions(ctx *iris.Context) {
 }
 
 func (self *RoleController)GetPermissions(ctx *iris.Context) {
-	roleService := permission.RoleService{}
-	rolePermissionRelService := permission.RolePermissionRelService{}
+	roleService := mngService.RoleService{}
+	rolePermissionRelService := mngService.RolePermissionRelService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)

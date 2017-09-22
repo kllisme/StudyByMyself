@@ -4,10 +4,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
 	"bytes"
 	"encoding/xml"
-
 	"github.com/bitly/go-simplejson"
 	"github.com/fatih/structs"
 	"github.com/go-errors/errors"
@@ -23,8 +21,8 @@ import (
 	"maizuo.com/soda/erp/api/src/server/kit/functions"
 	"maizuo.com/soda/erp/api/src/server/kit/util"
 	"maizuo.com/soda/erp/api/src/server/kit/wechat/pay"
-	"maizuo.com/soda/erp/api/src/server/model"
-	"maizuo.com/soda/erp/api/src/server/service"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
 )
 
 type BillController struct {
@@ -32,7 +30,7 @@ type BillController struct {
 
 // 根据微信支付或者支付宝来获取结算单列表
 func (self *BillController) ListByAccountType(ctx *iris.Context) {
-	userService := &service.UserService{}
+	userService := &mngService.UserService{}
 	limit, _ := ctx.URLParamInt("limit")       // Default: 10
 	offset, _ := ctx.URLParamInt("offset")     //  Default: 0 列表起始位:
 	dateType, _ := ctx.URLParamInt("dateType") // 筛选时间类型,1申请时间 2结算时间
@@ -42,7 +40,7 @@ func (self *BillController) ListByAccountType(ctx *iris.Context) {
 	accountType, _ := ctx.URLParamInt("type")  // 结算支付类型 1:支付宝 2:微信
 	status, _ := ctx.URLParamInt("status")     // 账单状态 1:结算成功 2:等待结算 3:结算中 4:结算失败
 
-	billService := &service.BillService{}
+	billService := &mngService.BillService{}
 
 	if accountType <= 0 {
 		common.Render(ctx, "27080101", nil)
@@ -82,8 +80,8 @@ func (self *BillController) ListByAccountType(ctx *iris.Context) {
 }
 
 func (self *BillController) BatchPay(ctx *iris.Context) {
-	billService := service.BillService{}
-	billBatchNoService := &service.BillBatchNoService{}
+	billService := mngService.BillService{}
+	billBatchNoService := &mngService.BillBatchNoService{}
 	params := simplejson.New()
 	err := ctx.ReadJSON(params)
 	if err != nil {
@@ -156,11 +154,11 @@ func (self *BillController) BatchPay(ctx *iris.Context) {
 	map[string]string aliPayReqParam
 	string   code
 */
-func BatchAlipay(billList []*model.Bill) (map[string]string, string, error) {
+func BatchAlipay(billList []*mngModel.Bill) (map[string]string, string, error) {
 
-	billBatchNoService := &service.BillBatchNoService{}
+	billBatchNoService := &mngService.BillBatchNoService{}
 	//aliPayBillIds := make([]int, 0)
-	billBatchNoList := make([]*model.BillBatchNo, 0)
+	billBatchNoList := make([]*mngModel.BillBatchNo, 0)
 	batchNum := 0
 	batchFee := 0
 	var aliPayReqParam map[string]string
@@ -175,7 +173,7 @@ func BatchAlipay(billList []*model.Bill) (map[string]string, string, error) {
 		})
 
 		aliPayDetailDataStr += bill.BillId + "^" + bill.Account + "^" + bill.RealName +
-			"^" + functions.Float64ToString(float64(bill.Amount)/100.00, 2) + "^" + _remark + "|" //组装支付宝支付data_detail
+			"^" + functions.Float64ToString(float64(bill.Amount) / 100.00, 2) + "^" + _remark + "|" //组装支付宝支付data_detail
 		//aliPayBillIds = append(aliPayBillIds,bill.BillId) //组装需要修改为"结账中"状态的支付宝订单
 		batchFee += bill.Amount
 		batchNum++ //计算批量结算请求中支付宝结算的日订单数,不可超过1000
@@ -190,7 +188,7 @@ func BatchAlipay(billList []*model.Bill) (map[string]string, string, error) {
 		}
 		//create bill_batch_no
 		for _, _bill := range billList {
-			_billBatchNo := &model.BillBatchNo{
+			_billBatchNo := &mngModel.BillBatchNo{
 				BillId:   _bill.BillId,
 				BatchNo:  aliPayReqParam["batch_no"],
 				BillType: 1, // 1为bill
@@ -224,7 +222,7 @@ func GenerateBatchAliPay(batchNum int, batchFee int, aliPayDetailDataStr string)
 		return param
 	}
 	if strings.HasSuffix(aliPayDetailDataStr, "|") {
-		aliPayDetailDataStr = aliPayDetailDataStr[:len(aliPayDetailDataStr)-1]
+		aliPayDetailDataStr = aliPayDetailDataStr[:len(aliPayDetailDataStr) - 1]
 	}
 	common.Logger.Warnln("aliPayDetailDataStr====================", aliPayDetailDataStr)
 	alipayKit := alipay.AlipayKit{}
@@ -236,7 +234,7 @@ func GenerateBatchAliPay(batchNum int, batchFee int, aliPayDetailDataStr string)
 	param["detail_data"] = aliPayDetailDataStr
 	param["batch_no"] = time.Now().Local().Format("20060102150405")
 	param["batch_num"] = strconv.Itoa(batchNum)
-	param["batch_fee"] = functions.Float64ToString(float64(batchFee)/100.00, 2)
+	param["batch_fee"] = functions.Float64ToString(float64(batchFee) / 100.00, 2)
 	param["email"] = viper.GetString("pay.aliPay.email")
 	param["pay_date"] = time.Now().Local().Format("20060102")
 	param["sign"] = alipayKit.CreateSign(param)
@@ -249,15 +247,15 @@ func GenerateBatchAliPay(batchNum int, batchFee int, aliPayDetailDataStr string)
 
 func (self *BillController) AlipayNotification(ctx *iris.Context) {
 	var err error
-	billService := &service.BillService{}
-	billBatchNoService := &service.BillBatchNoService{}
-	billRelService := &service.BillRelService{}
+	billService := &mngService.BillService{}
+	billBatchNoService := &mngService.BillBatchNoService{}
+	billRelService := &mngService.BillRelService{}
 	alipayKit := &alipay.AlipayKit{}
 	common.Logger.Warningln("======================支付宝回调开始======================")
 	reqMap := make(map[string]string, 0)
-	billList := make([]*model.Bill, 0)
-	failureList := make([]*model.Bill, 0)
-	billRelList := make([]*model.BillRel, 0)
+	billList := make([]*mngModel.Bill, 0)
+	failureList := make([]*mngModel.Bill, 0)
+	billRelList := make([]*mngModel.BillRel, 0)
 	successedBillIds := make([]string, 0)
 	failureBillIds := make([]string, 0)
 	successedNotifyDetail := make([]string, 0)
@@ -302,8 +300,8 @@ func (self *BillController) AlipayNotification(ctx *iris.Context) {
 					_alipayno := _info[6] //支付宝内部流水号
 					_time := _info[7]     //完成时间
 					_settledAt, _ := time.Parse("20060102150405", _time)
-					_bill := &model.Bill{BillId: _billId, SettledAt: _settledAt, Status: 2} //已结账
-					_billRel := &model.BillRel{BillId: _billId, BatchNo: reqMap["batch_no"], Type: 1, BillType: 1, IsSuccessed: true, Reason: _reason, OuterNo: _alipayno}
+					_bill := &mngModel.Bill{BillId: _billId, SettledAt: _settledAt, Status: 2} //已结账
+					_billRel := &mngModel.BillRel{BillId: _billId, BatchNo: reqMap["batch_no"], Type: 1, BillType: 1, IsSuccessed: true, Reason: _reason, OuterNo: _alipayno}
 					if _flag == "S" {
 						billList = append(billList, _bill)
 						billRelList = append(billRelList, _billRel)
@@ -331,8 +329,8 @@ func (self *BillController) AlipayNotification(ctx *iris.Context) {
 					_alipayno := _info[6]
 					_time := _info[7]
 					_settledAt, _ := time.Parse("20060102150405", _time)
-					_bill := &model.Bill{BillId: _billId, SettledAt: _settledAt, Status: 4} //结账失败
-					_billRel := &model.BillRel{BillId: _billId, BatchNo: reqMap["batch_no"], Type: 1, BillType: 1, IsSuccessed: false, Reason: _reason, OuterNo: _alipayno}
+					_bill := &mngModel.Bill{BillId: _billId, SettledAt: _settledAt, Status: 4} //结账失败
+					_billRel := &mngModel.BillRel{BillId: _billId, BatchNo: reqMap["batch_no"], Type: 1, BillType: 1, IsSuccessed: false, Reason: _reason, OuterNo: _alipayno}
 					if _flag == "F" {
 						failureList = append(failureList, _bill)
 						billRelList = append(billRelList, _billRel)
@@ -387,8 +385,8 @@ func (self *BillController) AlipayNotification(ctx *iris.Context) {
 取消提交支付宝批量付款申请,已取消
 */
 func (self *BillController) CancelBatchAliPay(ctx *iris.Context) {
-	billService := &service.BillService{}
-	billBatchNoService := &service.BillBatchNoService{}
+	billService := &mngService.BillService{}
+	billBatchNoService := &mngService.BillBatchNoService{}
 	param := simplejson.New()
 	err := ctx.ReadJSON(&param)
 	if err != nil {
@@ -455,9 +453,9 @@ func (self *BillController) CancelBatchAliPay(ctx *iris.Context) {
 }
 
 func (self *BillController) WechatPay(ctx *iris.Context) {
-	billService := &service.BillService{}
-	billRelService := &service.BillRelService{}
-	billBatchNoService := &service.BillBatchNoService{}
+	billService := &mngService.BillService{}
+	billRelService := &mngService.BillRelService{}
+	billBatchNoService := &mngService.BillBatchNoService{}
 	common.Logger.Warnln("---------------------微信企业支付开始--------------")
 	bill, err := billService.GetFirstWechatBill()
 	if err == gorm.ErrRecordNotFound {
@@ -491,7 +489,7 @@ func (self *BillController) WechatPay(ctx *iris.Context) {
 		}),
 		SPBillCreateIP: "116.24.64.139",
 	}
-	billRel := &model.BillRel{BillId: bill.BillId, BatchNo: bill.BillId, BillType: 1, Type: 2} // type=2代表微信,billType=1代表记录来源于bill
+	billRel := &mngModel.BillRel{BillId: bill.BillId, BatchNo: bill.BillId, BillType: 1, Type: 2} // type=2代表微信,billType=1代表记录来源于bill
 	respMap, err := BatchWechatPay(batchPayRequest)
 	if err != nil {
 		common.Render(ctx, "27080402", err)
@@ -637,7 +635,7 @@ func BatchWechatPay(batchPayRequest *pay.BatchPayRequest) (map[string]string, er
 }
 
 func (self *BillController) Export(ctx *iris.Context) {
-	billService := &service.BillService{}
+	billService := &mngService.BillService{}
 
 	params := simplejson.New()
 	ctx.ReadJSON(&params)
@@ -665,30 +663,30 @@ func (self *BillController) Export(ctx *iris.Context) {
 	timeName := ""
 	if dateType == 1 {
 		timeName = "申请时间"
-	}else if dateType == 2 {
+	} else if dateType == 2 {
 		timeName = "结算时间"
-	}else{
+	} else {
 		timeName = ""
 	}
 	payName := ""
 	if accountType == 1 {
 		payName = "支付宝"
-	}else if accountType == 2 {
+	} else if accountType == 2 {
 		payName = "微信"
 	}
 	// （申请时间/结算时间）XX.XX-XX.XX微信/支付宝结算账单
 	fileName := ""
-	if startAt != "" && endAt != ""{
-		if startAt[3:10] != endAt[3:10]{
-			fileName = "（"+timeName+"）"+strings.Replace(startAt[5:10], "-", ".", -1)+"-"+
-				strings.Replace(endAt[5:10], "-", ".", -1)+payName+"结算账单"
-		}else{
-			fileName = "（"+timeName+"）"+strings.Replace(endAt[5:10], "-", ".", -1)+payName+"结算账单"
+	if startAt != "" && endAt != "" {
+		if startAt[3:10] != endAt[3:10] {
+			fileName = "（" + timeName + "）" + strings.Replace(startAt[5:10], "-", ".", -1) + "-" +
+				strings.Replace(endAt[5:10], "-", ".", -1) + payName + "结算账单"
+		} else {
+			fileName = "（" + timeName + "）" + strings.Replace(endAt[5:10], "-", ".", -1) + payName + "结算账单"
 		}
-	}else{
-		fileName = payName+"结算账单"
+	} else {
+		fileName = payName + "结算账单"
 	}
-	sheet, file, fileUrl, fileName, err := excel.GetExcelHeader(fileName,tableHead, tableName)
+	sheet, file, fileUrl, fileName, err := excel.GetExcelHeader(fileName, tableHead, tableName)
 	if err != nil {
 		common.Logger.Warningln("操作excel文件失败, err ------------>", err)
 		common.Render(ctx, "27080503", err)

@@ -2,11 +2,11 @@ package two
 
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/service/two"
+	twoService "maizuo.com/soda/erp/api/src/server/service/soda_2"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
 	"github.com/bitly/go-simplejson"
-	model "maizuo.com/soda/erp/api/src/server/model/two"
+	twoModel "maizuo.com/soda/erp/api/src/server/model/soda_2"
 )
 
 type TopicController struct {
@@ -15,7 +15,7 @@ type TopicController struct {
 
 func (self *TopicController)PagingCircle(ctx *iris.Context) {
 	//CircleList := make([]*payload.Circle,0)
-	topicService := two.TopicService{}
+	topicService := twoService.TopicService{}
 
 	provinceID, _ := ctx.URLParamInt("provinceId")
 
@@ -31,9 +31,9 @@ func (self *TopicController)PagingCircle(ctx *iris.Context) {
 }
 
 func (self *TopicController)GetByID(ctx *iris.Context) {
-	topicService := two.TopicService{}
-	userService := two.UserService{}
-	inboxService:=two.InboxService{}
+	topicService := twoService.TopicService{}
+	userService := twoService.UserService{}
+	inboxService:= twoService.InboxService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "03010301", err)
@@ -60,8 +60,8 @@ func (self *TopicController)GetByID(ctx *iris.Context) {
 
 func (self *TopicController)GetSummary(ctx *iris.Context) {
 	result := map[string]interface{}{}
-	topicService := two.TopicService{}
-	userService := two.UserService{}
+	topicService := twoService.TopicService{}
+	userService := twoService.UserService{}
 
 	topicsCount, err := topicService.CountByCityIDs()
 	if err != nil {
@@ -88,8 +88,8 @@ func (self *TopicController)GetSummary(ctx *iris.Context) {
 
 func (self *TopicController)Paging(ctx *iris.Context) {
 	userIDs := make([]int, 0)
-	userService := two.UserService{}
-	topicService := two.TopicService{}
+	userService := twoService.UserService{}
+	topicService := twoService.TopicService{}
 	keywords := strings.TrimSpace(ctx.URLParam("keywords"))
 	name := strings.TrimSpace(ctx.URLParam("name"))
 	schoolName := strings.TrimSpace(ctx.URLParam("schoolName"))
@@ -120,7 +120,7 @@ func (self *TopicController)Paging(ctx *iris.Context) {
 		common.Render(ctx, "03010202", err)
 		return
 	}
-	topicList := result.Objects.([]*model.Topic)
+	topicList := result.Objects.([]*twoModel.Topic)
 	for _, topic := range topicList {
 		user, err := userService.GetByID(topic.UserID)
 		if err != nil {
@@ -173,8 +173,8 @@ func (self *TopicController)Paging(ctx *iris.Context) {
 //}
 
 func (self *TopicController)UpdateChannel(ctx *iris.Context) {
-	topicService := two.TopicService{}
-	channelService := two.ChannelService{}
+	topicService := twoService.TopicService{}
+	channelService := twoService.ChannelService{}
 	//topic := model.Topic{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
@@ -210,7 +210,7 @@ func (self *TopicController)UpdateChannel(ctx *iris.Context) {
 }
 
 func (self *TopicController)UpdateStatus(ctx *iris.Context) {
-	topicService := two.TopicService{}
+	topicService := twoService.TopicService{}
 	//topic := model.Topic{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {

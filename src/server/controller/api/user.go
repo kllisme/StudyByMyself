@@ -8,11 +8,9 @@ import (
 	"gopkg.in/kataras/iris.v5"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"maizuo.com/soda/erp/api/src/server/kit/functions"
-	"maizuo.com/soda/erp/api/src/server/model"
-	permissionModel "maizuo.com/soda/erp/api/src/server/model/permission"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/payload"
-	"maizuo.com/soda/erp/api/src/server/service"
-	"maizuo.com/soda/erp/api/src/server/service/permission"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
 )
 
 type UserController struct{}
@@ -22,7 +20,7 @@ func (self *UserController) AuthorizationUser(ctx *iris.Context) {
 }
 
 func (self *UserController) Paging(ctx *iris.Context) {
-	userService := service.UserService{}
+	userService := mngService.UserService{}
 	id, _ := ctx.URLParamInt("id")
 	account := strings.TrimSpace(ctx.URLParam("account"))
 	name := strings.TrimSpace(ctx.URLParam("name"))
@@ -39,7 +37,7 @@ func (self *UserController) Paging(ctx *iris.Context) {
 }
 
 func (self *UserController) Create(ctx *iris.Context) {
-	userService := service.UserService{}
+	userService := mngService.UserService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "27020201", err)
@@ -94,7 +92,7 @@ func (self *UserController) Create(ctx *iris.Context) {
 		return
 	}
 
-	user := model.User{
+	user := mngModel.User{
 		Account:   account,
 		Name:      name,
 		Mobile:    mobile,
@@ -118,7 +116,7 @@ func (self *UserController) Create(ctx *iris.Context) {
 }
 
 func (self *UserController) Update(ctx *iris.Context) {
-	userService := service.UserService{}
+	userService := mngService.UserService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -131,7 +129,7 @@ func (self *UserController) Update(ctx *iris.Context) {
 		return
 	}
 
-	user := model.User{}
+	user := mngModel.User{}
 	if err := ctx.ReadJSON(&user); err != nil {
 		common.Render(ctx, "27020401", err)
 		return
@@ -166,7 +164,7 @@ func (self *UserController) Update(ctx *iris.Context) {
 }
 
 func (self *UserController) Delete(ctx *iris.Context) {
-	userService := service.UserService{}
+	userService := mngService.UserService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -180,8 +178,8 @@ func (self *UserController) Delete(ctx *iris.Context) {
 }
 
 func (self *UserController) AssignRoles(ctx *iris.Context) {
-	userService := service.UserService{}
-	userRoleRelService := permission.UserRoleRelService{}
+	userService := mngService.UserService{}
+	userRoleRelService := mngService.UserRoleRelService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -206,8 +204,8 @@ func (self *UserController) AssignRoles(ctx *iris.Context) {
 }
 
 func (self *UserController) GetRoles(ctx *iris.Context) {
-	userService := service.UserService{}
-	userRoleRelService := permission.UserRoleRelService{}
+	userService := mngService.UserService{}
+	userRoleRelService := mngService.UserRoleRelService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -228,7 +226,7 @@ func (self *UserController) GetRoles(ctx *iris.Context) {
 }
 
 func (self *UserController) GetByID(ctx *iris.Context) {
-	userService := service.UserService{}
+	userService := mngService.UserService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -245,13 +243,13 @@ func (self *UserController) GetByID(ctx *iris.Context) {
 //GetSessionInfo	use for pull info which shown on pages after login
 func (self *UserController) GetProfile(ctx *iris.Context) {
 	var (
-		userService                 = service.UserService{}
-		menuService                 = permission.MenuService{}
-		userRoleRelService          = permission.UserRoleRelService{}
-		roleMenuRelService          = permission.PermissionMenuRelService{}
-		rolePermissionRelService    = permission.RolePermissionRelService{}
-		permissionElementRelService = permission.PermissionElementRelService{}
-		elementService              = permission.ElementService{}
+		userService                 = mngService.UserService{}
+		menuService                 = mngService.MenuService{}
+		userRoleRelService          = mngService.UserRoleRelService{}
+		roleMenuRelService          = mngService.PermissionMenuRelService{}
+		rolePermissionRelService    = mngService.RolePermissionRelService{}
+		permissionElementRelService = mngService.PermissionElementRelService{}
+		elementService              = mngService.ElementService{}
 	)
 
 	id, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
@@ -268,8 +266,8 @@ func (self *UserController) GetProfile(ctx *iris.Context) {
 
 	sessionInfo := payload.SessionInfo{
 		User:        userEntity,
-		MenuList:    &[]*permissionModel.Menu{},
-		ElementList: &[]*permissionModel.Element{},
+		MenuList:    &[]*mngModel.Menu{},
+		ElementList: &[]*mngModel.Element{},
 	}
 	//获取权限
 	roleIDs, err := userRoleRelService.GetRoleIDsByUserID(userEntity.ID)
@@ -316,7 +314,7 @@ func (self *UserController) GetProfile(ctx *iris.Context) {
 
 //ResetPassword 将指定用户的密码重置为服务器默认初始密码
 func (self *UserController) ResetPassword(ctx *iris.Context) {
-	userService := service.UserService{}
+	userService := mngService.UserService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -333,7 +331,7 @@ func (self *UserController) ResetPassword(ctx *iris.Context) {
 
 //ChangePassword 更改当前登录用户的密码
 func (self *UserController) ChangePassword(ctx *iris.Context) {
-	userService := service.UserService{}
+	userService := mngService.UserService{}
 	currentUserID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	if err != nil {
 		common.Render(ctx, "000008", err)
@@ -350,7 +348,7 @@ func (self *UserController) ChangePassword(ctx *iris.Context) {
 		common.Render(ctx, "27020702", nil)
 		return
 	}
-	user := model.User{}
+	user := mngModel.User{}
 	user.ID = currentUserID
 	user.Password = oldPassword
 	if _, err := userService.CheckInfo(&user); err != nil {

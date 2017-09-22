@@ -2,8 +2,8 @@ package permission
 
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/service/permission"
-	model "maizuo.com/soda/erp/api/src/server/model/permission"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
 )
@@ -13,7 +13,7 @@ type ActionController struct {
 }
 
 func (self *ActionController)GetByID(ctx *iris.Context) {
-	actionService := permission.ActionService{}
+	actionService := mngService.ActionService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -26,7 +26,7 @@ func (self *ActionController)GetByID(ctx *iris.Context) {
 }
 
 func (self *ActionController)Paging(ctx *iris.Context) {
-	actionService := permission.ActionService{}
+	actionService := mngService.ActionService{}
 	method := strings.TrimSpace(ctx.URLParam("method"))
 	handlerName := strings.TrimSpace(ctx.URLParam("handlerName"))
 	offset, _ := ctx.URLParamInt("offset")
@@ -40,8 +40,8 @@ func (self *ActionController)Paging(ctx *iris.Context) {
 }
 
 func (self *ActionController)Create(ctx *iris.Context) {
-	actionService := permission.ActionService{}
-	action := model.Action{}
+	actionService := mngService.ActionService{}
+	action := mngModel.Action{}
 	if err := ctx.ReadJSON(&action); err != nil {
 		common.Render(ctx, "01030301", err)
 	}
@@ -52,7 +52,7 @@ func (self *ActionController)Create(ctx *iris.Context) {
 }
 
 func (self *ActionController)Delete(ctx *iris.Context) {
-	actionService := permission.ActionService{}
+	actionService := mngService.ActionService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -64,8 +64,8 @@ func (self *ActionController)Delete(ctx *iris.Context) {
 }
 
 func (self *ActionController)Update(ctx *iris.Context) {
-	actionService := permission.ActionService{}
-	action := model.Action{}
+	actionService := mngService.ActionService{}
+	action := mngModel.Action{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)

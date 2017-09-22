@@ -1,9 +1,9 @@
-package public
+package soda_manager
 
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/service/public"
-	model "maizuo.com/soda/erp/api/src/server/model/public"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
 	"github.com/bitly/go-simplejson"
@@ -15,7 +15,7 @@ type ProvinceController struct {
 }
 
 func (self *ProvinceController)GetByID(ctx *iris.Context) {
-	provinceService := public.ProvinceService{}
+	provinceService := mngService.ProvinceService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04060101", err)
@@ -30,7 +30,7 @@ func (self *ProvinceController)GetByID(ctx *iris.Context) {
 }
 
 func (self *ProvinceController)Paging(ctx *iris.Context) {
-	provinceService := public.ProvinceService{}
+	provinceService := mngService.ProvinceService{}
 	offset, _ := ctx.URLParamInt("offset")
 	limit, _ := ctx.URLParamInt("limit")
 	result, err := provinceService.Paging(offset, limit)
@@ -43,7 +43,7 @@ func (self *ProvinceController)Paging(ctx *iris.Context) {
 }
 
 func (self *ProvinceController)Create(ctx *iris.Context) {
-	provinceService := public.ProvinceService{}
+	provinceService := mngService.ProvinceService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "04060301", err)
@@ -63,7 +63,7 @@ func (self *ProvinceController)Create(ctx *iris.Context) {
 		common.Render(ctx, "04060304", nil)
 		return
 	}
-	province := model.Province{
+	province := mngModel.Province{
 		Name:name,
 		Code:code,
 	}
@@ -76,7 +76,7 @@ func (self *ProvinceController)Create(ctx *iris.Context) {
 }
 
 func (self *ProvinceController)Update(ctx *iris.Context) {
-	provinceService := public.ProvinceService{}
+	provinceService := mngService.ProvinceService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "04060401", err)
@@ -126,7 +126,7 @@ func (self *ProvinceController)Update(ctx *iris.Context) {
 }
 
 func (self *ProvinceController)Delete(ctx *iris.Context) {
-	provinceService := public.ProvinceService{}
+	provinceService := mngService.ProvinceService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04060501", err)

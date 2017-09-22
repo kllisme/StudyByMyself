@@ -5,6 +5,7 @@ import (
 	"gopkg.in/kataras/iris.v5"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"maizuo.com/soda/erp/api/src/server/service"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
 	"strings"
 	"github.com/bitly/go-simplejson"
 )
@@ -15,7 +16,7 @@ type LoginController struct {
 func (self *LoginController) Login(ctx *iris.Context) {
 	var (
 		captchaKey = viper.GetString("server.captcha.key")
-		userService = service.UserService{}
+		userService = mngService.UserService{}
 		tokenService = service.TokenService{}
 	)
 

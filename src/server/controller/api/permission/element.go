@@ -2,8 +2,8 @@ package permission
 
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/service/permission"
-	model "maizuo.com/soda/erp/api/src/server/model/permission"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
 	"github.com/bitly/go-simplejson"
@@ -14,7 +14,7 @@ type ElementController struct {
 }
 
 func (self *ElementController)GetByID(ctx *iris.Context) {
-	elementService := permission.ElementService{}
+	elementService := mngService.ElementService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -28,7 +28,7 @@ func (self *ElementController)GetByID(ctx *iris.Context) {
 }
 
 func (self *ElementController)Paging(ctx *iris.Context) {
-	elementService := permission.ElementService{}
+	elementService := mngService.ElementService{}
 	offset, _ := ctx.URLParamInt("offset")
 	limit, _ := ctx.URLParamInt("limit")
 	name := ctx.URLParam("name")
@@ -42,7 +42,7 @@ func (self *ElementController)Paging(ctx *iris.Context) {
 }
 
 func (self *ElementController)Create(ctx *iris.Context) {
-	elementService := permission.ElementService{}
+	elementService := mngService.ElementService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "27070301", err)
@@ -58,7 +58,7 @@ func (self *ElementController)Create(ctx *iris.Context) {
 	//	common.Render(ctx, "27070303", nil)
 	//	return
 	//}
-	element := model.Element{
+	element := mngModel.Element{
 		Name:name,
 		Reference:reference,
 	}
@@ -71,7 +71,7 @@ func (self *ElementController)Create(ctx *iris.Context) {
 }
 
 func (self *ElementController)Update(ctx *iris.Context) {
-	elementService := permission.ElementService{}
+	elementService := mngService.ElementService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "27070501", err)
@@ -110,7 +110,7 @@ func (self *ElementController)Update(ctx *iris.Context) {
 }
 
 func (self *ElementController)Delete(ctx *iris.Context) {
-	elementService := permission.ElementService{}
+	elementService := mngService.ElementService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)

@@ -1,23 +1,22 @@
-package public
+package soda_manager
 
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/service/public"
-	model "maizuo.com/soda/erp/api/src/server/model/public"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
-	"github.com/bitly/go-simplejson"
-)
+	"github.com/bitly/go-simplejson")
 
 type SchoolController struct {
 
 }
 
 func (self *SchoolController)GetByID(ctx *iris.Context) {
-	schoolService := public.SchoolService{}
-	areaService := public.AreaService{}
-	cityService := public.CityService{}
-	provinceService := public.ProvinceService{}
+	schoolService := mngService.SchoolService{}
+	areaService := mngService.AreaService{}
+	cityService := mngService.CityService{}
+	provinceService := mngService.ProvinceService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04010101", err)
@@ -59,10 +58,10 @@ func (self *SchoolController)GetByID(ctx *iris.Context) {
 }
 
 func (self *SchoolController)Paging(ctx *iris.Context) {
-	schoolService := public.SchoolService{}
-	areaService := public.AreaService{}
-	provinceService := public.ProvinceService{}
-	cityService := public.CityService{}
+	schoolService := mngService.SchoolService{}
+	areaService := mngService.AreaService{}
+	provinceService := mngService.ProvinceService{}
+	cityService := mngService.CityService{}
 	offset, _ := ctx.URLParamInt("offset")
 	limit, _ := ctx.URLParamInt("limit")
 	name := strings.TrimSpace(ctx.URLParam("name"))
@@ -76,7 +75,7 @@ func (self *SchoolController)Paging(ctx *iris.Context) {
 		return
 	}
 
-	schoolList := result.Objects.([]*model.School)
+	schoolList := result.Objects.([]*mngModel.School)
 	for _, school := range schoolList {
 		if school.AreaCode != "" {
 			area, err := areaService.GetByCode(school.AreaCode)
@@ -111,10 +110,10 @@ func (self *SchoolController)Paging(ctx *iris.Context) {
 }
 
 func (self *SchoolController)Create(ctx *iris.Context) {
-	schoolService := public.SchoolService{}
-	areaService := public.AreaService{}
-	cityService := public.CityService{}
-	provinceService := public.ProvinceService{}
+	schoolService := mngService.SchoolService{}
+	areaService := mngService.AreaService{}
+	cityService := mngService.CityService{}
+	provinceService := mngService.ProvinceService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "04010301", err)
@@ -146,7 +145,7 @@ func (self *SchoolController)Create(ctx *iris.Context) {
 			return
 		}
 	}
-	school := model.School{
+	school := mngModel.School{
 		Name:name,
 		ProvinceCode:provinceCode,
 		CityCode:cityCode,
@@ -161,10 +160,10 @@ func (self *SchoolController)Create(ctx *iris.Context) {
 }
 
 func (self *SchoolController)Update(ctx *iris.Context) {
-	schoolService := public.SchoolService{}
-	areaService := public.AreaService{}
-	cityService := public.CityService{}
-	provinceService := public.ProvinceService{}
+	schoolService := mngService.SchoolService{}
+	areaService := mngService.AreaService{}
+	cityService := mngService.CityService{}
+	provinceService := mngService.ProvinceService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "04010401", err)
@@ -221,7 +220,7 @@ func (self *SchoolController)Update(ctx *iris.Context) {
 }
 
 func (self *SchoolController)Delete(ctx *iris.Context) {
-	schoolService := public.SchoolService{}
+	schoolService := mngService.SchoolService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04010501", err)

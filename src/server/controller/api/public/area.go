@@ -1,9 +1,9 @@
-package public
+package soda_manager
 
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/service/public"
-	model "maizuo.com/soda/erp/api/src/server/model/public"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
+	model "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
 	"github.com/bitly/go-simplejson"
@@ -15,9 +15,9 @@ type AreaController struct {
 }
 
 func (self *AreaController)GetByID(ctx *iris.Context) {
-	areaService := public.AreaService{}
-	cityService := public.CityService{}
-	provinceService:=public.ProvinceService{}
+	areaService := mngService.AreaService{}
+	cityService := mngService.CityService{}
+	provinceService:= mngService.ProvinceService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04070101", err)
@@ -51,9 +51,9 @@ func (self *AreaController)GetByID(ctx *iris.Context) {
 }
 
 func (self *AreaController)Paging(ctx *iris.Context) {
-	areaService := public.AreaService{}
-	cityService := public.CityService{}
-	provinceService:=public.ProvinceService{}
+	areaService := mngService.AreaService{}
+	cityService := mngService.CityService{}
+	provinceService:= mngService.ProvinceService{}
 	offset, _ := ctx.URLParamInt("offset")
 	limit, _ := ctx.URLParamInt("limit")
 	cityCode := strings.TrimSpace(ctx.URLParam("cityCode"))
@@ -91,8 +91,8 @@ func (self *AreaController)Paging(ctx *iris.Context) {
 }
 
 func (self *AreaController)Create(ctx *iris.Context) {
-	areaService := public.AreaService{}
-	cityService := public.CityService{}
+	areaService := mngService.AreaService{}
+	cityService := mngService.CityService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "04070301", err)
@@ -134,8 +134,8 @@ func (self *AreaController)Create(ctx *iris.Context) {
 }
 
 func (self *AreaController)Update(ctx *iris.Context) {
-	areaService := public.AreaService{}
-	cityService := public.CityService{}
+	areaService := mngService.AreaService{}
+	cityService := mngService.CityService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "04070401", err)
@@ -194,7 +194,7 @@ func (self *AreaController)Update(ctx *iris.Context) {
 }
 
 func (self *AreaController)Delete(ctx *iris.Context) {
-	areaService := public.AreaService{}
+	areaService := mngService.AreaService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04070501", err)

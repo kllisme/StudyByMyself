@@ -1,10 +1,10 @@
 package soda
 
 import (
-	"maizuo.com/soda/erp/api/src/server/model/soda"
+	sodaModel "maizuo.com/soda/erp/api/src/server/model/soda"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"time"
-	"maizuo.com/soda/erp/api/src/server/model"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"github.com/jinzhu/gorm"
 	"maizuo.com/soda/erp/api/src/server/entity"
 )
@@ -12,7 +12,7 @@ import (
 type TicketService struct {
 }
 
-func (self *TicketService) TotalByDailyBill(dailyBill *model.DailyBill) (int, error) {
+func (self *TicketService) TotalByDailyBill(dailyBill *mngModel.DailyBill) (int, error) {
 	t, _ := time.Parse("2006-01-02T15:04:05+08:00", dailyBill.BillAt)
 	tomorrow := t.Local().AddDate(0, 0, 1).Format("2006-01-02")
 	var total int64 = 0
@@ -25,15 +25,15 @@ func (self *TicketService) TotalByDailyBill(dailyBill *model.DailyBill) (int, er
 	and
 	status in (4,7)
 	`
-	r := common.SodaDB_R.Model(&soda.Ticket{}).Where(sql, dailyBill.UserId, dailyBill.BillAt, tomorrow).Count(&total)
+	r := common.SodaDB_R.Model(&sodaModel.Ticket{}).Where(sql, dailyBill.UserId, dailyBill.BillAt, tomorrow).Count(&total)
 	if r.Error != nil {
 		return 0, r.Error
 	}
 	return int(total), nil
 }
 
-func (self *TicketService) DetailsByDailyBill(dailyBill *model.DailyBill, limit, offset int) ([]*soda.Ticket, error) {
-	list := []*soda.Ticket{}
+func (self *TicketService) DetailsByDailyBill(dailyBill *mngModel.DailyBill, limit, offset int) ([]*sodaModel.Ticket, error) {
+	list := []*sodaModel.Ticket{}
 	//t, _ := time.Parse("2006-01-02", dailyBill.BillAt)
 	t, _ := time.Parse("2006-01-02T15:04:05+08:00", dailyBill.BillAt)
 	tomorrow := t.Local().AddDate(0, 0, 1).Format("2006-01-02")
@@ -46,7 +46,7 @@ func (self *TicketService) DetailsByDailyBill(dailyBill *model.DailyBill, limit,
 	and
 	status in (4,7)
 	`
-	r := common.SodaDB_R.Model(&soda.Ticket{}).Where(sql, dailyBill.UserId, dailyBill.BillAt, tomorrow).Offset(offset).Limit(limit).Find(&list)
+	r := common.SodaDB_R.Model(&sodaModel.Ticket{}).Where(sql, dailyBill.UserId, dailyBill.BillAt, tomorrow).Offset(offset).Limit(limit).Find(&list)
 	if r.Error != nil {
 		return nil, r.Error
 	}
@@ -55,7 +55,7 @@ func (self *TicketService) DetailsByDailyBill(dailyBill *model.DailyBill, limit,
 
 func (self *TicketService) Paging(userIDs []int, mobile string, paymentID int, deviceSerial string, deviceMode int, ownerIDs []int, feature int, appID int, statuses []int, start string, end string, offset int, limit int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
-	ticketList := make([]*soda.Ticket, 0)
+	ticketList := make([]*sodaModel.Ticket, 0)
 	db := common.SodaDB_R
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
 
@@ -124,7 +124,7 @@ func (self *TicketService) Paging(userIDs []int, mobile string, paymentID int, d
 		})
 	}
 
-	if err := db.Model(&soda.Ticket{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&ticketList).Error; err != nil {
+	if err := db.Model(&sodaModel.Ticket{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&ticketList).Error; err != nil {
 		return nil, err
 	}
 	pagination.Pagination.From = offset + 1
@@ -137,24 +137,24 @@ func (self *TicketService) Paging(userIDs []int, mobile string, paymentID int, d
 	return &pagination, nil
 }
 
-func (self *TicketService) Refund(ticketID string) (*soda.Ticket, error) {
+func (self *TicketService) Refund(ticketID string) (*sodaModel.Ticket, error) {
 	tx := common.SodaDB_WR.Begin()
-	_ticket := soda.Ticket{}
-	if err := tx.Model(&soda.Ticket{}).Where("ticket_id = ? ", ticketID).Update("status", 4).Scan(&_ticket).Error; err != nil {
+	_ticket := sodaModel.Ticket{}
+	if err := tx.Model(&sodaModel.Ticket{}).Where("ticket_id = ? ", ticketID).Update("status", 4).Scan(&_ticket).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
-	_wallet := soda.Wallet{}
-	if err := tx.Model(&soda.Wallet{}).Where("mobile = ? ", _ticket.Mobile).First(&_wallet).Error; err != nil {
+	_wallet := sodaModel.Wallet{}
+	if err := tx.Model(&sodaModel.Wallet{}).Where("mobile = ? ", _ticket.Mobile).First(&_wallet).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
-	if err := tx.Model(&soda.Wallet{}).Where(_wallet.ID).Update("value", _wallet.Value + _ticket.Value).Error; err != nil {
+	if err := tx.Model(&sodaModel.Wallet{}).Where(_wallet.ID).Update("value", _wallet.Value + _ticket.Value).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
-	if err := tx.Create(&soda.Bill{
+	if err := tx.Create(&sodaModel.Bill{
 		Mobile:_wallet.Mobile,
 		UserID:_wallet.UserID,
 		WalletID:_wallet.ID,
@@ -171,8 +171,8 @@ func (self *TicketService) Refund(ticketID string) (*soda.Ticket, error) {
 	return &_ticket, nil
 }
 
-func (self *TicketService) GetByTicketID(ticketID string) (*soda.Ticket, error) {
-	ticket := soda.Ticket{}
+func (self *TicketService) GetByTicketID(ticketID string) (*sodaModel.Ticket, error) {
+	ticket := sodaModel.Ticket{}
 	err := common.SodaDB_R.Where("ticket_id = ?", ticketID).Find(&ticket).Error
 	if err != nil {
 		return nil, err

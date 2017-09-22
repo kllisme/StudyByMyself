@@ -1,22 +1,21 @@
-package public
+package soda_manager
 
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/service/public"
-	model "maizuo.com/soda/erp/api/src/server/model/public"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
 	"github.com/bitly/go-simplejson"
-	"github.com/jinzhu/gorm"
-)
+	"github.com/jinzhu/gorm")
 
 type CityController struct {
 
 }
 
 func (self *CityController)GetByID(ctx *iris.Context) {
-	cityService := public.CityService{}
-	provinceService := public.ProvinceService{}
+	cityService := mngService.CityService{}
+	provinceService := mngService.ProvinceService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04050101", err)
@@ -41,8 +40,8 @@ func (self *CityController)GetByID(ctx *iris.Context) {
 }
 
 func (self *CityController)Paging(ctx *iris.Context) {
-	cityService := public.CityService{}
-	provinceService := public.ProvinceService{}
+	cityService := mngService.CityService{}
+	provinceService := mngService.ProvinceService{}
 	offset, _ := ctx.URLParamInt("offset")
 	limit, _ := ctx.URLParamInt("limit")
 	provinceCode := strings.TrimSpace(ctx.URLParam("provinceCode"))
@@ -53,7 +52,7 @@ func (self *CityController)Paging(ctx *iris.Context) {
 		return
 	}
 
-	cityList := result.Objects.([]*model.City)
+	cityList := result.Objects.([]*mngModel.City)
 	for _, city := range cityList {
 		if city.ParentCode != "" {
 			province, err := provinceService.GetByCode(city.ParentCode)
@@ -71,8 +70,8 @@ func (self *CityController)Paging(ctx *iris.Context) {
 }
 
 func (self *CityController)Create(ctx *iris.Context) {
-	cityService := public.CityService{}
-	provinceService := public.ProvinceService{}
+	cityService := mngService.CityService{}
+	provinceService := mngService.ProvinceService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "04050301", err)
@@ -100,7 +99,7 @@ func (self *CityController)Create(ctx *iris.Context) {
 		common.Render(ctx, "04050306", err)
 		return
 	}
-	city := model.City{
+	city := mngModel.City{
 		Name:name,
 		Code:code,
 		ParentCode:provinceCode,
@@ -114,8 +113,8 @@ func (self *CityController)Create(ctx *iris.Context) {
 }
 
 func (self *CityController)Update(ctx *iris.Context) {
-	cityService := public.CityService{}
-	provinceService := public.ProvinceService{}
+	cityService := mngService.CityService{}
+	provinceService := mngService.ProvinceService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "04050401", err)
@@ -174,7 +173,7 @@ func (self *CityController)Update(ctx *iris.Context) {
 }
 
 func (self *CityController)Delete(ctx *iris.Context) {
-	cityService := public.CityService{}
+	cityService := mngService.CityService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04050501", err)

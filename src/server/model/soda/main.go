@@ -1,8 +1,8 @@
 package soda
 
-import "maizuo.com/soda/erp/api/src/server/model"
+import mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 
-func (self *Ticket) Mapping(device *model.Device, dailyBill *model.DailyBill) map[string]interface{} {
+func (self *Ticket) Mapping(device *mngModel.Device, dailyBill *mngModel.DailyBill) map[string]interface{} {
 	settledAt := ""
 	if &dailyBill.SettledAt != nil {
 		settledAt = ""

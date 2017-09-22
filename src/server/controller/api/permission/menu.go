@@ -2,8 +2,8 @@ package permission
 
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/service/permission"
-	model "maizuo.com/soda/erp/api/src/server/model/permission"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
 	"github.com/bitly/go-simplejson"
@@ -14,7 +14,7 @@ type MenuController struct {
 }
 
 func (self *MenuController)GetByID(ctx *iris.Context) {
-	menuService := permission.MenuService{}
+	menuService := mngService.MenuService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "01040101", err)
@@ -28,7 +28,7 @@ func (self *MenuController)GetByID(ctx *iris.Context) {
 }
 
 func (self *MenuController)Paging(ctx *iris.Context) {
-	menuService := permission.MenuService{}
+	menuService := mngService.MenuService{}
 	offset, _ := ctx.URLParamInt("offset")
 	limit, _ := ctx.URLParamInt("limit")
 	result, err := menuService.Paging(offset, limit)
@@ -41,7 +41,7 @@ func (self *MenuController)Paging(ctx *iris.Context) {
 }
 
 func (self *MenuController)Create(ctx *iris.Context) {
-	menuService := permission.MenuService{}
+	menuService := mngService.MenuService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "01040301", err)
@@ -53,7 +53,7 @@ func (self *MenuController)Create(ctx *iris.Context) {
 	parentID := params.Get("parentId").MustInt()
 	icon := params.Get("icon").MustString()
 	status := params.Get("status").MustInt()
-	menu := model.Menu{
+	menu := mngModel.Menu{
 		Name:name,
 		Level:level,
 		ParentID:parentID,
@@ -70,7 +70,7 @@ func (self *MenuController)Create(ctx *iris.Context) {
 }
 
 func (self *MenuController)Update(ctx *iris.Context) {
-	menuService := permission.MenuService{}
+	menuService := mngService.MenuService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "01040501", err)
@@ -119,7 +119,7 @@ func (self *MenuController)Update(ctx *iris.Context) {
 }
 
 func (self *MenuController)Delete(ctx *iris.Context) {
-	menuService := permission.MenuService{}
+	menuService := mngService.MenuService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "01040401", err)
@@ -132,8 +132,8 @@ func (self *MenuController)Delete(ctx *iris.Context) {
 }
 
 func (self *MenuController)RearrangePosition(ctx *iris.Context) {
-	menuService := permission.MenuService{}
-	menuList := make([]*model.Menu, 0)
+	menuService := mngService.MenuService{}
+	menuList := make([]*mngModel.Menu, 0)
 	//params := simplejson.New()
 	if err := ctx.ReadJSON(&menuList); err != nil {
 		common.Render(ctx, "01040601", err)

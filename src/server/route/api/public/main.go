@@ -2,14 +2,14 @@ package public
 
 import (
 	iris "gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/controller/api/public"
+	publicCtrl "maizuo.com/soda/erp/api/src/server/controller/api/public"
 )
 
 func Setup(v iris.MuxAPI) {
 	var (
-		applicationCtrl = &public.ApplicationController{}
-		advertisementCtrl = &public.AdvertisementController{}
-		adPositionCtrl = &public.ADPositionController{}
+		applicationCtrl = &publicCtrl.ApplicationController{}
+		advertisementCtrl = &publicCtrl.AdvertisementController{}
+		adPositionCtrl = &publicCtrl.ADPositionController{}
 	)
 
 	api := v.Party("/")

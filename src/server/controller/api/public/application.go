@@ -1,8 +1,8 @@
-package public
+package soda_manager
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/service/public"
-	model "maizuo.com/soda/erp/api/src/server/model/public"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
 	"github.com/bitly/go-simplejson"
@@ -14,7 +14,7 @@ type ApplicationController struct {
 }
 
 func (self *ApplicationController)GetByID(ctx *iris.Context) {
-	applicationService := public.ApplicationService{}
+	applicationService := mngService.ApplicationService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04020101", err)
@@ -28,7 +28,7 @@ func (self *ApplicationController)GetByID(ctx *iris.Context) {
 }
 
 func (self *ApplicationController)Paging(ctx *iris.Context) {
-	applicationService := public.ApplicationService{}
+	applicationService := mngService.ApplicationService{}
 	offset, _ := ctx.URLParamInt("offset")
 	limit, _ := ctx.URLParamInt("limit")
 	result, err := applicationService.Paging(offset, limit)
@@ -41,7 +41,7 @@ func (self *ApplicationController)Paging(ctx *iris.Context) {
 }
 
 func (self *ApplicationController)Create(ctx *iris.Context) {
-	applicationService := public.ApplicationService{}
+	applicationService := mngService.ApplicationService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "04020301", nil)
@@ -60,7 +60,7 @@ func (self *ApplicationController)Create(ctx *iris.Context) {
 		common.Render(ctx, "04020304", nil)
 		return
 	}
-	application := model.Application{
+	application := mngModel.Application{
 		Name:name,
 		Description:description,
 	}
@@ -73,7 +73,7 @@ func (self *ApplicationController)Create(ctx *iris.Context) {
 }
 
 func (self *ApplicationController)Update(ctx *iris.Context) {
-	applicationService := public.ApplicationService{}
+	applicationService := mngService.ApplicationService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "04020507", nil)
@@ -115,8 +115,8 @@ func (self *ApplicationController)Update(ctx *iris.Context) {
 }
 
 func (self *ApplicationController)Delete(ctx *iris.Context) {
-	applicationService := public.ApplicationService{}
-	adPositionService := public.ADPositionService{}
+	applicationService := mngService.ApplicationService{}
+	adPositionService := mngService.ADPositionService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04020401", nil)

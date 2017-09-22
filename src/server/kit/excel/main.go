@@ -3,7 +3,7 @@ package excel
 import (
 	"github.com/tealeg/xlsx"
 	"os"
-	"maizuo.com/soda/erp/api/src/server/model"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/payload/crm"
 )
 // 生成excel表头,并返回文件路径以及名字
@@ -21,7 +21,7 @@ func GetExcelHeader(fileName string, values []interface{},tableName string)(shee
 	return
 }
 // 添加一行数据
-func ExportBillDataAsCol(sheet *xlsx.Sheet, bill *model.Bill) (int) {
+func ExportBillDataAsCol(sheet *xlsx.Sheet, bill *mngModel.Bill) (int) {
 	row := sheet.AddRow()
 	mode := "自动结算"
 	if bill.Mode != 0 { // 0代表自动提现

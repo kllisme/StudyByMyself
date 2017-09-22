@@ -2,8 +2,8 @@ package crm
 
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/service"
-	"maizuo.com/soda/erp/api/src/server/model"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"github.com/spf13/viper"
 )
@@ -13,29 +13,29 @@ type DeviceController struct {
 }
 
 func (self *DeviceController)Paging(ctx *iris.Context) {
-	deviceService := service.DeviceService{}
-	userService := service.UserService{}
-	deviceOperateService := &service.DeviceOperateService{}
+	deviceService := mngService.DeviceService{}
+	userService := mngService.UserService{}
+	deviceOperateService := &mngService.DeviceOperateService{}
 	offset, _ := ctx.URLParamInt("offset")
 	limit, _ := ctx.URLParamInt("limit")
 	keywords := ctx.URLParam("keywords")               // 运营商名称、帐号名称
 	serial := ctx.URLParam("deviceSerial")
 
-	userList := make([]*model.User, 0)
+	userList := make([]*mngModel.User, 0)
 	userIDs := make([]int, 0)
 	if keywords != "" {
 		if _p, err := userService.Paging(keywords, "", 0, 0, 0, 0); err != nil {
 			common.Render(ctx, "05020101", err)
 			return
 		} else {
-			_userList := _p.Objects.([]*model.User)
+			_userList := _p.Objects.([]*mngModel.User)
 			userList = append(userList, _userList...)
 		}
 		if _p, err := userService.Paging("", keywords, 0, 0, 0, 0); err != nil {
 			common.Render(ctx, "05020102", err)
 			return
 		} else {
-			_userList := _p.Objects.([]*model.User)
+			_userList := _p.Objects.([]*mngModel.User)
 			userList = append(userList, _userList...)
 		}
 		if len(userList) != 0 {
@@ -57,7 +57,7 @@ func (self *DeviceController)Paging(ctx *iris.Context) {
 		common.Render(ctx, "05020104", err)
 		return
 	}
-	deviceList := pagination.Objects.([]*model.Device)
+	deviceList := pagination.Objects.([]*mngModel.Device)
 	for _, device := range deviceList {
 		user, err := userService.GetById(device.UserID)
 		if err != nil {
@@ -98,13 +98,13 @@ func (self *DeviceController)Paging(ctx *iris.Context) {
 }
 
 func (self *DeviceController)UpdateStatus(ctx *iris.Context) {
-	deviceService := service.DeviceService{}
+	deviceService := mngService.DeviceService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "05020201", err)
 		return
 	}
-	device := model.Device{}
+	device := mngModel.Device{}
 	if err := ctx.ReadJSON(&device); err != nil {
 		common.Render(ctx, "05020202", err)
 		return
@@ -133,9 +133,9 @@ func (self *DeviceController)UpdateStatus(ctx *iris.Context) {
 }
 
 func (self *DeviceController)Reset(ctx *iris.Context) {
-	deviceService := service.DeviceService{}
-	userService := service.UserService{}
-	deviceOperateService := &service.DeviceOperateService{}
+	deviceService := mngService.DeviceService{}
+	userService := mngService.UserService{}
+	deviceOperateService := &mngService.DeviceOperateService{}
 	operatorId, _ := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	ids := []int{}
 	if err := ctx.ReadJSON(&ids); err != nil {
@@ -146,7 +146,7 @@ func (self *DeviceController)Reset(ctx *iris.Context) {
 		common.Render(ctx, "05020302", nil)
 		return
 	}
-	deviceList := []*model.Device{}
+	deviceList := []*mngModel.Device{}
 	for _, id := range ids {
 		device, err := deviceService.GetByID(id)
 		if err != nil {
@@ -163,7 +163,7 @@ func (self *DeviceController)Reset(ctx *iris.Context) {
 			common.Render(ctx, "05020305", err)
 			return
 		}
-		deviceOperation := &model.DeviceOperate{
+		deviceOperation := &mngModel.DeviceOperate{
 			OperatorID:   operatorId,
 			OperatorType: 1,
 			SerialNumber: device.SerialNumber,

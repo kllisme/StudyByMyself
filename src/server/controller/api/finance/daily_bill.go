@@ -5,16 +5,16 @@ import (
 	"gopkg.in/kataras/iris.v5"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"maizuo.com/soda/erp/api/src/server/entity"
-	"maizuo.com/soda/erp/api/src/server/service"
-	"maizuo.com/soda/erp/api/src/server/service/soda"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
+	sodaService "maizuo.com/soda/erp/api/src/server/service/soda"
 )
 
 type DailyBillController struct {
 }
 
 func (slef *DailyBillController) ListByBillId(ctx *iris.Context) {
-	dailyBillService := &service.DailyBillService{}
-	userService := &service.UserService{}
+	dailyBillService := &mngService.DailyBillService{}
+	userService := &mngService.UserService{}
 	id := ctx.Param("id")                  // 账单 ID 不是真正的id,而是bill中的bill_id
 	limit, _ := ctx.URLParamInt("limit")   // 返回最多数量:Default: 10
 	offset, _ := ctx.URLParamInt("offset") // 列表起始位: Default: 0
@@ -56,9 +56,9 @@ func (slef *DailyBillController) ListByBillId(ctx *iris.Context) {
 }
 
 func (self *DailyBillController) DetailsById(ctx *iris.Context) {
-	dailyBillService := &service.DailyBillService{}
-	ticketService := &soda.TicketService{}
-	deviceService := &service.DeviceService{}
+	dailyBillService := &mngService.DailyBillService{}
+	ticketService := &sodaService.TicketService{}
+	deviceService := &mngService.DeviceService{}
 	id, _ := ctx.ParamInt("id")            // 日账单 ID
 	limit, _ := ctx.URLParamInt("limit")   // 返回最多数量:Default: 10
 	offset, _ := ctx.URLParamInt("offset") // 列表起始位: Default: 0

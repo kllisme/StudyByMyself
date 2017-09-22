@@ -2,16 +2,16 @@ package public
 
 import (
 	iris "gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/controller/api/public"
+	publicCtrl "maizuo.com/soda/erp/api/src/server/controller/api/public"
 )
 
 func SetupAddress(v iris.MuxAPI) {
 	var (
-		provinceCtrl = &public.ProvinceController{}
-		cityCtrl = &public.CityController{}
-		areaCtrl = &public.AreaController{}
-		streetCtrl = &public.StreetController{}
-		schoolCtrl = &public.SchoolController{}
+		provinceCtrl = &publicCtrl.ProvinceController{}
+		cityCtrl = &publicCtrl.CityController{}
+		areaCtrl = &publicCtrl.AreaController{}
+		streetCtrl = &publicCtrl.StreetController{}
+		schoolCtrl = &publicCtrl.SchoolController{}
 	)
 
 	api := v.Party("/addresses")

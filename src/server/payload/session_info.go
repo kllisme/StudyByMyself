@@ -1,12 +1,11 @@
 package payload
 
 import (
-	"maizuo.com/soda/erp/api/src/server/model"
-	"maizuo.com/soda/erp/api/src/server/model/permission"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 )
 
 type SessionInfo struct {
-	User        *model.User        `json:"user"`
-	MenuList    *[]*permission.Menu       `json:"menuList"`
-	ElementList *[]*permission.Element        `json:"elementList"`
+	User        *mngModel.User        `json:"user"`
+	MenuList    *[]*mngModel.Menu       `json:"menuList"`
+	ElementList *[]*mngModel.Element        `json:"elementList"`
 }

@@ -7,16 +7,16 @@ import (
 	"gopkg.in/kataras/iris.v5"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"maizuo.com/soda/erp/api/src/server/kit/functions"
-	"maizuo.com/soda/erp/api/src/server/service/permission"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
 )
 
 //检验控制器访问权限的中间件
 func AccessControlMiddleware(ctx *iris.Context) {
 	var (
-		userRoleRelService         = permission.UserRoleRelService{}
-		rolePermissionRelService   = permission.RolePermissionRelService{}
-		permissionActionRelService = permission.PermissionActionRelService{}
-		actionService              = permission.ActionService{}
+		userRoleRelService         = mngService.UserRoleRelService{}
+		rolePermissionRelService   = mngService.RolePermissionRelService{}
+		permissionActionRelService = mngService.PermissionActionRelService{}
+		actionService              = mngService.ActionService{}
 	)
 	currentUserID, err := ctx.Session().GetInt(viper.GetString("server.session.user.id"))
 	if err != nil {

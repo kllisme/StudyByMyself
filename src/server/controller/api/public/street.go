@@ -1,9 +1,9 @@
-package public
+package soda_manager
 
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/service/public"
-	model "maizuo.com/soda/erp/api/src/server/model/public"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
 	"github.com/bitly/go-simplejson"
@@ -15,10 +15,10 @@ type StreetController struct {
 }
 
 func (self *StreetController)GetByID(ctx *iris.Context) {
-	streetService := public.StreetService{}
-	areaService := public.AreaService{}
-	cityService := public.CityService{}
-	provinceService := public.ProvinceService{}
+	streetService := mngService.StreetService{}
+	areaService := mngService.AreaService{}
+	cityService := mngService.CityService{}
+	provinceService := mngService.ProvinceService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04080101", err)
@@ -61,10 +61,10 @@ func (self *StreetController)GetByID(ctx *iris.Context) {
 }
 
 func (self *StreetController)Paging(ctx *iris.Context) {
-	streetService := public.StreetService{}
-	areaService := public.AreaService{}
-	provinceService := public.ProvinceService{}
-	cityService := public.CityService{}
+	streetService := mngService.StreetService{}
+	areaService := mngService.AreaService{}
+	provinceService := mngService.ProvinceService{}
+	cityService := mngService.CityService{}
 	offset, _ := ctx.URLParamInt("offset")
 	limit, _ := ctx.URLParamInt("limit")
 	areaCode := strings.TrimSpace(ctx.URLParam("areaCode"))
@@ -75,7 +75,7 @@ func (self *StreetController)Paging(ctx *iris.Context) {
 		return
 	}
 
-	streetList := result.Objects.([]*model.Street)
+	streetList := result.Objects.([]*mngModel.Street)
 	for _, street := range streetList {
 		if street.ParentCode != "" {
 			area, err := areaService.GetByCode(street.ParentCode)
@@ -111,8 +111,8 @@ func (self *StreetController)Paging(ctx *iris.Context) {
 }
 
 func (self *StreetController)Create(ctx *iris.Context) {
-	streetService := public.StreetService{}
-	areaService := public.AreaService{}
+	streetService := mngService.StreetService{}
+	areaService := mngService.AreaService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "04080301", err)
@@ -140,7 +140,7 @@ func (self *StreetController)Create(ctx *iris.Context) {
 		common.Render(ctx, "04080306", err)
 		return
 	}
-	street := model.Street{
+	street := mngModel.Street{
 		Name:name,
 		Code:code,
 		ParentCode:areaCode,
@@ -154,8 +154,8 @@ func (self *StreetController)Create(ctx *iris.Context) {
 }
 
 func (self *StreetController)Update(ctx *iris.Context) {
-	streetService := public.StreetService{}
-	areaService := public.AreaService{}
+	streetService := mngService.StreetService{}
+	areaService := mngService.AreaService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "04080401", err)
@@ -214,7 +214,7 @@ func (self *StreetController)Update(ctx *iris.Context) {
 }
 
 func (self *StreetController)Delete(ctx *iris.Context) {
-	streetService := public.StreetService{}
+	streetService := mngService.StreetService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04080501", err)

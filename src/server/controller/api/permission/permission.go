@@ -2,8 +2,8 @@ package permission
 
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/service/permission"
-	model "maizuo.com/soda/erp/api/src/server/model/permission"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
 	"github.com/bitly/go-simplejson"
@@ -15,7 +15,7 @@ type PermissionController struct {
 }
 
 func (self *PermissionController)GetByID(ctx *iris.Context) {
-	permissionService := permission.PermissionService{}
+	permissionService := mngService.PermissionService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -29,7 +29,7 @@ func (self *PermissionController)GetByID(ctx *iris.Context) {
 }
 
 func (self *PermissionController)Paging(ctx *iris.Context) {
-	permissionService := permission.PermissionService{}
+	permissionService := mngService.PermissionService{}
 	offset, _ := ctx.URLParamInt("offset")
 	limit, _ := ctx.URLParamInt("limit")
 	categoryID, _ := ctx.URLParamInt("categoryId")
@@ -43,7 +43,7 @@ func (self *PermissionController)Paging(ctx *iris.Context) {
 }
 
 func (self *PermissionController)Create(ctx *iris.Context) {
-	permissionService := permission.PermissionService{}
+	permissionService := mngService.PermissionService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "27060301", err)
@@ -59,7 +59,7 @@ func (self *PermissionController)Create(ctx *iris.Context) {
 	}
 	categoryID := params.Get("categoryId").MustInt()
 	status := params.Get("status").MustInt()
-	_permission := model.Permission{
+	_permission := mngModel.Permission{
 		Name:name,
 		CategoryID:categoryID,
 		Status:status,
@@ -73,8 +73,8 @@ func (self *PermissionController)Create(ctx *iris.Context) {
 }
 
 func (self *PermissionController)Update(ctx *iris.Context) {
-	permissionService := permission.PermissionService{}
-	permission := model.Permission{}
+	permissionService := mngService.PermissionService{}
+	permission := mngModel.Permission{}
 
 	if err := ctx.ReadJSON(&permission); err != nil {
 		common.Render(ctx, "27060501", err)
@@ -111,7 +111,7 @@ func (self *PermissionController)Update(ctx *iris.Context) {
 }
 
 func (self *PermissionController)Delete(ctx *iris.Context) {
-	permissionService := permission.PermissionService{}
+	permissionService := mngService.PermissionService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -124,8 +124,8 @@ func (self *PermissionController)Delete(ctx *iris.Context) {
 }
 
 func (self *PermissionController)AssignMenus(ctx *iris.Context) {
-	permissionService := permission.PermissionService{}
-	permissionMenuRelService := permission.PermissionMenuRelService{}
+	permissionService := mngService.PermissionService{}
+	permissionMenuRelService := mngService.PermissionMenuRelService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -150,8 +150,8 @@ func (self *PermissionController)AssignMenus(ctx *iris.Context) {
 }
 
 func (self *PermissionController)GetMenus(ctx *iris.Context) {
-	permissionService := permission.PermissionService{}
-	permissionMenuRelService := permission.PermissionMenuRelService{}
+	permissionService := mngService.PermissionService{}
+	permissionMenuRelService := mngService.PermissionMenuRelService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -172,8 +172,8 @@ func (self *PermissionController)GetMenus(ctx *iris.Context) {
 }
 
 func (self *PermissionController)AssignActions(ctx *iris.Context) {
-	permissionService := permission.PermissionService{}
-	permissionActionRelService := permission.PermissionActionRelService{}
+	permissionService := mngService.PermissionService{}
+	permissionActionRelService := mngService.PermissionActionRelService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -198,8 +198,8 @@ func (self *PermissionController)AssignActions(ctx *iris.Context) {
 }
 
 func (self *PermissionController)GetActions(ctx *iris.Context) {
-	permissionService := permission.PermissionService{}
-	permissionActionRelService := permission.PermissionActionRelService{}
+	permissionService := mngService.PermissionService{}
+	permissionActionRelService := mngService.PermissionActionRelService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -220,8 +220,8 @@ func (self *PermissionController)GetActions(ctx *iris.Context) {
 }
 
 func (self *PermissionController)AssignElements(ctx *iris.Context) {
-	permissionService := permission.PermissionService{}
-	permissionElementRelService := permission.PermissionElementRelService{}
+	permissionService := mngService.PermissionService{}
+	permissionElementRelService := mngService.PermissionElementRelService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)
@@ -246,8 +246,8 @@ func (self *PermissionController)AssignElements(ctx *iris.Context) {
 }
 
 func (self *PermissionController)GetElements(ctx *iris.Context) {
-	permissionService := permission.PermissionService{}
-	permissionElementRelService := permission.PermissionElementRelService{}
+	permissionService := mngService.PermissionService{}
+	permissionElementRelService := mngService.PermissionElementRelService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "000003", err)

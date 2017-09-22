@@ -1,9 +1,9 @@
-package public
+package soda_manager
 
 import (
 	"gopkg.in/kataras/iris.v5"
-	"maizuo.com/soda/erp/api/src/server/service/public"
-	model "maizuo.com/soda/erp/api/src/server/model/public"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	"maizuo.com/soda/erp/api/src/server/common"
 	"strings"
 	"github.com/bitly/go-simplejson"
@@ -15,8 +15,8 @@ type ADPositionController struct {
 }
 
 func (self *ADPositionController)GetByID(ctx *iris.Context) {
-	adPositionService := public.ADPositionService{}
-	applicationService := public.ApplicationService{}
+	adPositionService := mngService.ADPositionService{}
+	applicationService := mngService.ApplicationService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04030101", err)
@@ -35,8 +35,8 @@ func (self *ADPositionController)GetByID(ctx *iris.Context) {
 }
 
 func (self *ADPositionController)Paging(ctx *iris.Context) {
-	adPositionService := public.ADPositionService{}
-	applicationService := public.ApplicationService{}
+	adPositionService := mngService.ADPositionService{}
+	applicationService := mngService.ApplicationService{}
 
 	appID, _ := ctx.URLParamInt("appId")
 	offset, _ := ctx.URLParamInt("offset")
@@ -46,7 +46,7 @@ func (self *ADPositionController)Paging(ctx *iris.Context) {
 		common.Render(ctx, "04030201", err)
 		return
 	}
-	adPositionList := result.Objects.([]*model.ADPosition)
+	adPositionList := result.Objects.([]*mngModel.ADPosition)
 	for _, value := range adPositionList {
 		app, err := applicationService.GetByID(value.APPID)
 		if err != nil {
@@ -59,7 +59,7 @@ func (self *ADPositionController)Paging(ctx *iris.Context) {
 }
 
 func (self *ADPositionController)Create(ctx *iris.Context) {
-	adPositionService := public.ADPositionService{}
+	adPositionService := mngService.ADPositionService{}
 	params := simplejson.New()
 	if err := ctx.ReadJSON(&params); err != nil {
 		common.Render(ctx, "04030301", err)
@@ -90,7 +90,7 @@ func (self *ADPositionController)Create(ctx *iris.Context) {
 		common.Render(ctx, "04030307", nil)
 		return
 	}
-	adPosition := model.ADPosition{
+	adPosition := mngModel.ADPosition{
 		Name:name,
 		APPID:appID,
 		Description:description,
@@ -117,7 +117,7 @@ func (self *ADPositionController)Create(ctx *iris.Context) {
 }
 
 func (self *ADPositionController)Update(ctx *iris.Context) {
-	adPositionService := public.ADPositionService{}
+	adPositionService := mngService.ADPositionService{}
 
 	id, err := ctx.ParamInt("id")
 	if err != nil {
@@ -186,8 +186,8 @@ func (self *ADPositionController)Update(ctx *iris.Context) {
 }
 
 func (self *ADPositionController)Delete(ctx *iris.Context) {
-	adPositionService := public.ADPositionService{}
-	AdvertisementService := public.AdvertisementService{}
+	adPositionService := mngService.ADPositionService{}
+	AdvertisementService := mngService.AdvertisementService{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "04030401", err)

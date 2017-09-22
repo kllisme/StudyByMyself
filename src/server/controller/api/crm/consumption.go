@@ -5,10 +5,10 @@ import (
 	"maizuo.com/soda/erp/api/src/server/kit/excel"
 	"github.com/spf13/viper"
 	"maizuo.com/soda/erp/api/src/server/common"
-	"maizuo.com/soda/erp/api/src/server/service"
+	mngService "maizuo.com/soda/erp/api/src/server/service/soda_manager"
 	sodaService "maizuo.com/soda/erp/api/src/server/service/soda"
 	sodaModel "maizuo.com/soda/erp/api/src/server/model/soda"
-	"maizuo.com/soda/erp/api/src/server/model"
+	mngModel "maizuo.com/soda/erp/api/src/server/model/soda_manager"
 	payload "maizuo.com/soda/erp/api/src/server/payload/crm"
 	"time"
 	"strconv"
@@ -18,9 +18,9 @@ type ConsumptionController struct {
 }
 
 func (self *ConsumptionController) Paging(ctx *iris.Context) {
-	userService := service.UserService{}
+	userService := mngService.UserService{}
 	ticketService := sodaService.TicketService{}
-	deviceService := service.DeviceService{}
+	deviceService := mngService.DeviceService{}
 	paymentService := sodaService.PaymentService{}
 	limit, _ := ctx.URLParamInt("limit")       // Default: 10
 	offset, _ := ctx.URLParamInt("offset")     //  Default: 0 列表起始位:
@@ -30,21 +30,21 @@ func (self *ConsumptionController) Paging(ctx *iris.Context) {
 	cusMobile := ctx.URLParam("customerMobile")
 	serial := ctx.URLParam("deviceSerial")
 
-	userList := make([]*model.User, 0)
+	userList := make([]*mngModel.User, 0)
 	userIDs := make([]int, 0)
 	if keywords != "" {
 		if _p, err := userService.Paging(keywords, "", 0, 0, 0, 0); err != nil {
 			common.Render(ctx, "05010101", err)
 			return
 		} else {
-			_userList := _p.Objects.([]*model.User)
+			_userList := _p.Objects.([]*mngModel.User)
 			userList = append(userList, _userList...)
 		}
 		if _p, err := userService.Paging("", keywords, 0, 0, 0, 0); err != nil {
 			common.Render(ctx, "05010102", err)
 			return
 		} else {
-			_userList := _p.Objects.([]*model.User)
+			_userList := _p.Objects.([]*mngModel.User)
 			userList = append(userList, _userList...)
 		}
 		if len(userList) != 0 {
@@ -156,9 +156,9 @@ func (self *ConsumptionController) Refund(ctx *iris.Context) {
 }
 
 func (self *ConsumptionController) Export(ctx *iris.Context) {
-	userService := service.UserService{}
+	userService := mngService.UserService{}
 	ticketService := sodaService.TicketService{}
-	deviceService := service.DeviceService{}
+	deviceService := mngService.DeviceService{}
 	paymentService := sodaService.PaymentService{}
 	limit, _ := ctx.URLParamInt("limit")       // Default: 10
 	offset, _ := ctx.URLParamInt("offset")     //  Default: 0 列表起始位:
@@ -168,21 +168,21 @@ func (self *ConsumptionController) Export(ctx *iris.Context) {
 	cusMobile := ctx.URLParam("customerMobile")
 	serial := ctx.URLParam("deviceSerial")
 
-	userList := make([]*model.User, 0)
+	userList := make([]*mngModel.User, 0)
 	userIDs := make([]int, 0)
 	if keywords != "" {
 		if _p, err := userService.Paging(keywords, "", 0, 0, 0, 0); err != nil {
 			common.Render(ctx, "05010301", err)
 			return
 		} else {
-			_userList := _p.Objects.([]*model.User)
+			_userList := _p.Objects.([]*mngModel.User)
 			userList = append(userList, _userList...)
 		}
 		if _p, err := userService.Paging("", keywords, 0, 0, 0, 0); err != nil {
 			common.Render(ctx, "05010302", err)
 			return
 		} else {
-			_userList := _p.Objects.([]*model.User)
+			_userList := _p.Objects.([]*mngModel.User)
 			userList = append(userList, _userList...)
 		}
 		if len(userList) != 0 {
@@ -209,24 +209,24 @@ func (self *ConsumptionController) Export(ctx *iris.Context) {
 	}
 
 	ticketList := pagination.Objects.([]*sodaModel.Ticket)
-	userMap := make(map[int]*model.User)
+	userMap := make(map[int]*mngModel.User)
 	userPage, err := userService.Paging("","", 0, 0, 0, 0)
 	if err != nil {
 		common.Render(ctx, "05010305", err)
 		return
 	}
-	userList, _ = userPage.Objects.([]*model.User)
+	userList, _ = userPage.Objects.([]*mngModel.User)
 	for _, user := range userList {
 		userMap[user.ID] = user
 	}
 
-	deviceMap := make(map[string]*model.Device)
+	deviceMap := make(map[string]*mngModel.Device)
 	devicePage, err := deviceService.Paging(userIDs,[]int{},"",serial, 0, 0,[]int{}, 0, 0)
 	if err != nil {
 		common.Render(ctx, "05010306", err)
 		return
 	}
-	deviceList, _ := devicePage.Objects.([]*model.Device)
+	deviceList, _ := devicePage.Objects.([]*mngModel.Device)
 	for _, device := range deviceList {
 		deviceMap[device.SerialNumber] = device
 	}
