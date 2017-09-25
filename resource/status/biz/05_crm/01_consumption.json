@@ -9,6 +9,10 @@
   "05010105": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "运营商信息获取失败", "isError": true },
   "05010106": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "父级运营商信息获取失败", "isError": true },
   "05010107": { "status": "INTERNAL_SERVER_ERROR", "msg": "服务器内部异常", "description": "设备信息获取失败", "isError": true },
+  "05010108": { "status": "BAD_REQUEST", "msg": "参数错误", "description": "不支持的筛选条件" , "isError": true },
+  "05010109": { "status": "BAD_REQUEST", "msg": "参数错误", "description": "日期格式不正确" , "isError": true },
+  "05010110": { "status": "BAD_REQUEST", "msg": "参数错误", "description": "日期格式不正确" , "isError": true },
+  "05010111": { "status": "BAD_REQUEST", "msg": "参数错误", "description": "日期范围超过限制" , "isError": true },
 
   "050102":"Refund",
   "05010200": { "status": "OK", "msg": "", "description": "退款成功", "isError": false },

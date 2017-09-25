@@ -27,12 +27,12 @@ func (self *UserService) Paging(name string, account string, id int, roleID int,
 	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
 	if name != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("name like (?)", "%"+name+"%")
+			return db.Where("name like (?)", "%" + name + "%")
 		})
 	}
 	if account != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("account like (?)", "%"+account+"%")
+			return db.Where("account like (?)", "%" + account + "%")
 		})
 	}
 	if id != 0 {
@@ -77,9 +77,34 @@ func (self *UserService) GetByAccount(account string) (*mngModel.User, error) {
 	return &result, nil
 }
 
-func (self *UserService) GetList(limit int, offset int) (interface{}, error) {
-
-	return nil, nil
+func (self *UserService) GetList(name string, account string, ids []int, roleID int) (*[]*mngModel.User, error) {
+	userList := make([]*mngModel.User, 0)
+	db := common.SodaMngDB_R
+	scopes := make([]func(*gorm.DB) *gorm.DB, 0)
+	if name != "" {
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+			return db.Where("name = ?", name)
+		})
+	}
+	if account != "" {
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+			return db.Where("account = ?", account)
+		})
+	}
+	if len(ids) != 0 {
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+			return db.Where("id in (?)", ids)
+		})
+	}
+	if roleID != 0 {
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+			return db.Joins("left join erp_user_role_rel rel on rel.user_id = user.id and rel.role_id = ?", roleID)
+		})
+	}
+	if err := db.Model(&mngModel.User{}).Scopes(scopes...).Order("id desc").Find(&userList).Error; err != nil {
+		return nil, err
+	}
+	return &userList, nil
 }
 
 func (self *UserService) Create(user *mngModel.User) (*mngModel.User, error) {

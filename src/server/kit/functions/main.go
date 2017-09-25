@@ -31,6 +31,17 @@ func Uniq(ls []int) []int {
 	return Uniq
 }
 
+func UniqString(a []string) (ret []string) {
+	a_len := len(a)
+	for i := 0; i < a_len; i++ {
+		if (i > 0 && a[i-1] == a[i]) || len(a[i]) == 0 {
+			continue
+		}
+		ret = append(ret, a[i])
+	}
+	return
+}
+
 //在数组中查找,找到返回index 没找到返回-1
 func FindIndex(ls []int, value int) int {
 	for k, v := range ls {

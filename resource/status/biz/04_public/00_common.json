@@ -1,1 +1,5 @@
-{}
+{
+  "0400":"public",
+  "040001":"Timestamp",
+  "04000100": { "status": "OK", "msg": "", "description": "服务器时间获取成功", "isError": false }
+}

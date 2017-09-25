@@ -1,10 +1,13 @@
 package soda
 
-
-import "maizuo.com/soda/erp/api/src/server/model"
+import (
+	"time"
+)
 
 type Ticket struct {
-	model.Model
+	ID           int       `json:"id"`
+	CreatedAt    time.Time `json:"createdAt"`
+	UpdatedAt    time.Time `json:"updatedAt"`
 	TicketId     string `json:"ticketId"`
 	UserId       int    `json:"userId"`
 	Mobile       string `json:"mobile"`
