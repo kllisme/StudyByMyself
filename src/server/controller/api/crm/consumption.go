@@ -208,6 +208,10 @@ func (self *ConsumptionController) Export(ctx *iris.Context) {
 	if pagination == nil {
 		return
 	}
+	if pagination.Pagination.Total == 0 {
+		common.Render(ctx, "05010313", nil)
+		return
+	}
 	consumptionList := pagination.Objects.([]*payload.Consumption)
 	// 开始excel文件操作
 	tableHead := []interface{}{"订单号", "上级运营商", "运营商名称", "服务电话", "模块编号", "楼道信息", "消费手机号", "消费密码", "类型", "消费金额", "支付方式", "下单时间", "状态"}
