@@ -62,6 +62,10 @@ func ExportBillDataAsCol(sheet *xlsx.Sheet, bill *mngModel.Bill) int {
 
 func ExportConsumptionAsCol(sheet *xlsx.Sheet, consumption *crm.Consumption) int {
 	row := sheet.AddRow()
+	status := "正常"
+	if consumption.Status == 4 {
+		status = "已退款"
+	}
 	s := []interface{}{
 		consumption.TicketID,
 		consumption.ParentOperator + " (" + consumption.ParentOperatorMobile + ")",
@@ -75,6 +79,7 @@ func ExportConsumptionAsCol(sheet *xlsx.Sheet, consumption *crm.Consumption) int
 		float64(consumption.Value) / 100.00,
 		consumption.Payment,
 		consumption.CreatedAt.Local().Format("2006-01-02 15:04"),
+		status,
 	}
 	return row.WriteSlice(&s, -1)
 }

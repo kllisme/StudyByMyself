@@ -28,3 +28,6 @@
 /binary
 /Dockerfile
 /kubernetes/
+
+# temp
+/temp/*.xlsx
