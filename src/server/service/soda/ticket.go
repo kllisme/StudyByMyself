@@ -124,7 +124,7 @@ func (self *TicketService) Paging(userIDs []int, mobile string, paymentID int, d
 		})
 	}
 
-	if err := db.Model(&sodaModel.Ticket{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("id desc").Find(&ticketList).Error; err != nil {
+	if err := db.Model(&sodaModel.Ticket{}).Scopes(scopes...).Count(&pagination.Pagination.Total).Offset(offset).Limit(limit).Order("created_timestamp desc").Find(&ticketList).Error; err != nil {
 		return nil, err
 	}
 	pagination.Pagination.From = offset + 1
