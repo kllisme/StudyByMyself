@@ -213,7 +213,6 @@ func (self *TopicController)UpdateChannel(ctx *iris.Context) {
 
 func (self *TopicController)UpdateStatus(ctx *iris.Context) {
 	topicService := twoService.TopicService{}
-	//topic := model.Topic{}
 	id, err := ctx.ParamInt("id")
 	if err != nil {
 		common.Render(ctx, "03010501", err)
