@@ -222,7 +222,8 @@ module.exports = Object.assign({}, {
       "ext": ".png,.jpg,.gif,.jpeg",
       "maxSize": 2048000,
       "object": {
-        "ad": "soda/test/erp.sodalife.xyz/ad/"
+        "ad": "soda/test/erp.sodalife.xyz/ad/",
+        "topic": "soda/test/2.sodalife.xyz"
       }
     }
   }
