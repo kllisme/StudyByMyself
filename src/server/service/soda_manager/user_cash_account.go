@@ -17,7 +17,7 @@ func (self *UserCashAccountService) Basic(id int) (*mngModel.UserCashAccount, er
 	return userCashAccount, nil
 }
 
-func (self *UserCashAccountService) BasicByUserId(userId int) (*mngModel.UserCashAccount, error) {
+func (self *UserCashAccountService) GetByUserID(userId int) (*mngModel.UserCashAccount, error) {
 	userCashAccount := &mngModel.UserCashAccount{}
 	r := common.SodaMngDB_R.Where("user_id = ?", userId).First(userCashAccount)
 	if r.Error != nil {

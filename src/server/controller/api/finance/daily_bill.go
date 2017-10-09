@@ -40,7 +40,7 @@ func (slef *DailyBillController) ListByBillId(ctx *iris.Context) {
 		return
 	}
 	for _, dailyBill := range dailyBillList {
-		user, err := userService.GetById(dailyBill.UserId)
+		user, err := userService.GetByID(dailyBill.UserId)
 		if err != nil {
 			common.Logger.Debugln("获取日账单用户信息失败")
 			common.Render(ctx, "27090104", err)

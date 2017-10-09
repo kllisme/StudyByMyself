@@ -2,10 +2,11 @@ package soda_2
 
 import (
 	"time"
+	"maizuo.com/soda/erp/api/src/server/model"
 )
 
 type User struct {
-	Model
+	model.Model
 	Name             string `json:"name"`   //名称
 	OpenID           string        `json:"openId"`
 	AvatorURL        string        `json:"avatorUrl"`

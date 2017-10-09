@@ -1,9 +1,12 @@
 package soda_2
 
-import "time"
+import (
+	"time"
+	"maizuo.com/soda/erp/api/src/server/model"
+)
 
 type Inbox struct {
-	Model
+	model.Model
 	Title            string	`json:"title"` //名称
 	Content          string        `json:"content"`
 	Icon             string        `json:"icon"`

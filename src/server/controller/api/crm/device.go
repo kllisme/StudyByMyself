@@ -24,14 +24,14 @@ func (self *DeviceController)Paging(ctx *iris.Context) {
 	userList := make([]*mngModel.User, 0)
 	userIDs := make([]int, 0)
 	if keywords != "" {
-		if _p, err := userService.Paging(keywords, "", 0, 0, 0, 0); err != nil {
+		if _p, err := userService.Paging(keywords, "", []int{}, 0, 0, 0); err != nil {
 			common.Render(ctx, "05020101", err)
 			return
 		} else {
 			_userList := _p.Objects.([]*mngModel.User)
 			userList = append(userList, _userList...)
 		}
-		if _p, err := userService.Paging("", keywords, 0, 0, 0, 0); err != nil {
+		if _p, err := userService.Paging("", keywords, []int{}, 0, 0, 0); err != nil {
 			common.Render(ctx, "05020102", err)
 			return
 		} else {
@@ -59,7 +59,7 @@ func (self *DeviceController)Paging(ctx *iris.Context) {
 	}
 	deviceList := pagination.Objects.([]*mngModel.Device)
 	for _, device := range deviceList {
-		user, err := userService.GetById(device.UserID)
+		user, err := userService.GetByID(device.UserID)
 		if err != nil {
 			common.Render(ctx, "05020105", err)
 			return
@@ -76,7 +76,7 @@ func (self *DeviceController)Paging(ctx *iris.Context) {
 			}
 		}
 		if device.AssignerID != 0 {
-			assigner, err := userService.GetById(device.AssignerID)
+			assigner, err := userService.GetByID(device.AssignerID)
 			if err != nil {
 				common.Render(ctx, "05020107", err)
 				return
@@ -153,7 +153,7 @@ func (self *DeviceController)Reset(ctx *iris.Context) {
 			common.Render(ctx, "05020303", err)
 			return
 		}
-		user, err := userService.GetById(device.UserID)
+		user, err := userService.GetByID(device.UserID)
 		if err != nil {
 			common.Render(ctx, "05020304", err)
 			return

@@ -27,7 +27,7 @@ func (self *UserController) Paging(ctx *iris.Context) {
 	roleID, _ := ctx.URLParamInt("roleId")
 	offset, _ := ctx.URLParamInt("offset")
 	limit, _ := ctx.URLParamInt("limit")
-	result, err := userService.Paging(name, account, id, roleID, offset, limit)
+	result, err := userService.Paging(name, account, []int{id}, roleID, offset, limit)
 	if err != nil {
 		common.Render(ctx, "000002", err)
 		return
@@ -123,7 +123,7 @@ func (self *UserController) Update(ctx *iris.Context) {
 		return
 	}
 
-	_, err = userService.GetById(id)
+	_, err = userService.GetByID(id)
 	if err != nil {
 		common.Render(ctx, "000003", err)
 		return
@@ -185,7 +185,7 @@ func (self *UserController) AssignRoles(ctx *iris.Context) {
 		common.Render(ctx, "000003", err)
 		return
 	}
-	_, err = userService.GetById(id)
+	_, err = userService.GetByID(id)
 	if err != nil {
 		common.Render(ctx, "000003", err)
 		return
@@ -211,7 +211,7 @@ func (self *UserController) GetRoles(ctx *iris.Context) {
 		common.Render(ctx, "000003", err)
 		return
 	}
-	_, err = userService.GetById(id)
+	_, err = userService.GetByID(id)
 	if err != nil {
 		common.Render(ctx, "000003", err)
 		return
@@ -232,7 +232,7 @@ func (self *UserController) GetByID(ctx *iris.Context) {
 		common.Render(ctx, "000003", err)
 		return
 	}
-	userEntity, err := userService.GetById(id)
+	userEntity, err := userService.GetByID(id)
 	if err != nil {
 		common.Render(ctx, "000002", err)
 		return
@@ -258,7 +258,7 @@ func (self *UserController) GetProfile(ctx *iris.Context) {
 		return
 	}
 
-	userEntity, err := userService.GetById(id)
+	userEntity, err := userService.GetByID(id)
 	if err != nil {
 		common.Render(ctx, "27020120", err)
 		return

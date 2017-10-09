@@ -63,7 +63,7 @@ func (self *BillController) ListByAccountType(ctx *iris.Context) {
 	}
 	objects := make([]interface{}, 0)
 	for _, bill := range billList {
-		user, err := userService.GetById(bill.UserId)
+		user, err := userService.GetByID(bill.UserId)
 		if err != nil {
 			common.Logger.Debugln("获取账单用户信息失败err----------", err)
 			common.Render(ctx, "27080106", err)

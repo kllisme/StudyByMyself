@@ -5,10 +5,11 @@ import (
 	"github.com/spf13/viper"
 	"maizuo.com/soda/erp/api/src/server/entity"
 	"encoding/json"
+	"maizuo.com/soda/erp/api/src/server/model"
 )
 
 type Topic struct {
-	Model
+	model.Model
 	Title            string        `json:"title"`              //名称
 	Description      string        `json:"description"`
 	Content          string        `json:"content"`

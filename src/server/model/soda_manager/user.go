@@ -3,6 +3,7 @@ package soda_manager
 import (
 	"github.com/bitly/go-simplejson"
 	"maizuo.com/soda/erp/api/src/server/model"
+	"time"
 )
 
 type User struct {
@@ -12,7 +13,7 @@ type User struct {
 	Address    string `json:"address"`   //联系地址
 	Mobile     string `json:"mobile"`    //手机
 	Account    string `json:"account"`   //账号
-	Password   string `json:"-"`  //密码
+	Password   string `json:"-"`         //密码
 	Telephone  string `json:"telephone"` //服务电话
 	Email      string `json:"email"`     //邮箱
 	ParentID   int    `json:"parentId"`  //父id
@@ -22,6 +23,7 @@ type User struct {
 	Extra      string `json:"extra,omitempty"`
 	Nickname   string `json:"nickName" gorm:"-"`
 	HeadImgUrl string `json:"headImgUrl" gorm:"-"`
+	DeletedAt  *time.Time `json:"deletedAt"`
 }
 
 func (User) TableName() string {

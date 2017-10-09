@@ -1,7 +1,9 @@
 package soda_2
 
+import "maizuo.com/soda/erp/api/src/server/model"
+
 type Channel struct {
-	Model
+	model.Model
 	Title            string `json:"title"` //名称
 	URL              string        `json:"url"`
 	Order            int    `json:"order"`

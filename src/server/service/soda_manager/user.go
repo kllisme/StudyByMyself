@@ -20,7 +20,7 @@ func (self *UserService) CheckInfo(user *mngModel.User) (*mngModel.User, error) 
 	return &result, nil
 }
 
-func (self *UserService) Paging(name string, account string, id int, roleID int, offset int, limit int) (*entity.PaginationData, error) {
+func (self *UserService) Paging(name string, account string, ids []int, roleID int, offset int, limit int) (*entity.PaginationData, error) {
 	pagination := entity.PaginationData{}
 	userList := make([]*mngModel.User, 0)
 	db := common.SodaMngDB_R
@@ -35,9 +35,9 @@ func (self *UserService) Paging(name string, account string, id int, roleID int,
 			return db.Where("account like (?)", "%" + account + "%")
 		})
 	}
-	if id != 0 {
+	if len(ids) != 0 {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where(id)
+			return db.Where("id in (?)",ids)
 		})
 	}
 	if roleID != 0 {
@@ -59,7 +59,7 @@ func (self *UserService) Paging(name string, account string, id int, roleID int,
 
 }
 
-func (self *UserService) GetById(id int) (*mngModel.User, error) {
+func (self *UserService) GetByID(id int) (*mngModel.User, error) {
 	db := common.SodaMngDB_R
 	user := mngModel.User{}
 	if err := db.Where(id).First(&user).Error; err != nil {
